@@ -96,6 +96,8 @@ class DDPG:
 
     # Initialize tensorflow session
     self.sess = tf.Session()
+    self.log_writer = tf.summary.FileWriter(self.hparams.logdir)
+
     self.sess.run(tf.global_variables_initializer())
     self.sess.run(self.target_init)
 
@@ -154,7 +156,12 @@ class DDPG:
       Perform all DDPG updates at the end of the trajectory,
       in accordance with tuning done by TD3 paper authors.
       """
-      for _ in range(self.ep_len):
+      episode = self.ep_len // self.hparams.max_ep_len
+      q_loss_summary = tf.summary.scalar('q loss %d' % episode, self.q_loss)
+      pi_loss_summary = tf.summary.scalar('pi loss %d' % episode, self.pi_loss)
+
+
+      for i in range(self.ep_len):
         batch = self.replay_buffer.sample_batch(self.hparams.batch_size)
         feed_dict = {self.x_ph: batch['obs1'],
                self.x2_ph: batch['obs2'],
@@ -164,12 +171,14 @@ class DDPG:
               }
 
         # Q-learning update
-        outs = self.sess.run([self.q_loss, self.q, self.train_q_op], feed_dict)
-        self.logger.store(LossQ=outs[0], QVals=outs[1])
+        outs = self.sess.run([q_loss_summary, self.q_loss, self.q, self.train_q_op], feed_dict)
+        self.logger.store(LossQ=outs[1], QVals=outs[2])
+        self.log_writer.add_summary(outs[0], i)
 
         # Policy update
-        outs = self.sess.run([self.pi_loss, self.train_pi_op, self.target_update], feed_dict)
-        self.logger.store(LossPi=outs[0])
+        outs = self.sess.run([pi_loss_summary, self.pi_loss, self.train_pi_op, self.target_update], feed_dict)
+        self.logger.store(LossPi=outs[1])
+        self.log_writer.add_summary(outs[0], i)
 
       self.logger.store(EpRet=self.ep_ret, EpLen=self.ep_len)
       self.r, self.d, self.ep_ret, self.ep_len = 0, False, 0, 0
@@ -283,6 +292,8 @@ class DDPG:
 
     ac_output_activation (activation): Activation for the output layer in the actor critic
 
+    logdir (path): Where to write tensorboard data
+
   """
   def get_default_hparams():
     return tf.contrib.training.HParams(
@@ -309,4 +320,5 @@ class DDPG:
       ac_activation=tf.nn.relu,
       ac_output_activation=tf.tanh,
       test_steps=500,
+      logdir='logs',
       )

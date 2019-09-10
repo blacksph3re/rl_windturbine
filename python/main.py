@@ -7,6 +7,7 @@ from ddpg.ddpg import DDPG
 from gymadapter import GymAdapter
 import tensorflow as tf
 
+
 def main():
 
   print('huhu')
@@ -52,5 +53,6 @@ def main():
 
 
   env.close()
+
 
 main()
