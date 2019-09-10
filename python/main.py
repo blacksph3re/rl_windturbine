@@ -7,11 +7,13 @@ from ddpg.ddpg import DDPG
 from gymadapter import GymAdapter
 import tensorflow as tf
 
-def __main__():
+def main():
+
+  print('huhu')
 
   # Set up the environment
-  env = GymAdapter(tf.contrib.train.HParams(
-    env_name='HalfCheetah-v2'
+  env = GymAdapter(tf.contrib.training.HParams(
+    env_name='Walker2d-v3'
   ))
 
   # Get default hparams
@@ -21,6 +23,7 @@ def __main__():
   hparams.obs_dim = env.get_obs_dim()
   hparams.act_dim = env.get_act_dim()
   hparams.act_limit = env.get_act_limit()
+  print(hparams)
 
   # Initialize the agent
   agent = DDPG(hparams)
@@ -29,11 +32,25 @@ def __main__():
   o = env.reset()
   a = agent.prepare(o)
 
-  for t in range(0, 10000):
+  total_reward = 0
+
+  for t in range(0, hparams.steps_per_epoch * hparams.epochs):
     o, r, d = env.step(a)
     a, reset = agent.step(o, r, d)
-    print("Step %d of %d" % (t, 10000))
 
     if(reset):
       o = env.reset()
       a = agent.reset_finalize(o)
+
+  print('Testing results')
+  o = env.reset()
+  a = agent.reset_finalize(o)
+  for t in range(0, hparams.test_steps):
+    o, r, d = env.step(a)
+    a = agent.get_action(o)
+    env.render()
+
+
+  env.close()
+
+main()

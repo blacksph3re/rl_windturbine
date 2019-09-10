@@ -20,3 +20,9 @@ class GymAdapter:
   def step(self, action):
     self.observation, self.reward, self.death, _ = self.env.step(action)
     return self.observation, self.reward, self.death
+
+  def render(self):
+    return self.env.render()
+
+  def close(self):
+    return self.env.close()

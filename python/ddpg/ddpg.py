@@ -1,10 +1,10 @@
 import numpy as np
 import tensorflow as tf
 import time
-import core
-from core import get_vars
-from utils.logx import EpochLogger
-from utils.run_utils import setup_logger_kwargs
+
+from . import core
+from .utils.logx import EpochLogger
+from .utils.run_utils import setup_logger_kwargs
 
 
 class ReplayBuffer:
@@ -45,13 +45,14 @@ class DDPG:
   def __init__(self, hparams):
     self.hparams = hparams
     self.logger = EpochLogger(**setup_logger_kwargs(self.hparams.name, self.hparams.seed))
-    self.logger.save_config(locals())
+    #self.logger.save_config(dict(locals()))
 
-    tf.set_random_seed(seed)
-    np.random.seed(seed)
+    tf.set_random_seed(hparams.seed)
+    np.random.seed(hparams.seed)
 
     # Inputs to computation graph
-    self.x_ph, self.a_ph, self.x2_ph, self.r_ph, self.d_ph = core.placeholders(obs_dim, act_dim, obs_dim, None, None)
+    self.x_ph, self.a_ph, self.x2_ph, self.r_ph, self.d_ph = core.placeholders(
+      hparams.obs_dim, hparams.act_dim, hparams.obs_dim, None, None)
 
     # Main outputs from computation graph
     with tf.variable_scope('main'):
@@ -61,7 +62,7 @@ class DDPG:
     with tf.variable_scope('target'):
       # Note that the action placeholder going to actor_critic here is 
       # irrelevant, because we only need q_targ(s, pi_targ(s)).
-      self.pi_targ, _, self.q_pi_targ  = core.mlp_actor_critic(self.x2_ph, self.a_ph, self.hparams)
+      self.pi_targ, _, self.q_pi_targ = core.mlp_actor_critic(self.x2_ph, self.a_ph, self.hparams)
 
     # Experience buffer
     self.replay_buffer = ReplayBuffer(obs_dim=self.hparams.obs_dim, act_dim=self.hparams.act_dim, size=self.hparams.replay_size)
@@ -81,17 +82,17 @@ class DDPG:
     # Separate train ops for pi, q
     self.pi_optimizer = tf.train.AdamOptimizer(learning_rate=self.hparams.pi_lr)
     self.q_optimizer = tf.train.AdamOptimizer(learning_rate=self.hparams.q_lr)
-    self.train_pi_op = pi_optimizer.minimize(self.pi_loss, var_list=get_vars('main/pi'))
-    self.train_q_op = q_optimizer.minimize(self.q_loss, var_list=get_vars('main/q'))
+    self.train_pi_op = self.pi_optimizer.minimize(self.pi_loss, var_list=core.get_vars('main/pi'))
+    self.train_q_op = self.q_optimizer.minimize(self.q_loss, var_list=core.get_vars('main/q'))
 
     # Polyak averaging for target variables
 
     self.target_update = tf.group([tf.assign(v_targ, self.hparams.polyak*v_targ + (1-self.hparams.polyak)*v_main)
-                  for v_main, v_targ in zip(get_vars('main'), get_vars('target'))])
+                  for v_main, v_targ in zip(core.get_vars('main'), core.get_vars('target'))])
 
     # Initializing targets to match main variables
     self.target_init = tf.group([tf.assign(v_targ, v_main)
-                  for v_main, v_targ in zip(get_vars('main'), get_vars('target'))])
+                  for v_main, v_targ in zip(core.get_vars('main'), core.get_vars('target'))])
 
     # Initialize tensorflow session
     self.sess = tf.Session()
@@ -108,12 +109,12 @@ class DDPG:
     self.o, self.r, self.d, self.ep_ret, self.ep_len, self.t = initial_observation, 0, False, 0, 0, 0
 
     # Return an initial action (except for zero initial training steps, random)
-    return get_action(self, initial_observation)
+    return self.get_action(initial_observation)
 
   # If a reset has happened, call this function before returning to stepping the controller
   def reset_finalize(self, observation):
     self.o, self.r, self.d, self.ep_ret, self.ep_len = observation, 0, False, 0, 0
-    return get_action(self, observation)
+    return self.get_action(observation)
 
   # Get an action from the main actor
   def get_action(self, observation):
@@ -121,7 +122,7 @@ class DDPG:
       self.a = self.sess.run(self.pi, feed_dict={self.x_ph: observation.reshape(1,-1)})[0]
       self.a += self.hparams.act_noise * np.random.randn(self.hparams.act_dim)
     else:
-      self.a = self.hparams.act_limit * np.random.standart_normal(self.hparams.act_dim)
+      self.a = np.random.uniform(-self.hparams.act_limit, self.hparams.act_limit, self.hparams.act_dim)
     
     return np.clip(self.a, -self.hparams.act_limit, self.hparams.act_limit)
 
@@ -134,6 +135,7 @@ class DDPG:
 
     self.ep_ret += reward
     self.ep_len += 1
+    self.t += 1
 
     # Ignore the "done" signal if it comes from hitting the time
     # horizon (that is, when it's an artificial terminal signal
@@ -141,7 +143,7 @@ class DDPG:
     self.d = False if self.ep_len==self.hparams.max_ep_len else death
 
     # Store experience to replay buffer
-    replay_buffer.store(self.o, self.a, reward, observation, death)
+    self.replay_buffer.store(self.o, self.a, reward, observation, death)
 
     # Update recent observation
     self.o = observation
@@ -166,7 +168,7 @@ class DDPG:
         self.logger.store(LossQ=outs[0], QVals=outs[1])
 
         # Policy update
-        outs = sess.run([self.pi_loss, self.train_pi_op, self.target_update], feed_dict)
+        outs = self.sess.run([self.pi_loss, self.train_pi_op, self.target_update], feed_dict)
         self.logger.store(LossPi=outs[0])
 
       self.logger.store(EpRet=self.ep_ret, EpLen=self.ep_len)
@@ -177,8 +179,8 @@ class DDPG:
       reset_signal = True
 
     # Check for end
-    if t > 0 and t % self.hparams.steps_per_epoch == 0:
-      epoch = t // self.hparams.steps_per_epoch
+    if self.t > 0 and self.t % self.hparams.steps_per_epoch == 0:
+      epoch = self.t // self.hparams.steps_per_epoch
 
       # Save model
       if (epoch % self.hparams.save_freq == 0) or (epoch == self.hparams.epochs-1):
@@ -188,15 +190,15 @@ class DDPG:
       #test_agent()
 
       # Log info about epoch
-      logger.log_tabular('Epoch', epoch)
-      logger.log_tabular('EpRet', with_min_and_max=True)
-      logger.log_tabular('EpLen', average_only=True)
-      logger.log_tabular('TotalEnvInteracts', t)
-      logger.log_tabular('QVals', with_min_and_max=True)
-      logger.log_tabular('LossPi', average_only=True)
-      logger.log_tabular('LossQ', average_only=True)
-      logger.log_tabular('Time', time.time()-start_time)
-      logger.dump_tabular()
+      self.logger.log_tabular('Epoch', epoch)
+      self.logger.log_tabular('EpRet', with_min_and_max=True)
+      self.logger.log_tabular('EpLen', average_only=True)
+      self.logger.log_tabular('TotalEnvInteracts', self.t)
+      self.logger.log_tabular('QVals', with_min_and_max=True)
+      self.logger.log_tabular('LossPi', average_only=True)
+      self.logger.log_tabular('LossQ', average_only=True)
+      self.logger.log_tabular('Time', time.time()-self.start_time)
+      self.logger.dump_tabular()
 
     # Draw a new action
     self.a = self.get_action(observation)
@@ -288,7 +290,7 @@ class DDPG:
       l=1,
       gamma=0.99,
       seed=0,
-      epochs=100,
+      epochs=10,
       name="ddpg",
       steps_per_epoch=5000,
       replay_size=int(1e6),
@@ -296,14 +298,15 @@ class DDPG:
       pi_lr=1e-3,
       q_lr=1e-3,
       batch_size=100,
-      start_steps=10000,
+      start_steps=5000,
       act_noise=0.1,
       max_ep_len=1000,
       save_freq=1,
       obs_dim=20,
       act_dim=1,
       act_limit=1.0,
-      ac_hidden_size=(400,300),
+      ac_hidden_sizes=(400,300),
       ac_activation=tf.nn.relu,
       ac_output_activation=tf.tanh,
+      test_steps=500,
       )
