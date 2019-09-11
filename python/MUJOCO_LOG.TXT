@@ -1,9 +1,0 @@
-Wed Aug 14 10:53:10 2019
-ERROR: Expired activation key
-
-Tue Sep 10 10:38:37 2019
-ERROR: Expired activation key
-
-Tue Sep 10 10:43:43 2019
-ERROR: Expired activation key
-

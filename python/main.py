@@ -3,19 +3,19 @@
 # A learner also has an init routine and a step routine, which takes a state and returns control parameters
 # The learner takes a hyperparameter map
 
-from ddpg.ddpg import DDPG
+from ddpg_pytorch.ddpg import DDPG
 from gymadapter import GymAdapter
+from gym.wrappers import Monitor
 import tensorflow as tf
 
 
 def main():
 
-  print('huhu')
-
   # Set up the environment
   env = GymAdapter(tf.contrib.training.HParams(
-    env_name='Walker2d-v3'
+    env_name='Pendulum-v0'
   ))
+  #recorder = Monitor(env.env, 'videos')
 
   # Get default hparams
   hparams = DDPG.get_default_hparams()
@@ -34,14 +34,20 @@ def main():
   a = agent.prepare(o)
 
   total_reward = 0
+  epoch_reward = 0
 
   for t in range(0, hparams.steps_per_epoch * hparams.epochs):
     o, r, d = env.step(a)
+
+    total_reward += r
+    epoch_reward += r
+
     a, reset = agent.step(o, r, d)
 
     if(reset):
       o = env.reset()
       a = agent.reset_finalize(o)
+
 
   print('Testing results')
   o = env.reset()
@@ -53,6 +59,7 @@ def main():
 
 
   env.close()
+  agent.close()
 
 
 main()
