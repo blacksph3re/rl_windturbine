@@ -22,8 +22,33 @@ Next Steps - Taking the pytorch code and using this for pendulum, then for qblad
 
 
 ### **09/11**
-I started my day with trying to adapt the DDPG implementation of [this one](https://towardsdatascience.com/deep-deterministic-policy-gradients-explained-2d94655a9b7b) - there were some flaws in the repo such as: death conditions are not regarded at all. The main loop wasn't in the repo at all. Etc
+I started my day with trying to adapt the DDPG implementation of [this one](https://towardsdatascience.com/deep-deterministic-policy-gradients-explained-2d94655a9b7b) - there were some flaws in the repo such as: death conditions are not regarded at all. The main loop wasn't in the repo at all, no tensorboard reporting, etc
 
 After a bit of tests, it works! It takes 25-ish episodes until convergence - it would be interesting to play around a bit with the hyperparameters...
 ![Pendulum](Screenshot-Pendulum.png)
-I played around a bit with hyperparameters, and it was pretty consistent over changing of noise and of batch size. Trying learning rate as next
+
+I played around a bit with hyperparameters...
+
+* changing noise: Seems to be important. With the correlated noise from the article it doesn't converge, with high (.4 and higher) np.uniform noise it does, after 25k steps. .5 after 15k, .6 after 12k but unstable, .7 too much
+* changing batch size: not really much of a difference, worse with lower and a bit better with 64 as batchsize
+* changing learning rate: higher - more interesting policy loss, but no convergence (until 35k)
+
+As noise seemed that important, I am thinking about introducing parameter noise to the policy... I think that's a nice todo for tomorrow. Also getting the qbladeadapter running would be good :)
+
+### **09/12**
+
+I read a bit about TD3, I recognize the problem of the noisy Q-estimates (Q loss looks quite noisy in tensorboard). Also the algorithm doesn't seem much more complex than ddpg, I could try to implement it aswell.
+
+QBlade keeps crashing a lot. Loading the library works, but already createInstance crashes sometimes. It seems to make a difference whether calling it via \_Z14createInstancev or via the link, but then not deterministically. Something seems badly wrong. It deterministically segfaults at setControlVars or initializeSimulation
+
+WTF-Moment of the day: Suddenly ddpg converges reliably after 7-8 episodes without any noise at all, what I changed is nothing (except for adding parameter noise), but even after disabling it again it still converges quickly. WTF.
+
+
+DDPG conclusion
+
+* Added random exploration phase of 5k steps, super helpful.
+* Changed the OUNoise from the paper to normal uniform noise, kinda helpful (maybe it had been enough to understand OUNoise and tweak it but meh)
+* Added parameter noise to the policy, I think it's helpful, currently testing
+* With enough noise it seems to produce quite robust results
+* Sometimes, in the testing, though the policy has converged, it doesn't do sensful things. That could be due to it once making the hop up 'randomly' and then forgetting it
+* I think it would be cool to experiment with TD3...

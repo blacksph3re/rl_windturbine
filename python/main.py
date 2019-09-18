@@ -23,7 +23,8 @@ def main():
   # Set environment-specific hparams
   hparams.obs_dim = env.get_obs_dim()
   hparams.act_dim = env.get_act_dim()
-  hparams.act_limit = env.get_act_limit()
+  hparams.act_high = env.get_act_high()
+  hparams.act_low = env.get_act_low()
   print(hparams)
 
   # Initialize the agent

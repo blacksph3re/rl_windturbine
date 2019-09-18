@@ -17,6 +17,12 @@ class GymAdapter:
   def get_act_limit(self):
     return self.env.action_space.high[0]
 
+  def get_act_high(self):
+    return self.env.action_space.high
+
+  def get_act_low(self):
+    return self.env.action_space.low
+
   def step(self, action):
     self.observation, self.reward, self.death, _ = self.env.step(action)
     return self.observation, self.reward, self.death

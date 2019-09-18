@@ -57,7 +57,10 @@ class DDPG:
         action = self.actor.forward(state)
         action = action.squeeze(0).cpu().detach().numpy()
         if(add_noise):
-            action = action + self.hparams.noise_factor * self.random_action()
+            if(self.hparams.noise_type == 'correlated'):
+                action = self.noise.get_action(action, self.time)
+            else:
+                action += self.random_action() * self.hparams.noise_factor
 
         self.last_action = action
         self.last_state = obs
@@ -108,6 +111,11 @@ class DDPG:
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
             target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
 
+        # Add actor parameter noise
+        if(self.hparams.parameter_noise != 0):
+            for param in self.actor.parameters():
+                param.data.copy_(param.data + self.hparams.parameter_noise * np.random.uniform(-1, 1))
+
     def step(self, state, reward, done):
         self.time = self.time + 1
         self.epoch_reward += reward
@@ -139,19 +147,21 @@ class DDPG:
     def get_default_hparams():
         return tf.contrib.training.HParams(
             steps_per_epoch = 500,
-            random_exploration_steps = 500,
+            random_exploration_steps = 5000,
             epochs = 100,
             test_steps = 1000,
-            batch_size = 16,
+            batch_size = 64,
             gamma = 0.99,
             tau = 1e-2,
             buffer_maxlen = 100000,
-            critic_lr = 1e-3,
-            actor_lr = 1e-3,
+            critic_lr = 1e-4,
+            actor_lr = 1e-4,
             obs_dim = 20,
             act_dim = 1,
             act_high = 1,
             act_low = -1,
             logdir = "logs",
-            noise_factor = 0.1,
+            noise_factor = 0.6,
+            noise_type = 'uncorrelated',
+            parameter_noise = 0.1,
         )
