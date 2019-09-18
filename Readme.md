@@ -52,3 +52,9 @@ DDPG conclusion
 * With enough noise it seems to produce quite robust results
 * Sometimes, in the testing, though the policy has converged, it doesn't do sensful things. That could be due to it once making the hop up 'randomly' and then forgetting it
 * I think it would be cool to experiment with TD3...
+
+### **09/18**
+
+I have spent the last couple days working on getting qblade running, but it's a quite iterative process of me trying something and qblade crashing, then me sending a mail to david and him fixing something.
+
+Also somehow, DDPG has stopped converging with the very same hparams as before. I am back to playing around with it.
