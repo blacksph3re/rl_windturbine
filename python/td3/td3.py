@@ -10,24 +10,23 @@ class TD3(object):
             action_dim (int): action size
             max_action (float): highest action to take
             device (device): cuda or cpu to process tensors
-            env (env): gym environment to use
     
     """
     
-    def __init__(self, state_dim, action_dim, max_action, env):
-        self.actor = Actor(state_dim, action_dim, max_action).to(device)
-        self.actor_target = Actor(state_dim, action_dim, max_action).to(device)
+    def __init__(self, state_dim, action_dim, max_action):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+        self.actor = Actor(state_dim, action_dim, max_action).to(self.device)
+        self.actor_target = Actor(state_dim, action_dim, max_action).to(self.device)
         self.actor_target.load_state_dict(self.actor.state_dict())
         self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=1e-3)
 
-        self.critic = Critic(state_dim, action_dim).to(device)
-        self.critic_target = Critic(state_dim, action_dim).to(device)
+        self.critic = Critic(state_dim, action_dim).to(self.device)
+        self.critic_target = Critic(state_dim, action_dim).to(self.device)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=1e-3)
 
         self.max_action = max_action
-        self.env = env
-
 
         
     def select_action(self, state, noise=0.1):
@@ -42,10 +41,9 @@ class TD3(object):
         
         """
         
-        state = torch.FloatTensor(state.reshape(1, -1)).to(device)
-        print(state)
+        state = torch.FloatTensor(state.reshape(1, -1)).to(self.device)
         
-        action = self.actor(state).cpu().data.numpy().flatten()
+        action = self.actor.forward(state).cpu().data.numpy().flatten()
         if noise != 0: 
             action = (action + np.random.normal(0, noise, size=self.env.action_space.shape[0]))
             

@@ -1,10 +1,12 @@
+from .td3 import TD3
+
 class Runner():
     """Carries out the environment steps and adds experiences to memory"""
     
     def __init__(self, hparams):
         self.hparams = hparams
 
-        
+        self.TD3 = TD3()
         self.env = env
         self.agent = agent
         self.replay_buffer = replay_buffer

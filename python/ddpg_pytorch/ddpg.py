@@ -143,11 +143,26 @@ class DDPG:
     def close(self):
         self.writer.close()
 
+    def save_checkpoint(self, directory, prefix):
+        torch.save(self.actor.state_dict(), '%s/%s_actor.pth' % (directory, prefix))
+        torch.save(self.actor_target.state_dict(), '%s/%s_actor_target.pth' % (directory, prefix))
+        torch.save(self.critic.state_dict(), '%s/%s_critic.pth' % (directory, prefix))
+        torch.save(self.critic_target.state_dict(), '%s/%s_critic_target.pth' % (directory, prefix))
+        self.replay_buffer.save(directory, prefix)
+
+    def load_checkpoint(self, directory, prefix):
+        self.actor.load_state_dict(torch.load('%s/%s_actor.pth' % (directory, prefix)))
+        self.actor_target.load_state_dict(torch.load('%s/%s_actor_target.pth' % (directory, prefix)))
+        self.critic.load_state_dict(torch.load('%s/%s_critic.pth' % (directory, prefix)))
+        self.critic_target.load_state_dict(torch.load('%s/%s_critic_target.pth' % (directory, prefix)))
+        self.replay_buffer.load(directory, prefix)
+
 
     def get_default_hparams():
         return tf.contrib.training.HParams(
             steps_per_epoch = 500,
-            random_exploration_steps = 5000,
+            random_exploration_steps = 500,
+            checkpoint_steps = 500,
             epochs = 100,
             test_steps = 1000,
             batch_size = 64,
@@ -161,7 +176,7 @@ class DDPG:
             act_high = 1,
             act_low = -1,
             logdir = "logs",
-            noise_factor = 0.6,
+            noise_factor = 0.2,
             noise_type = 'uncorrelated',
-            parameter_noise = 0.1,
+            parameter_noise = 0.05,
         )

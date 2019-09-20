@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import pickle
 from collections import deque
 
 
@@ -84,3 +85,11 @@ class BasicBuffer:
 
     def __len__(self):
         return len(self.buffer)
+
+    def save(self, directory, prefix):
+        with open("%s/%s_memory.dat", "w" % (directory, prefix)) as f:
+            pickle.dump(self.buffer, f)
+
+    def load(self, directory, prefix):
+        with open("%s/%s_memory.dat", "r" % (directory, prefix)) as f:
+            self.buffer = pickle.load(f)

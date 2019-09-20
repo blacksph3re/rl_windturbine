@@ -5,6 +5,7 @@
 
 from ddpg_pytorch.ddpg import DDPG
 from gymadapter import GymAdapter
+from qbladeadapter import QBladeAdapter
 from gym.wrappers import Monitor
 import tensorflow as tf
 
@@ -12,10 +13,12 @@ import tensorflow as tf
 def main():
 
   # Set up the environment
-  env = GymAdapter(tf.contrib.training.HParams(
-    env_name='Pendulum-v0'
-  ))
+  #env = GymAdapter(tf.contrib.training.HParams(
+  #  env_name='Pendulum-v0'
+  #))
   #recorder = Monitor(env.env, 'videos')
+
+  env = QBladeAdapter()
 
   # Get default hparams
   hparams = DDPG.get_default_hparams()
@@ -40,6 +43,9 @@ def main():
   for t in range(0, hparams.steps_per_epoch * hparams.epochs):
     o, r, d = env.step(a)
 
+    env.logAction(agent.writer, t, a)
+    env.logObservation(agent.writer, t, o)
+
     total_reward += r
     epoch_reward += r
 
@@ -48,15 +54,6 @@ def main():
     if(reset):
       o = env.reset()
       a = agent.reset_finalize(o)
-
-
-  print('Testing results')
-  o = env.reset()
-  a = agent.reset_finalize(o)
-  for t in range(0, hparams.test_steps):
-    o, r, d = env.step(a)
-    a = agent.get_action(o)
-    env.render()
 
 
   env.close()
