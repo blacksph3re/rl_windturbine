@@ -44,6 +44,7 @@ class DDPG:
     
         self.replay_buffer = BasicBuffer(hparams.buffer_maxlen)        
         self.noise = OUNoise(hparams.act_dim, hparams.act_low, hparams.act_high)
+        self.noise_polynom = np.polyfit([hparams.noise_start, hparams.noise_end], [hparams.noise_start_factor, hparams.noise_end_factor], 1)
 
         self.writer = SummaryWriter(hparams.logdir)
 
@@ -57,10 +58,15 @@ class DDPG:
         action = self.actor.forward(state)
         action = action.squeeze(0).cpu().detach().numpy()
         if(add_noise):
-            if(self.hparams.noise_type == 'correlated'):
+            if(self.time < self.hparams.random_exploration_steps):
+                action = self.random_action()
+            elif(self.hparams.noise_type == 'correlated'):
                 action = self.noise.get_action(action, self.time)
             else:
-                action += self.random_action() * self.hparams.noise_factor
+                m, c = self.noise_polynom
+                x = np.clip(self.time, self.hparams.noise_start, self.hparams.noise_end)
+                noise_level = np.clip((m * x + c), 0, 1)
+                action = self.random_action() * noise_level + action * (1 - noise_level)
 
         self.last_action = action
         self.last_state = obs
@@ -136,8 +142,7 @@ class DDPG:
             self.epoch_reward = 0
 
         action = self.get_action(state, True)
-        if (self.time < self.hparams.random_exploration_steps):
-            action = self.random_action()
+
         return action, False
 
     def close(self):
@@ -162,7 +167,8 @@ class DDPG:
         return tf.contrib.training.HParams(
             steps_per_epoch = 500,
             random_exploration_steps = 500,
-            checkpoint_steps = 500,
+            checkpoint_steps = 10000,
+            checkpoint_dir = "checkpoints",
             epochs = 100,
             test_steps = 1000,
             batch_size = 64,
@@ -176,7 +182,10 @@ class DDPG:
             act_high = 1,
             act_low = -1,
             logdir = "logs",
-            noise_factor = 0.2,
+            noise_start = 5,            # When to start applying noise
+            noise_start_factor = 0.5,     # The factor of noise at the beginning (1 max, 0 min)
+            noise_end = 30000,          # When to stop applying noise
+            noise_end_factor = 0,       # The factor of noise at the end (1 max, 0 min)
             noise_type = 'uncorrelated',
             parameter_noise = 0.05,
         )

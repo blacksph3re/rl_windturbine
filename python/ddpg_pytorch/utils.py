@@ -7,7 +7,7 @@ from collections import deque
 # Ornstein-Ulhenbeck Noise
 # Taken from #https://github.com/vitchyr/rlkit/blob/master/rlkit/exploration_strategies/ou_strategy.py
 class OUNoise(object):
-    def __init__(self, act_dim, act_high, act_low, mu=0.0, theta=0.15, max_sigma=0.3, min_sigma=0.3, decay_period=100000):
+    def __init__(self, act_dim, act_high, act_low, mu=0.0, theta=0.15, max_sigma=0.3, min_sigma=0.3, decay_period=10000):
         self.mu           = mu
         self.theta        = theta
         self.sigma        = max_sigma
@@ -87,9 +87,12 @@ class BasicBuffer:
         return len(self.buffer)
 
     def save(self, directory, prefix):
-        with open("%s/%s_memory.dat", "w" % (directory, prefix)) as f:
+        with open("%s/%s_memory.dat" % (directory, prefix), "wb") as f:
             pickle.dump(self.buffer, f)
 
     def load(self, directory, prefix):
-        with open("%s/%s_memory.dat", "r" % (directory, prefix)) as f:
-            self.buffer = pickle.load(f)
+        try:
+            with open("%s/%s_memory.dat" % (directory, prefix), "rb") as f:
+                self.buffer = pickle.load(f)
+        except:
+            print("No memory data found")
