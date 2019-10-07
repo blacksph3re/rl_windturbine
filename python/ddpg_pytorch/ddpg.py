@@ -4,6 +4,7 @@ import torch.autograd as autograd
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
 import numpy as np
+from datetime import datetime
 
 # For hparams
 import tensorflow as tf
@@ -28,14 +29,16 @@ class DDPG:
         self.tau = hparams.tau
         
         # initialize actor and critic networks
-        self.critic = Critic(self.obs_dim, self.action_dim).to(self.device)
-        self.critic_target = Critic(self.obs_dim, self.action_dim).to(self.device)
+        self.critic = Critic(self.obs_dim, self.action_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2]).to(self.device)
+        self.critic_target = Critic(self.obs_dim, self.action_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2]).to(self.device)
         
-        self.actor = Actor(self.obs_dim, self.action_dim).to(self.device)
-        self.actor_target = Actor(self.obs_dim, self.action_dim).to(self.device)
+        self.actor = Actor(self.obs_dim, self.action_dim, hparams.actor_sizes[0], hparams.actor_sizes[1]).to(self.device)
+        self.actor_target = Actor(self.obs_dim, self.action_dim, hparams.actor_sizes[0], hparams.actor_sizes[1]).to(self.device)
     
-        # Copy critic target parameters
+        # Copy target parameters
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
+            target_param.data.copy_(param.data)
+        for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
             target_param.data.copy_(param.data)
         
         # optimizers
@@ -46,7 +49,7 @@ class DDPG:
         self.noise = OUNoise(hparams.act_dim, hparams.act_low, hparams.act_high)
         self.noise_polynom = np.polyfit([hparams.noise_start, hparams.noise_end], [hparams.noise_start_factor, hparams.noise_end_factor], 1)
 
-        self.writer = SummaryWriter(hparams.logdir)
+        self.writer = SummaryWriter(hparams.logdir + '/' + str(datetime.now()))
 
         self.time = 0
         self.last_state = None
@@ -81,14 +84,16 @@ class DDPG:
         return self.get_action(obs, True)
     
     def update(self, batch_size):
-        states, actions, rewards, next_states, _ = self.replay_buffer.sample(batch_size)
         state_batch, action_batch, reward_batch, next_state_batch, masks = self.replay_buffer.sample(batch_size)
+
+        # TODO adding replay noise to observations and actions?
         state_batch = torch.FloatTensor(state_batch).to(self.device)
         action_batch = torch.FloatTensor(action_batch).to(self.device)
         reward_batch = torch.FloatTensor(reward_batch).to(self.device)
         next_state_batch = torch.FloatTensor(next_state_batch).to(self.device)
         masks = torch.FloatTensor(masks).to(self.device)
    
+        self.critic_optimizer.zero_grad()
         curr_Q = self.critic.forward(state_batch, action_batch)
         next_actions = self.actor_target.forward(next_state_batch)
         next_Q = self.critic_target.forward(next_state_batch, next_actions.detach())
@@ -96,19 +101,23 @@ class DDPG:
         
         # update critic
         q_loss = F.mse_loss(curr_Q, expected_Q.detach())
-        self.writer.add_scalar('Loss/q', q_loss, self.time)
 
-        self.critic_optimizer.zero_grad()
         q_loss.backward() 
         self.critic_optimizer.step()
+        
 
         # update actor
-        policy_loss = -self.critic.forward(state_batch, self.actor.forward(state_batch)).mean()
-        self.writer.add_scalar('Loss/policy', policy_loss, self.time)
-        
         self.actor_optimizer.zero_grad()
+        policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
+
         policy_loss.backward()
+        #print([p.grad for p in self.actor.parameters()])
+        #print(policy_loss)
         self.actor_optimizer.step()
+
+        self.writer.add_scalar('Loss/q', q_loss, self.time)
+        self.writer.add_scalar('Loss/policy', policy_loss, self.time)
+ 
 
         # update target networks 
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
@@ -138,6 +147,19 @@ class DDPG:
             print('Epoch reward %d' % self.epoch_reward)
             print('Step %d' % self.time)
             self.writer.add_scalar('Epoch reward', self.epoch_reward, epoch)
+
+            # Printing weights
+            #print(dict(self.actor.state_dict())['linear1.weight'])
+            print([p.grad for p in self.actor.parameters()])
+            self.writer.add_histogram('actor/linear1', dict(self.actor.state_dict())['linear1.weight'], self.time)
+            self.writer.add_histogram('actor/linear2', dict(self.actor.state_dict())['linear2.weight'], self.time)
+            self.writer.add_histogram('actor/linear3', dict(self.actor.state_dict())['linear3.weight'], self.time)        
+
+            self.writer.add_histogram('critic/linear1', dict(self.critic.state_dict())['linear1.weight'], self.time)
+            self.writer.add_histogram('critic/linear2', dict(self.critic.state_dict())['linear2.weight'], self.time)
+            self.writer.add_histogram('critic/linear3', dict(self.critic.state_dict())['linear3.weight'], self.time)
+            self.writer.add_histogram('critic/linear4', dict(self.critic.state_dict())['linear4.weight'], self.time)
+
 
             self.epoch_reward = 0
 
@@ -169,14 +191,16 @@ class DDPG:
             random_exploration_steps = 500,
             checkpoint_steps = 10000,
             checkpoint_dir = "checkpoints",
-            epochs = 100,
+            epochs = 500,
             test_steps = 1000,
-            batch_size = 64,
+            batch_size = 16,
             gamma = 0.99,
             tau = 1e-2,
             buffer_maxlen = 100000,
-            critic_lr = 1e-4,
-            actor_lr = 1e-4,
+            critic_lr = 1e-3,
+            critic_sizes = [128, 64, 32],
+            actor_lr = 1e-3,
+            actor_sizes = [32, 8],
             obs_dim = 20,
             act_dim = 1,
             act_high = 1,
@@ -187,5 +211,5 @@ class DDPG:
             noise_end = 30000,          # When to stop applying noise
             noise_end_factor = 0,       # The factor of noise at the end (1 max, 0 min)
             noise_type = 'uncorrelated',
-            parameter_noise = 0.05,
+            parameter_noise = 0,
         )

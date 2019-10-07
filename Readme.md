@@ -58,3 +58,43 @@ DDPG conclusion
 I have spent the last couple days working on getting qblade running, but it's a quite iterative process of me trying something and qblade crashing, then me sending a mail to david and him fixing something.
 
 Also somehow, DDPG has stopped converging with the very same hparams as before. I am back to playing around with it.
+
+### **09/23**
+
+I got qblade running and also have access to a small desktop computer where I can run my simulations much quicker. I have done several runs with the default scenario and ddpg, converging most of the time to setting all actions to 1. Q and policy loss approach 0 pretty quickly and for some reason all actions are the same (i.e. same outputs for all 5 control inputs). I have tried several runs, that was the same result every time - and the power output indeed raised. However, I have tried to maximize rotational speed, and it again converges with all actions to 1, not really delivering high rotational speeds. Same with me trying to optimize for high blade bending, the reward reduces over time as noise reduces, and the policy does not learn that shaking the blades could produce high plane bending. Even squaring the reward (in theory intensifying it) doesn't solve that, still converging to always 1 as output.
+
+
+### **10/06**
+
+Preparing the presentation for tomorrow, I tex-ed some formulas
+Bellman
+Q(s, a) &= r + \max_{a'}Q(s', a')
+Q(s,a) = \mathbb{E}_{s' \sim \varepsilon}(r + \gamma \max_{a'}Q(s', a')|s,a)
+
+Lookup-table
+Q_{i+1}(s,a) \leftarrow (1-\alpha)Q_{i}(s,a) + \alpha(target)
+target &= r + \gamma \max_{a'}Q_{i}(s', a')
+
+DQN
+L(\theta_i)=\mathbb{E}[(target -Q(s,a;\theta_i))^2]
+target = r + \gamma \max_{a'} Q(s',a';\theta_{i-1})
+
+DDPG
+Q(s,a) = \mathbb{E}[r + \gamma Q(s', \mu(s))|s,a]
+
+target = r + \gamma Q(s', \mu(s);\theta^Q_{i-1})
+L(\theta^Q_i)=\mathbb{E}[(target -Q(s,a;\theta^Q_i))^2]
+\Delta_{\theta^{\mu}} J(\theta^{\mu}) = \Delta_{\mu}Q(s, \mu(s))\Delta_{\theta^{\mu}}\mu(s)
+
+### **10/07**
+
+Todo-collection
+* Setting a higher Gamma-value, as 0.99 is ca 0.37 after 100 iterations already
+* Reworking the reward as rpm\*torque
+* Trying way smaller fully connected networks
+* Only having torque as control parameter, not blade pitch at all
+* Having a look at the destruction problem (it should be maximizing at least a little)
+
+Trying with smaller networks: critic [128, 64, 32] and actor [128, 32], increased gamma .9999 and reward as rpm\*torque
+
+Actually trying various hyperparameters all yielded the same results, until I noticed that policy params aren't updating for some reason. Indifferently from learning rate, plain nothing happens. I compared the code with other implementations online (TODO: Add norms to the layers, should be better somehow), but their implementations were mostly equal.

@@ -1,7 +1,7 @@
 import ctypes
 import time
-
-
+import numpy as np
+import itertools
 
 class QBladeAdapter:
   def __init__(self):
@@ -24,6 +24,8 @@ class QBladeAdapter:
     self._loadProject(x)
     self._initializeSimulation(ctypes.c_int(0))
 
+    self.lastAction = np.zeros(self.get_act_dim())
+
   def reset(self):
     # Resetting means 20 timesteps with constant control inputs
     for _ in range(0, 20):
@@ -32,21 +34,25 @@ class QBladeAdapter:
     return self.extractObservation()
 
   def get_obs_dim(self):
-    return 23
+    #return 23
+    return 22
 
   def get_act_dim(self):
-    return 5
+    #return 5
+    return 1
 
   # TODO get actual values for this
   def get_act_high(self):
-    return [10, 10, 10, 10, 10]
+    #return [10, 10, 10, 10, 10]
+    return [100]
 
   # TODO get actual values for this
   def get_act_low(self):
-    return [0, 0, 0, 0, 0]
+    #return [0, 0, 0, 0, 0]
+    return [0]
 
   def calc_reward(self, observation):
-    return observation[1]
+    return observation[0]*self.lastAction[0]
 
   def calc_death(self, observation):
     return False
@@ -74,23 +80,34 @@ class QBladeAdapter:
     writer.add_scalar('obs/ip tip deflection blade 1', observation[19], step)
     writer.add_scalar('obs/ip tip deflection blade 2', observation[20], step)
     writer.add_scalar('obs/ip tip deflection blade 3', observation[21], step)
-    writer.add_scalar('obs/current time', observation[22], step)
+    #writer.add_scalar('obs/current time', observation[22], step)
 
   def logAction(self, writer, step, action):
+    action = self.padAction(action)
     writer.add_scalar('act/generator torque', action[0], step)
     writer.add_scalar('act/yaw angle', action[1], step)
     writer.add_scalar('act/pitch blade 1', action[2], step)
     writer.add_scalar('act/pitch blade 2', action[3], step)
     writer.add_scalar('act/pitch blade 3', action[4], step)
 
+  def padAction(self, action):
+    def choose(a, b):
+      if(a == None):
+        return b
+      return a
+    return [choose(a, null) for a, null in itertools.zip_longest(action, np.zeros(5))]
 
   def storeAction(self, action):
     # Copy action to control vars
-    in_data = (ctypes.c_double * self.get_act_dim())(*action)
+    my_action = self.padAction(action)
+    in_data = (ctypes.c_double * 5)(*my_action)
     self._setControlVars(in_data)
 
+    self.lastAction = action
+
   def extractObservation(self):
-    out_data = (ctypes.c_double * self.get_obs_dim())()
+    # 23 values are hardcoded in the library
+    out_data = (ctypes.c_double * 23)()
     self._getControlVars(out_data)
     observation = [out_data[i] for i in range(0, self.get_obs_dim())]
 
@@ -108,7 +125,7 @@ class QBladeAdapter:
     pass
 
   def close(self):
-    return self.env.close()
+    del self._qbladeLib
 
   def storeProject(self, filename):
     x = ctypes.c_char_p(bytes(filename, 'utf-8'))
