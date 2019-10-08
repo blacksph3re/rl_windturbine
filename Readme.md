@@ -98,3 +98,7 @@ Todo-collection
 Trying with smaller networks: critic [128, 64, 32] and actor [128, 32], increased gamma .9999 and reward as rpm\*torque
 
 Actually trying various hyperparameters all yielded the same results, until I noticed that policy params aren't updating for some reason. Indifferently from learning rate, plain nothing happens. I compared the code with other implementations online (TODO: Add norms to the layers, should be better somehow), but their implementations were mostly equal.
+
+### **10/08**
+
+A talk with Matt hinted me at not having normalized anything. I will implement a normalization at the end of the random exploration phase to bring everything into the same order of magnitude
