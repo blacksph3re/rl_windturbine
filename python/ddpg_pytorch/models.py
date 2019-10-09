@@ -11,25 +11,19 @@ class Critic(nn.Module):
         self.obs_dim = obs_dim
         self.action_dim = action_dim
 
-        self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
-        self.linear2 = nn.Linear(hidden_size_1 + self.action_dim, hidden_size_2)
-        self.linear3 = nn.Linear(hidden_size_2, hidden_size_3)
-        self.linear4 = nn.Linear(hidden_size_3, 1)
+        self.linear1 = nn.Linear(self.obs_dim + self.action_dim, hidden_size_1)
+        self.linear2 = nn.Linear(hidden_size_1, 1)
 
         self.init_weights(init_w)
 
     def init_weights(self, init_w):
         self.linear1.weight.data.uniform_(-init_w, init_w)
         self.linear2.weight.data.uniform_(-init_w, init_w)
-        self.linear3.weight.data.uniform_(-init_w, init_w)
-        self.linear4.weight.data.uniform_(-init_w, init_w)
 
     def forward(self, x, a):
-        x = F.relu(self.linear1(x))
         xa_cat = torch.cat([x,a], 1)
-        xa = F.relu(self.linear2(xa_cat))
-        xa = F.relu(self.linear3(xa))
-        qval = self.linear4(xa)
+        xa = F.relu(self.linear1(xa_cat))
+        qval = self.linear2(xa)
 
         return qval
 
@@ -42,20 +36,17 @@ class Actor(nn.Module):
         self.action_dim = action_dim
 
         self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
-        self.linear2 = nn.Linear(hidden_size_1, hidden_size_2)
-        self.linear3 = nn.Linear(hidden_size_2, self.action_dim)
+        self.linear2 = nn.Linear(hidden_size_1, self.action_dim)
 
         self.init_weights(init_w)
 
     def init_weights(self, init_w):
         self.linear1.weight.data.uniform_(-init_w, init_w)
         self.linear2.weight.data.uniform_(-init_w, init_w)
-        self.linear3.weight.data.uniform_(-init_w, init_w)
 
 
     def forward(self, obs):
         x = F.relu(self.linear1(obs))
-        x = F.relu(self.linear2(x))
-        x = torch.tanh(self.linear3(x))
+        x = torch.tanh(self.linear2(x))
 
         return x

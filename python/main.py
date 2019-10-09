@@ -69,13 +69,13 @@ def main():
   for t in range(0, hparams.steps_per_epoch * hparams.epochs):
     o, r, d = env.step(a)
 
-    env.logAction(agent.writer, t, a)
-    env.logObservation(agent.writer, t, o)
-
     total_reward += r
     epoch_reward += r
 
     a, reset = agent.step(o, r, d)
+    
+    env.logAction(agent.writer, t, a)
+    env.logObservation(agent.writer, t, o)
 
     if(reset):
       o = env.reset()
@@ -88,7 +88,7 @@ def main():
       with open(checkpoint_dir + '/last', 'w') as f:
         f.write("step_%d_" % t)
 
-
+  env.storeProject("checkpoints/sampleproject.wpa")
   env.close()
   agent.close()
 

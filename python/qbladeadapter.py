@@ -44,12 +44,12 @@ class QBladeAdapter:
   # TODO get actual values for this
   def get_act_high(self):
     #return [10, 10, 10, 10, 10]
-    return [100]
+    return [3.94e6, 1e-5, 45, 45, 45]
 
   # TODO get actual values for this
   def get_act_low(self):
     #return [0, 0, 0, 0, 0]
-    return [0]
+    return [0, 0, 0, 0, 0]
 
   def calc_reward(self, observation):
     return observation[0]*self.lastAction[0]
@@ -95,12 +95,14 @@ class QBladeAdapter:
       if(a == None):
         return b
       return a
-    return [choose(a, null) for a, null in itertools.zip_longest(action, np.zeros(5))]
+    return [choose(a, null) for a, null in itertools.zip_longest(action, np.ones(5))]
 
   def storeAction(self, action):
     # Copy action to control vars
-    my_action = self.padAction(action)
-    in_data = (ctypes.c_double * 5)(*my_action)
+    action = np.clip(action)
+    action = np.nan_to_num(self.padAction(action)), self.get_act_low(), self.get_act_high()
+
+    in_data = (ctypes.c_double * 5)(*action)
     self._setControlVars(in_data)
 
     self.lastAction = action
@@ -110,6 +112,7 @@ class QBladeAdapter:
     out_data = (ctypes.c_double * 23)()
     self._getControlVars(out_data)
     observation = [out_data[i] for i in range(0, self.get_obs_dim())]
+    observation = np.nan_to_num(observation)
 
     return observation
 

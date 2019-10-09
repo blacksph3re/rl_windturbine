@@ -101,4 +101,11 @@ Actually trying various hyperparameters all yielded the same results, until I no
 
 ### **10/08**
 
-A talk with Matt hinted me at not having normalized anything. I will implement a normalization at the end of the random exploration phase to bring everything into the same order of magnitude
+A talk with Matt hinted me at not having normalized anything. I will implement a normalization at the end of the random exploration phase to bring everything into the same order of magnitude.
+
+So, after a while of trying, I noticed that I was actually dealing with the vanishing gradients problem. On the way there, I tried normalization without noticing that I actually made it far worse because I forgot the ^-1 to the normalizations and thus ended up making the big values way bigger and the small ones way smaller. Because I didn't notice, I tried fighting the vanishing gradients problem by reducing the complexity of the function approximators even further, ending up with both Q and policy as 1-layer network. I think I might want to increase that in the future...
+
+Tries
+* Subtract tip deflection from reward
+* OU-Noise
+* Reparameterize control so actions are gradients
