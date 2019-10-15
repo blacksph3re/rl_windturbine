@@ -110,6 +110,16 @@ Tries
 * OU-Noise
 * Reparameterize control so actions are gradients
 
+Kill-count: ca 20
+
 ### **10/09**
 
 Today I spent the whole day refactoring my code, as I didn't like the way I hacked in noise and normalizations. Now I can easily switch around between different types of noise, the whole code looks way better and it is easier to adjust things.
+
+### **10/15**
+
+I managed to get my code running again, as I was getting NaNs after division by zero in the normalization. Now I am having the problem that the turbine spools up to ca 2rad, then stays at 0.4rad forever. Also, usually one of the blades ends up bended a lot more than the others, never returning to straight. My next tries are using action gradients instead of directly inputting the action space, as I can limit the movement per step like that. Will be completely new hparam tuning then. I am thinking about automatizing hparam tuning, as it gets a bit annoying to do it per hand.
+
+Kill-count: ca 15
+
+I implemented gradient actions. I found that usually during random exploration, the first blades break off. 

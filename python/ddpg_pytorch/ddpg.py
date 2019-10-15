@@ -2,9 +2,7 @@ import torch
 import torch.optim as optim
 import torch.autograd as autograd
 import torch.nn.functional as F
-from torch.utils.tensorboard import SummaryWriter
 import numpy as np
-from datetime import datetime
 
 # For hparams
 import tensorflow as tf
@@ -20,21 +18,31 @@ class DDPG:
         
         self.hparams = hparams
         self.obs_dim = hparams.obs_dim
-        self.action_dim = hparams.act_dim
+        self.act_dim = hparams.act_dim
         self.act_high = np.array(hparams.act_high)
         self.act_low = np.array(hparams.act_low)
         self.batch_size = hparams.batch_size
-        
-        # hyperparameters
         self.gamma = hparams.gamma
         self.tau = hparams.tau
+
+        # In case of action gradients, reduce action high and low and extend the observation space
+        if(self.hparams.action_gradients):
+            self.real_obs_dim = self.obs_dim
+            self.obs_dim += self.act_dim
+            self.real_act_high = self.act_high
+            self.real_act_low = self.act_low
+            self.act_high = np.ones(self.act_dim)
+            self.act_low = -np.ones(self.act_dim)
+            self.real_last_action = self.real_act_low.astype(float)
+            self.action_grad_denormalizer = (self.real_act_high - self.real_act_low) * self.hparams.action_gradient_stepsize
+            assert(not np.any(self.action_grad_denormalizer == 0))
         
         # initialize actor and critic networks
-        self.critic = Critic(self.obs_dim, self.action_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2], hparams.init_weight_limit).to(self.device)
-        self.critic_target = Critic(self.obs_dim, self.action_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2]).to(self.device)
+        self.critic = Critic(self.obs_dim, self.act_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2], hparams.init_weight_limit).to(self.device)
+        self.critic_target = Critic(self.obs_dim, self.act_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2]).to(self.device)
         
-        self.actor = Actor(self.obs_dim, self.action_dim, hparams.actor_sizes[0], hparams.actor_sizes[1], hparams.init_weight_limit).to(self.device)
-        self.actor_target = Actor(self.obs_dim, self.action_dim, hparams.actor_sizes[0], hparams.actor_sizes[1]).to(self.device)
+        self.actor = Actor(self.obs_dim, self.act_dim, hparams.actor_sizes[0], hparams.actor_sizes[1], hparams.init_weight_limit).to(self.device)
+        self.actor_target = Actor(self.obs_dim, self.act_dim, hparams.actor_sizes[0], hparams.actor_sizes[1]).to(self.device)
     
         # Copy target parameters
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
@@ -52,28 +60,28 @@ class DDPG:
         # Random exploration
         if(self.hparams.random_exploration_type == 'correlated'):
             self.random_exploration_noise = OUNoise(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.random_exploration_theta,
                 self.hparams.random_exploration_sigma,
                 self.hparams.random_exploration_mu)
         elif(self.hparams.random_exploration_type == 'uncorrelated'):
             self.random_exploration_noise = GaussianNoise(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.random_exploration_mean,
                 self.hparams.random_exploration_variance)
         else:
             self.random_exploration_noise = NoNoise(
-                self.hparams.act_dim)
+                self.act_dim)
 
         # Action noise
         if(self.hparams.action_noise_type == 'correlated'):
             self.action_noise = OUNoise(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.action_noise_theta,
                 self.hparams.action_noise_sigma)
         elif(self.hparams.action_noise_type == 'correlated-decreasing'):
             self.action_noise = OUNoiseDec(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.action_noise_theta,
                 self.hparams.action_noise_sigma,
                 self.hparams.random_exploration_steps,
@@ -81,18 +89,18 @@ class DDPG:
                 self.hparams.action_noise_decay_steps)
         elif(self.hparams.action_noise_type == 'uncorrelated'):
             self.action_noise = UniformNoise(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.action_noise_sigma)
         elif(self.hparams.action_noise_type == 'uncorrelated-decreasing'):
             self.action_noise = UniformNoiseDec(
-                self.hparams.act_dim,
+                self.act_dim,
                 self.hparams.action_noise_sigma,
                 self.hparams.random_exploration_steps,
                 self.hparams.action_noise_sigma_decayed,
                 self.hparams.action_noise_decay_steps)
         else:
             self.action_noise = NoNoise(
-                self.hparams.act_dim)
+                self.act_dim)
 
         # We can already calc action normalization based on parameter space limits
         m = (self.act_low - self.act_high) / (-1 - 1)
@@ -113,11 +121,11 @@ class DDPG:
         self.reward_normalizer_params_gpu = (torch.FloatTensor(np.ones(1)).to(self.device), 
                                              torch.FloatTensor(np.zeros(1)).to(self.device))
 
-        self.writer = SummaryWriter(hparams.logdir + '/' + str(datetime.now()))
+        self.logger = QBladeLogger(self.hparams.logdir)
 
         self.time = 0
-        self.last_state = np.zeros(self.hparams.obs_dim)
-        self.last_action = np.zeros(self.hparams.act_dim)
+        self.last_state = np.zeros(self.obs_dim)
+        self.last_action = np.zeros(self.act_dim)
         self.epoch_reward = 0
 
     def normalize_action(self, action, gpu=False):
@@ -165,12 +173,13 @@ class DDPG:
             noise = torch.FloatTensor(self.action_noise.get_noise(self.time)).to(self.device)
             action = action + noise
             
-            action = self.denormalize_action(action, True)
+            if(self.hparams.normalize_actions):
+                action = self.denormalize_action(action, True)
             
             # Get it to the cpu
             action = action.squeeze(0).cpu().detach().numpy()
 
-        action = np.clip(action, self.hparams.act_low, self.hparams.act_high)
+        action = np.clip(action, self.act_low, self.act_high)
         self.last_action = action
         self.last_state = obs
 
@@ -178,9 +187,11 @@ class DDPG:
 
 
     def prepare(self, obs):
+        if(self.hparams.action_gradients):
+            return self.real_last_action
         return self.get_action(obs, True)
     def reset_finalize(self, obs):
-        return self.get_action(obs, True)
+        return self.prepare(obs)
 
     def calc_normalizations(self):
         # Calculate state max and min
@@ -188,6 +199,14 @@ class DDPG:
         
         state_max = np.amax(states, 0)
         state_min = np.amin(states, 0)
+
+        # If we do action gradients, we concatenate last actions to observations
+        # Thus we already know min and max for these
+        if(self.hparams.action_gradients):
+            for i in range(0, self.act_dim):
+                state_max[self.real_obs_dim + i] = self.real_act_high[i]
+                state_min[self.real_obs_dim + i] = self.real_act_low[i]
+
 
         state_max[(state_min - state_max) == 0] += 1e-3
 
@@ -230,13 +249,13 @@ class DDPG:
 
         # Add replay noise if desired
         if(self.hparams.replay_noise):
-            state_noise = [np.random.uniform(-np.ones(self.hparams.obs_dim), np.ones(self.hparams.obs_dim), self.hparams.obs_dim) for i in range(0, batch_size)]
+            state_noise = [np.random.uniform(-np.ones(self.obs_dim), np.ones(self.obs_dim), self.obs_dim) for i in range(0, batch_size)]
             state_noise = torch.FloatTensor(state_noise).to(self.device)
             state_noise = self.denormalize_state(state_noise, True)
-            action_noise = [np.random.uniform(-np.ones(self.hparams.act_dim), np.ones(self.hparams.act_dim), self.hparams.act_dim) for i in range(0, batch_size)]
+            action_noise = [np.random.uniform(-np.ones(self.act_dim), np.ones(self.act_dim), self.act_dim) for i in range(0, batch_size)]
             action_noise = torch.FloatTensor(action_noise).to(self.device)
             action_noise = self.denormalize_action(action_noise, True)
-            next_state_noise = [np.random.uniform(-np.ones(self.hparams.obs_dim), np.ones(self.hparams.obs_dim), self.hparams.obs_dim) for i in range(0, batch_size)]
+            next_state_noise = [np.random.uniform(-np.ones(self.obs_dim), np.ones(self.obs_dim), self.obs_dim) for i in range(0, batch_size)]
             next_state_noise = torch.FloatTensor(next_state_noise).to(self.device)
             next_state_noise = self.denormalize_state(next_state_noise, True)
 
@@ -252,7 +271,8 @@ class DDPG:
         if(self.hparams.normalize_rewards):
             reward_batch = self.normalize_reward(reward_batch, True)
 
-        action_batch = self.normalize_action(action_batch, True)
+        if(self.hparams.normalize_actions):
+            action_batch = self.normalize_action(action_batch, True)
 
         self.critic_optimizer.zero_grad()
         curr_Q = self.critic.forward(state_batch, action_batch)
@@ -276,8 +296,8 @@ class DDPG:
 
         self.actor_optimizer.step()
 
-        self.writer.add_scalar('Loss/q', q_loss, self.time)
-        self.writer.add_scalar('Loss/policy', policy_loss, self.time)
+        self.logger.add_scalar('Loss/q', q_loss, self.time)
+        self.logger.add_scalar('Loss/policy', policy_loss, self.time)
 
         # update target networks 
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
@@ -294,9 +314,14 @@ class DDPG:
     def step(self, state, reward, done):
         self.time = self.time + 1
         self.epoch_reward += reward
+
+        # Amend last action to observation if using action gradients
+        if(self.hparams.action_gradients):
+            state = np.concatenate([state, self.real_last_action])
+
         self.replay_buffer.push(self.last_state, self.last_action, reward, state, done)
 
-        self.writer.add_scalar('Reward', reward, self.time)
+        self.logger.add_scalar('Reward', reward, self.time)
 
         if (self.time == self.hparams.random_exploration_steps):
             self.calc_normalizations()
@@ -309,16 +334,26 @@ class DDPG:
             print('Epoch %d' % epoch)
             print('Epoch reward %d' % self.epoch_reward)
             print('Step %d' % self.time)
-            self.writer.add_scalar('Epoch reward', self.epoch_reward, epoch)
+            self.logger.add_scalar('Epoch reward', self.epoch_reward, epoch)
 
             self.epoch_reward = 0
 
         action = self.get_action(state, True)
 
+        if(self.hparams.action_gradients):
+            self.real_last_action += action * self.action_grad_denormalizer
+            self.real_last_action = np.clip(self.real_last_action, self.real_act_low, self.real_act_high)
+
+            self.logger.logGradAction(self.time, action)
+            action = self.real_last_action
+
+        self.logger.logAction(self.time, action)
+        self.logger.logObservation(self.time, state)
+
         return action, False
 
     def close(self):
-        self.writer.close()
+        self.logger.close()
 
     def save_checkpoint(self, directory, prefix):
         torch.save(self.actor.state_dict(), '%s/%s_actor.pth' % (directory, prefix))
@@ -353,13 +388,13 @@ class DDPG:
             random_exploration_theta = 0.05,
 
             # How strongly it wanders around
-            random_exploration_sigma = 0.1,
+            random_exploration_sigma = 0.05,
 
             # The default action to start with in random exploration
             # Also where most of the exploration will happen around
             # -1 being minimum action and 1 maximum
             # None means np.zeros(act_dim) as mu
-            random_exploration_mu = [-0.6, -1, -0.9, -0.9, -0.9],
+            random_exploration_mu = [-0.01, -0.01, -0.01, -0.01, -0.01],
 
             # Number of steps after which to write out a checkpoint
             checkpoint_steps = 10000,
@@ -430,7 +465,7 @@ class DDPG:
             # For correlated noise the sigma (intensity of random movement)
             # For uncorrelated noise the noise_level factor
             # 1 results in noise across the whole action space
-            action_noise_sigma = 0.01,
+            action_noise_sigma = 0.1,
 
             # For decreasing noises this is the minimum sigma level
             action_noise_sigma_decayed = 1e-8,
@@ -444,15 +479,15 @@ class DDPG:
             action_noise_decay_steps = 50000,
 
             # Adding a uniform noise to the policy parameters helped facilitate exploration
-            parameter_noise = 0,
+            parameter_noise = 0.01,
 
             # Adding noise to experience replay helps to prevent overfitting
             # Requires action and observation normalization
             replay_noise = 1e-5,
 
-            # Actions are always normalized, as normalization for actions is perfect
-            # Makes it easier to implement action noise
-            #normalize_actions = True,
+            # Action normalization should always be enabled when the action space is not already between -1 and 1.
+            # Otherwise noise will not make sense
+            normalize_actions = True,
 
             # Whether to normalize observations
             # Normalization factors will be computed after observing some inputs, i.e.
@@ -467,4 +502,13 @@ class DDPG:
             # After that, rewards will mostly be between -1 and 1 internally
             # Though min and max from the random exploration phase is assumed
             normalize_rewards = True,
+
+            # Whether to offer gradient action spaces instead of the ones from the environment
+            # The policy is then limted to outputting a gradient and cannot change the action from
+            # One end of the action space to the other immediately
+            # Last actions are added as observations to the observation input
+            action_gradients = True,
+
+            # The maximum fraction of the action space to traverse in one step
+            action_gradient_stepsize = 0.01,
         )

@@ -52,43 +52,10 @@ class QBladeAdapter:
     return [0, 0, 0, 0, 0]
 
   def calc_reward(self, observation):
-    return observation[0]*self.lastAction[0]
+    return np.clip(observation[1], 0, None) - 1e-6*(observation[10] + observation[11] + observation[12])
 
   def calc_death(self, observation):
     return False
-
-  def logObservation(self, writer, step, observation):
-    writer.add_scalar('obs/rotational speed', observation[0], step)
-    writer.add_scalar('obs/power', observation[1], step)
-    writer.add_scalar('obs/HH wind velocity', observation[2], step)
-    writer.add_scalar('obs/yaw angle', observation[3], step)
-    writer.add_scalar('obs/pitch blade 1', observation[4], step)
-    writer.add_scalar('obs/pitch blade 2', observation[5], step)
-    writer.add_scalar('obs/pitch blade 3', observation[6], step)
-    writer.add_scalar('obs/tower top bending local x', observation[7], step)
-    writer.add_scalar('obs/tower top bending local y', observation[8], step)
-    writer.add_scalar('obs/tower top bending local z', observation[9], step)
-    writer.add_scalar('obs/oop bending blade 1', observation[10], step)
-    writer.add_scalar('obs/oop bending blade 2', observation[11], step)
-    writer.add_scalar('obs/oop bending blade 3', observation[12], step)
-    writer.add_scalar('obs/ip bending blade 1', observation[13], step)
-    writer.add_scalar('obs/ip bending blade 2', observation[14], step)
-    writer.add_scalar('obs/ip bending blade 3', observation[15], step)
-    writer.add_scalar('obs/oop tip deflection blade 1', observation[16], step)
-    writer.add_scalar('obs/oop tip deflection blade 2', observation[17], step)
-    writer.add_scalar('obs/oop tip deflection blade 3', observation[18], step)
-    writer.add_scalar('obs/ip tip deflection blade 1', observation[19], step)
-    writer.add_scalar('obs/ip tip deflection blade 2', observation[20], step)
-    writer.add_scalar('obs/ip tip deflection blade 3', observation[21], step)
-    #writer.add_scalar('obs/current time', observation[22], step)
-
-  def logAction(self, writer, step, action):
-    action = self.padAction(action)
-    writer.add_scalar('act/generator torque', action[0], step)
-    writer.add_scalar('act/yaw angle', action[1], step)
-    writer.add_scalar('act/pitch blade 1', action[2], step)
-    writer.add_scalar('act/pitch blade 2', action[3], step)
-    writer.add_scalar('act/pitch blade 3', action[4], step)
 
   def padAction(self, action):
     def choose(a, b):

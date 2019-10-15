@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import pickle
+from torch.utils.tensorboard import SummaryWriter
+from datetime import datetime
 from collections import deque
 
 # OU Noise with constant sigma
@@ -167,3 +169,54 @@ class BasicBuffer:
                 self.buffer = pickle.load(f)
         except:
             print("No memory data found")
+
+class QBladeLogger:
+
+    def __init__(self, logdir):
+        self.logdir = logdir
+        self.writer = SummaryWriter(logdir + '/' + str(datetime.now()))
+
+    def logObservation(self, step, observation):
+        self.writer.add_scalar('obs/rotational speed [rad/s]', observation[0], step)
+        self.writer.add_scalar('obs/power [W]', observation[1], step)
+        self.writer.add_scalar('obs/HH wind velocity [m/s]', observation[2], step)
+        self.writer.add_scalar('obs/yaw angle [deg]', observation[3], step)
+        self.writer.add_scalar('obs/pitch blade 1 [deg]', observation[4], step)
+        self.writer.add_scalar('obs/pitch blade 2 [deg]', observation[5], step)
+        self.writer.add_scalar('obs/pitch blade 3 [deg]', observation[6], step)
+        self.writer.add_scalar('obs/tower top bending local x [Nm]', observation[7], step)
+        self.writer.add_scalar('obs/tower top bending local y [Nm]', observation[8], step)
+        self.writer.add_scalar('obs/tower top bending local z [Nm]', observation[9], step)
+        self.writer.add_scalar('obs/oop bending blade 1 [Nm]', observation[10], step)
+        self.writer.add_scalar('obs/oop bending blade 2 [Nm]', observation[11], step)
+        self.writer.add_scalar('obs/oop bending blade 3 [Nm]', observation[12], step)
+        self.writer.add_scalar('obs/ip bending blade 1 [Nm]', observation[13], step)
+        self.writer.add_scalar('obs/ip bending blade 2 [Nm]', observation[14], step)
+        self.writer.add_scalar('obs/ip bending blade 3 [Nm]', observation[15], step)
+        self.writer.add_scalar('obs/oop tip deflection blade 1 [m]', observation[16], step)
+        self.writer.add_scalar('obs/oop tip deflection blade 2 [m]', observation[17], step)
+        self.writer.add_scalar('obs/oop tip deflection blade 3 [m]', observation[18], step)
+        self.writer.add_scalar('obs/ip tip deflection blade 1 [m]', observation[19], step)
+        self.writer.add_scalar('obs/ip tip deflection blade 2 [m]', observation[20], step)
+        self.writer.add_scalar('obs/ip tip deflection blade 3 [m]', observation[21], step)
+        #self.writer.add_scalar('obs/current time', observation[22], step)
+
+    def add_scalar(self, name, val, time):
+        self.writer.add_scalar(name, val, time)
+
+    def logGradAction(self, step, action):
+        self.writer.add_scalar('act_grad/generator torque', action[0], step)
+        self.writer.add_scalar('act_grad/yaw angle', action[1], step)
+        self.writer.add_scalar('act_grad/pitch blade 1', action[2], step)
+        self.writer.add_scalar('act_grad/pitch blade 2', action[3], step)
+        self.writer.add_scalar('act_grad/pitch blade 3', action[4], step)
+
+    def logAction(self, step, action):
+        self.writer.add_scalar('act/generator torque [Nm]', action[0], step)
+        self.writer.add_scalar('act/yaw angle [deg]', action[1], step)
+        self.writer.add_scalar('act/pitch blade 1 [deg]', action[2], step)
+        self.writer.add_scalar('act/pitch blade 2 [deg]', action[3], step)
+        self.writer.add_scalar('act/pitch blade 3 [deg]', action[4], step)
+
+    def close(self):
+        self.writer.close()

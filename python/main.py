@@ -73,9 +73,6 @@ def main():
     epoch_reward += r
 
     a, reset = agent.step(o, r, d)
-    
-    env.logAction(agent.writer, t, a)
-    env.logObservation(agent.writer, t, o)
 
     if(reset):
       o = env.reset()
