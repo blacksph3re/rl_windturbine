@@ -39,7 +39,7 @@ class QBladeAdapter:
 
   def get_act_dim(self):
     #return 5
-    return 1
+    return 5
 
   # TODO get actual values for this
   def get_act_high(self):
@@ -99,8 +99,8 @@ class QBladeAdapter:
 
   def storeAction(self, action):
     # Copy action to control vars
-    action = np.clip(action)
-    action = np.nan_to_num(self.padAction(action)), self.get_act_low(), self.get_act_high()
+    action = np.clip(action, self.get_act_low(), self.get_act_high())
+    action = np.nan_to_num(self.padAction(action))
 
     in_data = (ctypes.c_double * 5)(*action)
     self._setControlVars(in_data)

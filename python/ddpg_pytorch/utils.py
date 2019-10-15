@@ -10,6 +10,7 @@ class OUNoise(object):
         self.dim = dim
         self.theta = theta
         self.sigma = sigma
+        self.reset()
 
     def reset(self):
         self.state = self.mu
@@ -22,7 +23,6 @@ class OUNoise(object):
 
     def get_noise(self, _t=0):
         return self.evolve_state()
-
 
 # Ornstein-Ulhenbeck Noise
 # Taken from #https://github.com/vitchyr/rlkit/blob/master/rlkit/exploration_strategies/ou_strategy.py

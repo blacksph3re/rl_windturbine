@@ -109,3 +109,7 @@ Tries
 * Subtract tip deflection from reward
 * OU-Noise
 * Reparameterize control so actions are gradients
+
+### **10/09**
+
+Today I spent the whole day refactoring my code, as I didn't like the way I hacked in noise and normalizations. Now I can easily switch around between different types of noise, the whole code looks way better and it is easier to adjust things.

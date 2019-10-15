@@ -97,6 +97,7 @@ class DDPG:
         # We can already calc action normalization based on parameter space limits
         m = (self.act_low - self.act_high) / (-1 - 1)
         c = self.act_low - m * (-1)
+        assert(not np.any(m == 0))
         self.action_normalizer_params = (m, c)
         self.action_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
                                              torch.FloatTensor(c).to(self.device))
@@ -147,8 +148,8 @@ class DDPG:
     def get_action(self, obs, add_noise=False):
         action = None
         # Do some random exploration at the beginning
-        if(self.time < self.hparams.random_exploration_steps && add_noise):
-            action = self.denormalize_action(self.random_exploration_noise.get_noise(self.time))
+        if(self.time < self.hparams.random_exploration_steps and add_noise):
+            action = self.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
         else:
             # Send the observation to the device, normalize it
             # Then calculate the action and denormalize it
@@ -188,9 +189,13 @@ class DDPG:
         state_max = np.amax(states, 0)
         state_min = np.amin(states, 0)
 
+        state_max[(state_min - state_max) == 0] += 1e-3
+
         # Define a linear projection
         m = (state_min - state_max) / (-1 - 1)
         c = state_min - m * (-1)
+
+        assert(not np.any(m == 0))
 
         # Store once as cpu and once as gpu variant
         self.state_normalizer_params = (m, c)
@@ -200,11 +205,15 @@ class DDPG:
         # Same for rewards
         rewards = [reward for state, action, reward, next_state, mask in self.replay_buffer.buffer]
 
-        rewards_max = np.amax(rewards, 0)
-        rewards_min = np.amin(rewards, 0)
+        reward_max = np.amax(rewards, 0)
+        reward_min = np.amin(rewards, 0)
+
+        reward_max[(reward_min - reward_max) == 0] += 1e-3
 
         m = (reward_min - reward_max) / (-1 - 1)
         c = reward_min - m * (-1)
+
+        assert(not np.any(m == 0))
 
         self.reward_normalizer_params = (m, c)
         self.reward_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
@@ -302,15 +311,6 @@ class DDPG:
             print('Step %d' % self.time)
             self.writer.add_scalar('Epoch reward', self.epoch_reward, epoch)
 
-            # Printing weights
-            #print(dict(self.actor.state_dict())['linear1.weight'])
-            self.writer.add_histogram('actor/linear1', dict(self.actor.state_dict())['linear1.weight'], self.time)
-            self.writer.add_histogram('actor/linear2', dict(self.actor.state_dict())['linear2.weight'], self.time)
-
-            self.writer.add_histogram('critic/linear1', dict(self.critic.state_dict())['linear1.weight'], self.time)
-            self.writer.add_histogram('critic/linear2', dict(self.critic.state_dict())['linear2.weight'], self.time)
-
-
             self.epoch_reward = 0
 
         action = self.get_action(state, True)
@@ -350,10 +350,10 @@ class DDPG:
             random_exploration_type = "correlated",
 
             # How strongly it is drawn towards mu
-            random_exploration_theta = 0.1,
+            random_exploration_theta = 0.05,
 
             # How strongly it wanders around
-            random_exploration_sigma = 0.2,
+            random_exploration_sigma = 0.1,
 
             # The default action to start with in random exploration
             # Also where most of the exploration will happen around
@@ -413,7 +413,7 @@ class DDPG:
 
             # Upper and lower limits for actions, will be overwritten by environment act limits
             act_high = None,
-            act_low = -None,
+            act_low = None,
 
             # Where to store tensorboard logs
             logdir = "logs",
