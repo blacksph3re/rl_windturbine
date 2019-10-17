@@ -7,9 +7,11 @@ from ddpg_pytorch.ddpg import DDPG
 from gymadapter import GymAdapter
 from qbladeadapter import QBladeAdapter
 from gym.wrappers import Monitor
+from datetime import datetime
 import tensorflow as tf
 import argparse
 import os
+import json
 
 def main():
 
@@ -32,7 +34,8 @@ def main():
   hparams = DDPG.get_default_hparams()
 
   # Override arguments in command line
-  #hparams.parse(args.hparams)
+  if(args.hparams):
+    hparams.parse(args.hparams)
 
   # Set environment-specific hparams
   hparams.obs_dim = env.get_obs_dim()
@@ -51,22 +54,26 @@ def main():
   # Initialize the agent
   agent = DDPG(hparams)
 
+  start_time = 0
+
   # If we shall load a checkpoint, do so now
   if(args.load_checkpoint):
-    prefix = ""
-    with open(args.load_checkpoint + '/last', 'r') as f:
-      prefix = f.read()
-    print("Loading checkpoint from %s, prefix %s" % (args.load_checkpoint, prefix))
-    agent.load_checkpoint(args.load_checkpoint, prefix)
-
+    start_time = agent.load_checkpoint(args.load_checkpoint)
+    print("Loaded checkpoint from %s, starting at step %d" % (args.load_checkpoint, start_time))
   # Reset the environment
   o = env.reset()
   a = agent.prepare(o)
 
   total_reward = 0
+  total_resets = 0
   epoch_reward = 0
 
-  for t in range(0, hparams.steps_per_epoch * hparams.epochs):
+  for t in range(start_time, hparams.steps_per_epoch * hparams.epochs):
+    # do a checkpoint if required
+    if(t>0 and t%checkpoint_steps == 0):
+      file = agent.save_checkpoint(checkpoint_dir)
+      print("Checkpoint written to %s" % file)
+
     o, r, d = env.step(a)
 
     total_reward += r
@@ -77,13 +84,9 @@ def main():
     if(reset):
       o = env.reset()
       a = agent.reset_finalize(o)
+      total_resets += 1
 
-    # do a checkpoint
-    if(t>0 and t%checkpoint_steps == 0):
-      print("Writing checkpoint to %s at step %d" % (checkpoint_dir, t))
-      agent.save_checkpoint(checkpoint_dir, "step_%d_" % t)
-      with open(checkpoint_dir + '/last', 'w') as f:
-        f.write("step_%d_" % t)
+
 
   env.storeProject("checkpoints/sampleproject.wpa")
   env.close()

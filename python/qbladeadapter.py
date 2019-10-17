@@ -1,12 +1,47 @@
 import ctypes
+import _ctypes
 import time
 import numpy as np
 import itertools
+import os
+
+def isLoaded(lib):
+  libp = os.path.abspath(lib)
+  ret = os.system("lsof -p %d | grep %s" % (os.getpid(), libp))
+  print(ret)
+  return (ret == 0)
+
+def unloadLib(handle, path):
+  tries = 0
+  while(isLoaded(path)):
+    tries += 1
+    _ctypes.dlclose(handle)
+    print('Unloading, try %d' % tries)
+    if(tries > 150):
+      break
+
 
 class QBladeAdapter:
   def __init__(self):
-    qbladeLib = ctypes.cdll.LoadLibrary('../qblade_build/libQBlade.so')
+    self._qbladeLib = None
+
+    print("loading qblade library")
+    qbladeLib = ctypes.CDLL('../qblade_build/libQBlade.so')
+
+
     self._qbladeLib = qbladeLib
+
+    self.map_functions(qbladeLib)
+
+    print("creating qblade instance")
+    self._qbladeLib._Z14createInstancev()
+    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
+    print("loading qblade project")
+    self._loadProject(x)
+
+    print("qblade init done")
+
+  def map_functions(self, qbladeLib):
     self._createInstance = qbladeLib._Z14createInstancev
     self._initializeSimulation = qbladeLib._Z20initializeSimulationi
     self._loadProject = qbladeLib._Z11loadProjectPc
@@ -19,17 +54,20 @@ class QBladeAdapter:
     self._setControlVars.argtypes = [ctypes.POINTER(ctypes.c_double)]
     self._advanceSingleTimestep = qbladeLib._Z21advanceSingleTimestepv
 
-    self._qbladeLib._Z14createInstancev()
-    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
-    self._loadProject(x)
-    self._initializeSimulation(ctypes.c_int(0))
+  def del_functions(self):
+    del self._createInstance
+    del self._initializeSimulation
+    del self._loadProject
+    del self._storeProject
+    del self._setControlVars
+    del self._getControlVars
+    del self._advanceSingleTimestep
 
-    self.lastAction = np.zeros(self.get_act_dim())
 
   def reset(self):
-    # Resetting means 20 timesteps with constant control inputs
-    for _ in range(0, 20):
-      self._advanceSingleTimestep()
+    print('Resetting simulation')
+    self._initializeSimulation(ctypes.c_int(0))
+    print('reset done')
 
     return self.extractObservation()
 
@@ -39,30 +77,34 @@ class QBladeAdapter:
 
   def get_act_dim(self):
     #return 5
-    return 5
+    return 2
 
   # TODO get actual values for this
   def get_act_high(self):
     #return [10, 10, 10, 10, 10]
-    return [3.94e6, 1e-5, 45, 45, 45]
+    return [1.4e7, 90]
 
   # TODO get actual values for this
   def get_act_low(self):
     #return [0, 0, 0, 0, 0]
-    return [0, 0, 0, 0, 0]
+    return [0, 0]
 
-  def calc_reward(self, observation):
-    return np.clip(observation[1], 0, None) - 1e-6*(observation[10] + observation[11] + observation[12])
+  def calc_reward(self, observation, action):
+    rated_power = 1e6
+    rated_speed = 1.1
+    #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
+    #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
+    return -np.abs(observation[0]-rated_speed)
 
   def calc_death(self, observation):
-    return False
+
+    # 63 is the rotor size, so if anything bends further than that, it's broken off.
+    broken_state = 20
+    return np.abs(observation[16]) > broken_state or np.abs(observation[17]) > broken_state or np.abs(observation[18]) > broken_state
 
   def padAction(self, action):
-    def choose(a, b):
-      if(a == None):
-        return b
-      return a
-    return [choose(a, null) for a, null in itertools.zip_longest(action, np.ones(5))]
+    action = [action[0], 0, action[1], action[1], action[1]]
+    return action
 
   def storeAction(self, action):
     # Copy action to control vars
@@ -89,7 +131,7 @@ class QBladeAdapter:
     self._advanceSingleTimestep()
 
     observation = self.extractObservation()
-    return observation, self.calc_reward(observation), self.calc_death(observation)
+    return observation, self.calc_reward(observation, action), self.calc_death(observation)
 
   def render(self):
     pass

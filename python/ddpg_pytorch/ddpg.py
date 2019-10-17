@@ -3,6 +3,9 @@ import torch.optim as optim
 import torch.autograd as autograd
 import torch.nn.functional as F
 import numpy as np
+import os
+import json
+from datetime import datetime
 
 # For hparams
 import tensorflow as tf
@@ -33,8 +36,11 @@ class DDPG:
             self.real_act_low = self.act_low
             self.act_high = np.ones(self.act_dim)
             self.act_low = -np.ones(self.act_dim)
-            self.real_last_action = self.real_act_low.astype(float)
+            self.real_last_action = self.hparams.starting_action
             self.action_grad_denormalizer = (self.real_act_high - self.real_act_low) * self.hparams.action_gradient_stepsize
+
+            assert(np.all(self.real_last_action <= self.real_act_high))
+            assert(np.all(self.real_last_action >= self.real_act_low))
             assert(not np.any(self.action_grad_denormalizer == 0))
         
         # initialize actor and critic networks
@@ -121,12 +127,13 @@ class DDPG:
         self.reward_normalizer_params_gpu = (torch.FloatTensor(np.ones(1)).to(self.device), 
                                              torch.FloatTensor(np.zeros(1)).to(self.device))
 
-        self.logger = QBladeLogger(self.hparams.logdir)
+        self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps)
 
         self.time = 0
         self.last_state = np.zeros(self.obs_dim)
         self.last_action = np.zeros(self.act_dim)
         self.epoch_reward = 0
+        self.killcount = 0
 
     def normalize_action(self, action, gpu=False):
         m, c = self.action_normalizer_params_gpu if gpu else self.action_normalizer_params
@@ -190,6 +197,7 @@ class DDPG:
         if(self.hparams.action_gradients):
             return self.real_last_action
         return self.get_action(obs, True)
+
     def reset_finalize(self, obs):
         return self.prepare(obs)
 
@@ -209,6 +217,7 @@ class DDPG:
 
 
         state_max[(state_min - state_max) == 0] += 1e-3
+
 
         # Define a linear projection
         m = (state_min - state_max) / (-1 - 1)
@@ -238,7 +247,9 @@ class DDPG:
         self.reward_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
                                              torch.FloatTensor(c).to(self.device))
     
-    def update(self, batch_size):
+    def update(self, batch_size, time = None):
+        time = time or self.time
+
         state_batch, action_batch, reward_batch, next_state_batch, masks = self.replay_buffer.sample(batch_size)
 
         state_batch = torch.FloatTensor(state_batch).to(self.device)
@@ -288,7 +299,6 @@ class DDPG:
         
 
         # update actor
-        self.critic_optimizer.zero_grad()
         self.actor_optimizer.zero_grad()
         policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
 
@@ -296,8 +306,10 @@ class DDPG:
 
         self.actor_optimizer.step()
 
-        self.logger.add_scalar('Loss/q', q_loss, self.time)
-        self.logger.add_scalar('Loss/policy', policy_loss, self.time)
+        self.logger.add_scalar('Loss/q', q_loss, time)
+        self.logger.add_scalar('Loss/policy', policy_loss, time)
+
+        #print([x.grad for x in self.actor.parameters()])
 
         # update target networks 
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
@@ -312,8 +324,9 @@ class DDPG:
                 param.data.copy_(param.data + self.hparams.parameter_noise * np.random.uniform(-1, 1))
 
     def step(self, state, reward, done):
-        self.time = self.time + 1
         self.epoch_reward += reward
+        if(done):
+            self.killcount += 1
 
         # Amend last action to observation if using action gradients
         if(self.hparams.action_gradients):
@@ -326,7 +339,11 @@ class DDPG:
         if (self.time == self.hparams.random_exploration_steps):
             self.calc_normalizations()
 
-        if (len(self.replay_buffer) > self.batch_size):
+            # do the learning which we missed up on during random exploration
+            for i in range(0, self.hparams.random_exploration_steps):
+                self.update(self.batch_size, i)
+
+        if (self.time > self.hparams.random_exploration_steps and len(self.replay_buffer) > self.batch_size):
             self.update(self.batch_size)
 
         if (self.time > 0 and self.time % self.hparams.steps_per_epoch == 0):
@@ -350,24 +367,58 @@ class DDPG:
         self.logger.logAction(self.time, action)
         self.logger.logObservation(self.time, state)
 
+        self.time = self.time + 1
+
         return action, False
 
     def close(self):
         self.logger.close()
 
-    def save_checkpoint(self, directory, prefix):
+    def save_checkpoint(self, directory):
+        prefix = 'step_%d_' % self.time
+
+        # Save states
         torch.save(self.actor.state_dict(), '%s/%s_actor.pth' % (directory, prefix))
         torch.save(self.actor_target.state_dict(), '%s/%s_actor_target.pth' % (directory, prefix))
         torch.save(self.critic.state_dict(), '%s/%s_critic.pth' % (directory, prefix))
         torch.save(self.critic_target.state_dict(), '%s/%s_critic_target.pth' % (directory, prefix))
         self.replay_buffer.save(directory, prefix)
 
-    def load_checkpoint(self, directory, prefix):
+        # And metadata
+        metadata = {
+            "step": self.time,
+            "prefix": prefix,
+            "time": str(datetime.now()),
+            "killcount": self.killcount,
+            "hparams": str(self.hparams),
+            "real_last_action": self.real_last_action.tolist() if self.hparams.action_gradients else None,
+        }
+        with open('%s/%s_metadata' % (directory, prefix), 'w') as f:
+            f.write(json.dumps(metadata, indent=2))
+
+        return '%s/%s_metadata' % (directory, prefix)
+
+    def load_checkpoint(self, metadata_file):
+        # Load metadata
+        with open(metadata_file, 'r') as f:
+            metadata = json.loads(f.read())
+        directory = os.path.dirname(metadata_file)
+        prefix = metadata['prefix']
+        self.time = metadata['step'] + 1 # +1 to avoid saving right after loading
+        if('real_last_action' in metadata):
+            self.real_last_action = np.array(metadata['real_last_action'])
+        if('killcount' in metadata):
+            self.killcount = metadata['killcount']
+
+        # Load model state
         self.actor.load_state_dict(torch.load('%s/%s_actor.pth' % (directory, prefix)))
         self.actor_target.load_state_dict(torch.load('%s/%s_actor_target.pth' % (directory, prefix)))
         self.critic.load_state_dict(torch.load('%s/%s_critic.pth' % (directory, prefix)))
         self.critic_target.load_state_dict(torch.load('%s/%s_critic_target.pth' % (directory, prefix)))
         self.replay_buffer.load(directory, prefix)
+
+        # The main loop needs to know which timestep to start with
+        return self.time
 
 
     def get_default_hparams():
@@ -388,13 +439,14 @@ class DDPG:
             random_exploration_theta = 0.05,
 
             # How strongly it wanders around
-            random_exploration_sigma = 0.05,
+            random_exploration_sigma = 0.01,
 
             # The default action to start with in random exploration
             # Also where most of the exploration will happen around
             # -1 being minimum action and 1 maximum
             # None means np.zeros(act_dim) as mu
-            random_exploration_mu = [-0.01, -0.01, -0.01, -0.01, -0.01],
+            # If gradient actions are active, this is in gradient action space
+            random_exploration_mu = [-0.975, -1],
 
             # Number of steps after which to write out a checkpoint
             checkpoint_steps = 10000,
@@ -403,7 +455,7 @@ class DDPG:
             checkpoint_dir = "checkpoints",
 
             # Number of total epochs to run the training
-            epochs = 500,
+            epochs = 5000,
 
             # Number of steps to run after the training, testing the policy
             test_steps = 1000,
@@ -427,20 +479,20 @@ class DDPG:
             buffer_maxlen = 100000,
 
             # Learning rate of the Q approximator
-            critic_lr = 1e-3,
+            critic_lr = 1e-5,
 
             # Neural network sizes of the critic
-            critic_sizes = [32, 16, 16],
+            critic_sizes = [64, 32, 16],
 
             # Learning rate of the policy
-            actor_lr = 1e-3,
+            actor_lr = 1e-5,
 
             # Network sizes of the policy
-            actor_sizes = [16, 8],
+            actor_sizes = [32, 8],
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
-            init_weight_limit = 1,
+            init_weight_limit = 0.1,
 
             # Observation and action dimension, will be overwritten by environment obs dim
             obs_dim = None,
@@ -452,6 +504,9 @@ class DDPG:
 
             # Where to store tensorboard logs
             logdir = "logs",
+
+            # Log data every n steps
+            log_steps = 15,
 
             # Action noise
             # The type of action noise can be either
@@ -471,7 +526,7 @@ class DDPG:
             action_noise_sigma_decayed = 1e-8,
 
             # For correlated noises, how much the noise stays around the policy action
-            action_noise_theta = 0.01,
+            action_noise_theta = 0.0001,
 
             # For decreasing noise, after how many iterations the noise will be reduced to
             # action_noise_sigma_decayed
@@ -507,8 +562,13 @@ class DDPG:
             # The policy is then limted to outputting a gradient and cannot change the action from
             # One end of the action space to the other immediately
             # Last actions are added as observations to the observation input
-            action_gradients = True,
+            action_gradients = False,
 
             # The maximum fraction of the action space to traverse in one step
-            action_gradient_stepsize = 0.01,
+            action_gradient_stepsize = 1e-4,
+
+            # Starting action in absolute terms
+            # Only regarded when using action gradients, otherwise
+            # use random_exploration_mu
+            starting_action = [0, 30],
         )

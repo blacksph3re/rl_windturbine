@@ -2,11 +2,40 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
 class Critic(nn.Module):
-
-    def __init__(self, obs_dim, action_dim, hidden_size_1 = 1024, hidden_size_2 = 512, hidden_size_3 = 300, init_w = 1e-3):
+    def __init__(self, obs_dim, action_dim, hidden_size_1 = 1024, hidden_size_2 = 512, hidden_size_3 = 300, init_w = 0.1):
         super(Critic, self).__init__()
+
+        self.obs_dim = obs_dim
+        self.action_dim = action_dim
+
+        self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
+        self.linear2 = nn.Linear(hidden_size_1 + self.action_dim, hidden_size_2)
+        self.linear3 = nn.Linear(hidden_size_2, hidden_size_3)
+        self.linear4 = nn.Linear(hidden_size_3, 1)
+
+        self.init_weights(init_w)
+
+    def init_weights(self, init_w):
+        self.linear1.weight.data.uniform_(-init_w, init_w)
+        self.linear2.weight.data.uniform_(-init_w, init_w)
+        self.linear3.weight.data.uniform_(-init_w, init_w)
+        self.linear4.weight.data.uniform_(-init_w, init_w)
+
+    def forward(self, x, a):
+        xa = F.relu(self.linear1(x))
+        xa = torch.cat([xa,a], 1)
+        xa = F.relu(self.linear2(xa))
+        xa = F.relu(self.linear3(xa))
+        qval = self.linear4(xa)
+
+        return qval
+
+
+class CriticSimple(nn.Module):
+
+    def __init__(self, obs_dim, action_dim, hidden_size_1 = 1024, hidden_size_2 = 512, hidden_size_3 = 300, init_w = 0.1):
+        super(CriticSimple, self).__init__()
 
         self.obs_dim = obs_dim
         self.action_dim = action_dim
@@ -28,9 +57,35 @@ class Critic(nn.Module):
         return qval
 
 class Actor(nn.Module):
-
-    def __init__(self, obs_dim, action_dim, hidden_size_1 = 512, hidden_size_2 = 128, init_w = 1e-3):
+    def __init__(self, obs_dim, action_dim, hidden_size_1 = 512, hidden_size_2 = 128, init_w = 0.1):
         super(Actor, self).__init__()
+
+        self.obs_dim = obs_dim
+        self.action_dim = action_dim
+
+        self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
+        self.linear2 = nn.Linear(hidden_size_1, hidden_size_2)
+        self.linear3 = nn.Linear(hidden_size_2, self.action_dim)
+
+        self.init_weights(init_w)
+
+    def init_weights(self, init_w):
+        self.linear1.weight.data.uniform_(-init_w, init_w)
+        self.linear2.weight.data.uniform_(-init_w, init_w)
+        self.linear2.weight.data.uniform_(-init_w, init_w)
+
+
+    def forward(self, obs):
+        x = F.relu(self.linear1(obs))
+        x = F.relu(self.linear2(x))
+        action = torch.tanh(self.linear3(x))
+
+        return action
+
+class ActorSimple(nn.Module):
+
+    def __init__(self, obs_dim, action_dim, hidden_size_1 = 512, hidden_size_2 = 128, init_w = 0.1):
+        super(ActorSimple, self).__init__()
 
         self.obs_dim = obs_dim
         self.action_dim = action_dim

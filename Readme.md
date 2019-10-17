@@ -123,3 +123,22 @@ I managed to get my code running again, as I was getting NaNs after division by 
 Kill-count: ca 15
 
 I implemented gradient actions. I found that usually during random exploration, the first blades break off. 
+
+### **10/16**
+
+We were having zero parameters again after random exploration - problem was that I normalized after random exploration but did some learning before already
+Changing the orders of magnitude the network was getting after normalizing again resulted in zeroing out all weights and stopping learning
+
+Later we had other normalization problems where the turbine shaking like crazy later but not doing so in random exploration resulted in the same problem as before - with q exploding.
+
+Then, it wasn't even able to converge to setting the action to a certain value. I removed gradient actions which somehow seemed to improve on that. However, it is still not able to converge the bistable windturbine.
+
+The turbine appears to be stable either in backwards rotation super-high speed (high torque makes the rotor rotate backwards) or forwards super-high speed (4 rads, where 1 should be normal). In the latter case, sometimes blades fall off. The actions bounce between minimum and maximum, which is why we suspect a too high learning rate to cause overfitting. Because I can, I also try running a more complex network.
+
+Overnight I ran 4 simulations
+
+One with lr 1e-4 (second from top)
+One with lr 1e-5 (third from top)
+One with the complex networks (fifth from top)
+One with complex networks and higher gamma/tau (sixth from top)
+One who should hold a specific rotational speed (seventh)
