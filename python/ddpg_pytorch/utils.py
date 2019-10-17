@@ -6,7 +6,7 @@ from datetime import datetime
 from collections import deque
 
 # OU Noise with constant sigma
-class OUNoise(object):
+class OUNoise:
     def __init__(self, dim, theta, sigma, mu=None):
         self.mu = np.array(mu) if mu is not None else np.zeros(dim)
         self.dim = dim
@@ -30,7 +30,7 @@ class OUNoise(object):
 # Taken from #https://github.com/vitchyr/rlkit/blob/master/rlkit/exploration_strategies/ou_strategy.py
 # Sigma is the value for how much noise
 # Theta is the value for how close to stay around mu
-class OUNoiseDec(object):
+class OUNoiseDec:
     def __init__(self, dim, theta=0.15, sigma_start=0.3, sigma_start_step=0, sigma_end=None, sigma_end_step=1, mu=None):
         sigma_end = sigma_end if sigma_end is not None else sigma_start
         sigma_end_step = max(sigma_start_step+1, sigma_end_step)
@@ -56,7 +56,7 @@ class OUNoiseDec(object):
         self.update_sigma(t)
         return self.ounoise.get_noise()
 
-class GaussianNoise(object):
+class GaussianNoise:
     def __init__(self, dim, mean=0, variance=1):
         self.dim = dim
         self.mean = mean
@@ -66,7 +66,7 @@ class GaussianNoise(object):
         return np.random.randn(dim) * variance + mean
 
 
-class UniformNoise(object):
+class UniformNoise:
     def __init__(self, dim, noise_factor):
         self.dim = dim
         self.noise_factor = noise_factor
@@ -74,8 +74,7 @@ class UniformNoise(object):
     def get_noise(self, _t=0):
         return np.random.uniform(-np.ones(self.dim), np.ones(self.dim), self.dim) * noise_factor
 
-
-class UniformNoiseDec(object):
+class UniformNoiseDec:
     def __init__(self, dim, noise_start_factor=0.01, noise_start=0, noise_end_factor=None, noise_end=None):
         noise_end = max(noise_start+1, noise_end or 0)
         noise_end_factor = noise_end_factor if noise_end_factor is not None else noise_start_factor
@@ -98,7 +97,7 @@ class UniformNoiseDec(object):
 
   
 # Helper class for not having noise at all
-class NoNoise(object):
+class NoNoise:
     def __init__(self, dim, default_action=None):
         self.default_action = default_action if default_action is not None else np.zeros(self.dim)
         self.dim = dim

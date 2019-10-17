@@ -142,3 +142,7 @@ One with lr 1e-5 (third from top)
 One with the complex networks (fifth from top)
 One with complex networks and higher gamma/tau (sixth from top)
 One who should hold a specific rotational speed (seventh)
+
+### **10/17**
+
+Unfortunately I can't really look at my simulations at the moment, because the server seems to be unavailable. However I fixed checkpoint writing and a bug of a duplicate reset at startup.

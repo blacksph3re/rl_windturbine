@@ -390,7 +390,7 @@ class DDPG:
             "prefix": prefix,
             "time": str(datetime.now()),
             "killcount": self.killcount,
-            "hparams": str(self.hparams),
+            "hparams": self.hparams.values(),
             "real_last_action": self.real_last_action.tolist() if self.hparams.action_gradients else None,
         }
         with open('%s/%s_metadata' % (directory, prefix), 'w') as f:
@@ -495,12 +495,12 @@ class DDPG:
             init_weight_limit = 0.1,
 
             # Observation and action dimension, will be overwritten by environment obs dim
-            obs_dim = None,
-            act_dim = None,
+            obs_dim = 1,
+            act_dim = 1,
 
             # Upper and lower limits for actions, will be overwritten by environment act limits
-            act_high = None,
-            act_low = None,
+            act_high = [0.],
+            act_low = [0.],
 
             # Where to store tensorboard logs
             logdir = "logs",

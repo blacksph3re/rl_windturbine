@@ -18,8 +18,9 @@ def main():
   import argparse
   parser = argparse.ArgumentParser(description='QBlade RL controller training')
   parser.add_argument('--hparams', type=str,
-                    help='Comma separated list of "name=value" pairs.')
+                    help='Comma separated list of "name=value" pairs, overrides defaults and checkpoint hparams')
   parser.add_argument('--load_checkpoint', type=str, help="checkpoint to load")
+  parser.add_argument('--load_checkpoint_hparams', action="store_true", help="also load hparams from checkpoint file")
   args = parser.parse_args()
 
   # Set up the environment
@@ -33,9 +34,18 @@ def main():
   # Get default hparams
   hparams = DDPG.get_default_hparams()
 
-  # Override arguments in command line
+  # Check if we should load hparams from checkpoint file
+  if(args.load_checkpoint_hparams):
+    assert(args.load_checkpoint)
+    with open(args.load_checkpoint, 'r') as f:
+      metadata = json.loads(f.read())
+    print('parsing hparams from checkpoint: %s' % metadata['hparams'])
+    hparams.override_from_dict(metadata['hparams'])
+
+  # Override with arguments in command line
   if(args.hparams):
     hparams.parse(args.hparams)
+
 
   # Set environment-specific hparams
   hparams.obs_dim = env.get_obs_dim()
