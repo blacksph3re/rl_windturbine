@@ -82,7 +82,7 @@ class QBladeAdapter:
   # TODO get actual values for this
   def get_act_high(self):
     #return [10, 10, 10, 10, 10]
-    return [1.4e7, 90]
+    return [4e6, 90]
 
   # TODO get actual values for this
   def get_act_low(self):
@@ -90,17 +90,24 @@ class QBladeAdapter:
     return [0, 0]
 
   def calc_reward(self, observation, action):
-    rated_power = 1e6
+    rated_power = 1e3
     rated_speed = 1.1
     #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
     #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
-    return -np.abs(observation[0]-rated_speed)
+    return np.clip(2 
+      - np.abs((observation[1]-rated_power)/rated_power)
+      - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -5, 5)
+    #return -np.abs(observation[0]-rated_speed)
 
   def calc_death(self, observation):
 
     # 63 is the rotor size, so if anything bends further than that, it's broken off.
     broken_state = 20
-    return np.abs(observation[16]) > broken_state or np.abs(observation[17]) > broken_state or np.abs(observation[18]) > broken_state
+    broken_rpm = 3
+    return np.abs(observation[16]) > broken_state or \
+           np.abs(observation[17]) > broken_state or \
+           np.abs(observation[18]) > broken_state or \
+           np.abs(observation[0]) > broken_rpm
 
   def padAction(self, action):
     action = [action[0], 0, action[1], action[1], action[1]]

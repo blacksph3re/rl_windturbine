@@ -3,10 +3,9 @@
 # A learner also has an init routine and a step routine, which takes a state and returns control parameters
 # The learner takes a hyperparameter map
 
-from ddpg_pytorch.ddpg import DDPG
-from gymadapter import GymAdapter
-from qbladeadapter import QBladeAdapter
-from gym.wrappers import Monitor
+from ddpg.ddpg import DDPG
+from env.gymadapter import GymAdapter
+from env.qbladeadapter import QBladeAdapter
 from datetime import datetime
 import tensorflow as tf
 import argparse
@@ -22,12 +21,6 @@ def main():
   parser.add_argument('--load_checkpoint', type=str, help="checkpoint to load")
   parser.add_argument('--load_checkpoint_hparams', action="store_true", help="also load hparams from checkpoint file")
   args = parser.parse_args()
-
-  # Set up the environment
-  #env = GymAdapter(tf.contrib.training.HParams(
-  #  env_name='Pendulum-v0'
-  #))
-  #recorder = Monitor(env.env, 'videos')
 
   env = QBladeAdapter()
 
