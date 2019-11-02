@@ -94,9 +94,9 @@ class QBladeAdapter:
     rated_speed = 1.1
     #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
     #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
-    return np.clip(2 
+    return np.clip(5 
       - np.abs((observation[1]-rated_power)/rated_power)
-      - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -5, 5)
+      - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -50, 50)
     #return -np.abs(observation[0]-rated_speed)
 
   def calc_death(self, observation):

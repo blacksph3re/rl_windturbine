@@ -67,9 +67,6 @@ def main():
   o = env.reset()
   a = agent.prepare(o)
 
-  total_reward = 0
-  total_resets = 0
-  epoch_reward = 0
 
   for t in range(start_time, hparams.steps_per_epoch * hparams.epochs):
     # do a checkpoint if required
@@ -79,15 +76,11 @@ def main():
 
     o, r, d = env.step(a)
 
-    total_reward += r
-    epoch_reward += r
-
     a, reset = agent.step(o, r, d)
 
     if(reset):
       o = env.reset()
       a = agent.reset_finalize(o)
-      total_resets += 1
 
 
 

@@ -105,6 +105,27 @@ class NoNoise:
     def get_noise(self, _t=0):
         return np.zeros(dim)
 
+class CapacityBuffer:
+    def __init__(self, max_size):
+        self.max_size = max_size
+        self.buffer = []
+
+    def append(self, data):
+        self.push(data)
+    def push(self, data):
+        self.buffer.append(data)
+        while(len(self.buffer) > self.max_size):
+            del self.buffer[-1]
+
+    def get_buffer(self):
+        return self.buffer
+
+    def clear(self):
+        self.buffer = []
+
+    def __len__(self):
+        return len(self.buffer)
+
 class BasicBuffer:
 
     def __init__(self, max_size):
@@ -113,19 +134,30 @@ class BasicBuffer:
         self.full = False # Whether we are full
         self.buffer = np.array([(None, None, None, None, None, 0) for _ in range(max_size)])
         self.total_priority = 0
+        self.max_priority = 1
         self.steps_since_update = 0
 
     def update_totals(self):
         prios = [p for s,a,r,ns,d,p in self.buffer]
         self.total_priority = np.sum(prios)
+        self.max_priority = np.max(prios)
         self.steps_since_update = 0
 
-    def push(self, state, action, reward, next_state, done, priority=1):
+    def push(self, state, action, reward, next_state, done, priority=None):
+        # If not given a priority, make sure it's getting sampled
+        if(priority == None):
+            priority = self.max_priority
+        # If priority zero, increase it by just a little so it could still be sampled
+        # Also avoid filling the buffer with zero-priority samples
+        if(priority == 0):
+            priority = 1e-15
+
         experience = (state, action, np.array([reward]), next_state, done, priority)
 
         # Remove previous prio, add new one
         self.total_priority -= self.buffer[self.iterator][5]
         self.total_priority += priority
+        self.max_priority = max(self.max_priority, priority)
 
         # Store experience
         self.buffer[self.iterator] = experience
@@ -141,9 +173,13 @@ class BasicBuffer:
             self.total_priority -= self.buffer[i][5]
             self.buffer[i][5] = p
             self.total_priority += p
+            self.max_priority = max(self.max_priority, p)
 
     def get_buffer(self):
-        return self.buffer
+        if(self.full):
+            return self.buffer
+        else:
+            return self.buffer[0:self.iterator]
 
     def sample(self, batch_size):
         if(len(self.buffer) == 0):
@@ -197,6 +233,9 @@ class BasicBuffer:
 
     def load(self, file):
         try:
+            self.full = False
+            self.iterator = 0
+
             with open(file, "rb") as f:
                 self.buffer = pickle.load(f)
 
@@ -205,6 +244,10 @@ class BasicBuffer:
                 self.iterator = len(self.buffer)
 
                 self.buffer = np.concatenate((self.buffer, [(None, None, None, None, None, 0) for _ in range(len(self.buffer), self.max_size)]))
+            elif(len(self.buffer) > self.max_size):
+                self.buffer = self.buffer[0:self.max_size]
+                self.full = True
+                self.iterator = 0
             else:
                 self.full = True
                 self.iterator = 0

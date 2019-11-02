@@ -32,7 +32,7 @@ class DDPG:
         # If we should feed in past data, multiply obs dim by that
         if(self.hparams.feed_past):
             self.obs_dim *= self.hparams.feed_past + 1
-            self.past_obs = deque(maxlen=self.hparams.feed_past)
+            self.past_obs = CapacityBuffer(self.hparams.feed_past)
 
         # In case of action gradients, reduce action high and low and extend the observation space
         if(self.hparams.action_gradients):
@@ -197,16 +197,18 @@ class DDPG:
             action = action.squeeze(0).cpu().detach().numpy()
 
         action = np.clip(action, self.act_low, self.act_high)
-        self.last_action = action
-        self.last_state = obs
 
         return action
 
 
-    def prepare(self, obs):
+    def prepare(self, state):
+        state = self.feed_past_obs(state)
         if(self.hparams.action_gradients):
             return self.real_last_action
-        return self.get_action(obs, True)
+        action = self.get_action(state, True)
+        self.last_action = action
+        self.last_state = state
+        return action
 
     def reset_finalize(self, obs):
         return self.prepare(obs)
@@ -214,13 +216,14 @@ class DDPG:
     def calc_normalizations(self):
         # Load additional data if wanted
         if(self.hparams.normalization_extradata):
-            tmpbuffer = BasicBuffer(0)
+            tmpbuffer = BasicBuffer(100000)
             tmpbuffer.load(self.hparams.normalization_extradata)
-            extrastates = [state for state, action, reward, next_state, mask in tmpbuffer.buffer]
-            extrarewards = [reward for state, action, reward, next_state, mask in tmpbuffer.buffer]
+            extrastates = [state for state, _, _, _, _, _ in tmpbuffer.get_buffer()]
+            extrarewards = [reward for _, _, reward, _, _, _ in tmpbuffer.get_buffer()]
+
 
         # Calculate state max and min
-        states = [state for state, action, reward, next_state, mask in self.replay_buffer.get_buffer()]
+        states = [state for state, _, _, _, _, _ in self.replay_buffer.get_buffer()]
 
         if(self.hparams.normalization_extradata):
             states = states + extrastates
@@ -251,7 +254,7 @@ class DDPG:
                                             torch.FloatTensor(c).to(self.device))
 
         # Same for rewards
-        rewards = [reward for state, action, reward, next_state, mask in self.replay_buffer.get_buffer()]
+        rewards = [reward for _, _, reward, _, _, _ in self.replay_buffer.get_buffer()]
 
         if(self.hparams.normalization_extradata):
             rewards = rewards + extrarewards
@@ -270,10 +273,24 @@ class DDPG:
         self.reward_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
                                              torch.FloatTensor(c).to(self.device))
     
+    def feed_past_obs(self, state):
+        # Append last observations to observation if using past feeding
+        if(self.hparams.feed_past):
+            # Check if past feeding is long enough already
+            if(len(self.past_obs) < self.hparams.feed_past):
+                self.reset_past_obs(state)
+
+            state = np.concatenate([state, *self.past_obs.get_buffer()])
+
+            self.past_obs.append(state)
+
+        assert(len(state) == self.obs_dim)
+        return state
+
     def update(self, batch_size, time = None):
         time = time or self.time
 
-        state_batch, action_batch, reward_batch, next_state_batch, masks = self.replay_buffer.sample(batch_size)
+        state_batch, action_batch, reward_batch, next_state_batch, masks, indices = self.replay_buffer.sample(batch_size)
 
         state_batch = torch.FloatTensor(state_batch).to(self.device)
         action_batch = torch.FloatTensor(action_batch).to(self.device)
@@ -320,19 +337,19 @@ class DDPG:
         q_loss.backward() 
         self.critic_optimizer.step()
 
-        if(self.hparams.log_net_insights and self.hparams.log_net_insights % self.time == 0):
+        if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
             critic_state = dict(self.critic.cpu().named_parameters())
-            self.logger.add_histogram_nofilter('critic-weights/linear1', critic_state['linear1.weight'], self.time)
-            self.logger.add_histogram_nofilter('critic-weights/linear2', critic_state['linear2.weight'], self.time)
+            self.logger.add_histogram_nofilter('critic-weights/linear1', critic_state['linear1.weight'], time)
+            self.logger.add_histogram_nofilter('critic-weights/linear2', critic_state['linear2.weight'], time)
 
-            self.logger.add_histogram_nofilter('critic-grads/linear1', np.log10(np.abs(critic_state['linear1.weight'].grad)+1e-20), self.time)
-            self.logger.add_histogram_nofilter('critic-grads/linear2', np.log10(np.abs(critic_state['linear2.weight'].grad)+1e-20), self.time)
+            self.logger.add_histogram_nofilter('critic-grads/linear1', np.log10(np.abs(critic_state['linear1.weight'].grad)+1e-20), time)
+            self.logger.add_histogram_nofilter('critic-grads/linear2', np.log10(np.abs(critic_state['linear2.weight'].grad)+1e-20), time)
 
             if('linear3.weight' in critic_state and 'linear4.weight' in critic_state):
-                self.logger.add_histogram_nofilter('critic-weights/linear3', critic_state['linear3.weight'], self.time)
-                self.logger.add_histogram_nofilter('critic-weights/linear4', critic_state['linear4.weight'], self.time)
-                self.logger.add_histogram_nofilter('critic-grads/linear3', np.log10(np.abs(critic_state['linear3.weight'].grad)+1e-20), self.time)
-                self.logger.add_histogram_nofilter('critic-grads/linear4', np.log10(np.abs(critic_state['linear4.weight'].grad)+1e-20), self.time)
+                self.logger.add_histogram_nofilter('critic-weights/linear3', critic_state['linear3.weight'], time)
+                self.logger.add_histogram_nofilter('critic-weights/linear4', critic_state['linear4.weight'], time)
+                self.logger.add_histogram_nofilter('critic-grads/linear3', np.log10(np.abs(critic_state['linear3.weight'].grad)+1e-20), time)
+                self.logger.add_histogram_nofilter('critic-grads/linear4', np.log10(np.abs(critic_state['linear4.weight'].grad)+1e-20), time)
             self.critic.to(self.device)
 
 
@@ -347,17 +364,18 @@ class DDPG:
         self.logger.add_scalar('Loss/q', q_loss, time)
         self.logger.add_scalar('Loss/policy', policy_loss, time)
 
-        if(self.hparams.log_net_insights and self.hparams.log_net_insights % self.time == 0):
-            actor_state = dict(self.actor.cpu().named_parameters())
-            self.logger.add_histogram_nofilter('actor-weights/linear1', actor_state['linear1.weight'], self.time)
-            self.logger.add_histogram_nofilter('actor-weights/linear2', actor_state['linear2.weight'], self.time)
 
-            self.logger.add_histogram_nofilter('actor-grads/linear1', np.log10(np.abs(actor_state['linear1.weight'].grad)+1e-20), self.time)
-            self.logger.add_histogram_nofilter('actor-grads/linear2', np.log10(np.abs(actor_state['linear2.weight'].grad)+1e-20), self.time)
+        if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
+            actor_state = dict(self.actor.cpu().named_parameters())
+            self.logger.add_histogram_nofilter('actor-weights/linear1', actor_state['linear1.weight'], time)
+            self.logger.add_histogram_nofilter('actor-weights/linear2', actor_state['linear2.weight'], time)
+
+            self.logger.add_histogram_nofilter('actor-grads/linear1', np.log10(np.abs(actor_state['linear1.weight'].grad)+1e-20), time)
+            self.logger.add_histogram_nofilter('actor-grads/linear2', np.log10(np.abs(actor_state['linear2.weight'].grad)+1e-20), time)
 
             if('linear3.weight' in actor_state):
-                self.logger.add_histogram_nofilter('actor-weights/linear3', actor_state['linear3.weight'], self.time)
-                self.logger.add_histogram_nofilter('actor-grads/linear3', np.log10(np.abs(actor_state['linear3.weight'].grad)+1e-20), self.time)
+                self.logger.add_histogram_nofilter('actor-weights/linear3', actor_state['linear3.weight'], time)
+                self.logger.add_histogram_nofilter('actor-grads/linear3', np.log10(np.abs(actor_state['linear3.weight'].grad)+1e-20), time)
             self.actor.to(self.device)
 
 
@@ -375,40 +393,27 @@ class DDPG:
 
     def reset_past_obs(self, cur_state):
         if(self.hparams.feed_past):
+            self.past_obs.clear()
             for i in range(0, self.hparams.feed_past):
                 self.past_obs.append(cur_state)
 
     def step(self, state, reward, done):
-        self.epoch_reward += reward
-        if(done):
-            self.killcount += 1
-            self.epoch_killcount += 1
 
-        # Append last observations to observation if using past feeding
-        if(self.hparams.feed_past):
-            # Check if past feeding is long enough already
-            if(len(self.past_obs) < self.hparams.feed_past):
-                self.reset_past_obs()
-
-            state = np.concatenate([state, *self.past_obs])
-            self.past_obs.append(state)
+        state = self.feed_past_obs(state)
 
         # Append last action to observation if using action gradients
         if(self.hparams.action_gradients):
             state = np.concatenate([state, self.real_last_action])
 
-        # If in the last step we died, do not add that experience to the replay buffer
-        if(not self.last_death):
-            self.replay_buffer.push(self.last_state, self.last_action, reward, state, done)
-            
-            # Also reset past observations to not capture anything before the death
-            self.reset_past_obs()
+        self.replay_buffer.push(self.last_state, self.last_action, reward, state, done)
 
-        self.last_death = done
+        self.epoch_reward += reward
+        if(done):
+            self.killcount += 1
+            self.epoch_killcount += 1
+            self.past_obs.clear()
 
-        self.logger.add_scalar('Reward/real', reward, self.time)
         [norm_reward] = self.normalize_reward([reward], False)
-        self.logger.add_scalar('Reward/norm', norm_reward, self.time)
 
         if (self.time == self.hparams.random_exploration_steps):
             print("Random exploration finished, preparing normal run")
@@ -434,6 +439,10 @@ class DDPG:
 
         action = self.get_action(state, True)
 
+        self.last_action = action
+        self.last_state = state
+        self.last_death = done
+
         if(self.hparams.action_gradients):
             self.real_last_action += action * self.action_grad_denormalizer
             self.real_last_action = np.clip(self.real_last_action, self.real_act_low, self.real_act_high)
@@ -443,10 +452,12 @@ class DDPG:
 
         self.logger.logAction(self.time, action)
         self.logger.logObservation(self.time, state)
+        self.logger.add_scalar('Reward/real', reward, self.time)
 
         if(self.time > self.hparams.random_exploration_steps):
             self.logger.logAction(self.time, self.normalize_action(action), 'act_norm')
             self.logger.logObservation(self.time, self.normalize_state(state), 'obs_norm')
+            self.logger.add_scalar('Reward/norm', norm_reward, self.time)
 
 
         self.time = self.time + 1
@@ -511,24 +522,24 @@ class DDPG:
 
             # Number of steps to sample random actions
             # before starting to utilize the policy
-            random_exploration_steps = 6000,
+            random_exploration_steps = 1000,
 
             # Type of random exploration noise
             # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
             random_exploration_type = "correlated",
 
             # How strongly it is drawn towards mu
-            random_exploration_theta = 0.05,
+            random_exploration_theta = 0.1,
 
             # How strongly it wanders around
-            random_exploration_sigma = 0.01,
+            random_exploration_sigma = 0.2,
 
             # The default action to start with in random exploration
             # Also where most of the exploration will happen around
             # -1 being minimum action and 1 maximum
             # None means np.zeros(act_dim) as mu
             # If gradient actions are active, this is in gradient action space
-            random_exploration_mu = [-1, -1],
+            random_exploration_mu = [0.5, -0.5],
 
             # Number of steps after which to write out a checkpoint
             checkpoint_steps = 10000,
@@ -544,7 +555,7 @@ class DDPG:
 
             # Batch size for experience replay
             # The bigger the less it will overfit to specific samples
-            batch_size = 16,
+            batch_size = 32,
 
             # The discounting factor with which experiences in the future are regarded
             # less than experiences now. The higher, the further into the future the value function
@@ -564,7 +575,7 @@ class DDPG:
             critic_lr = 1e-2,
 
             # Neural network sizes of the critic
-            critic_sizes = [64, 32, 16],
+            critic_sizes = [128, 64, 32],
 
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
@@ -574,7 +585,7 @@ class DDPG:
             actor_lr = 1e-5,
 
             # Network sizes of the policy
-            actor_sizes = [32, 8],
+            actor_sizes = [64, 16],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
             actor_simple = False,
@@ -599,7 +610,7 @@ class DDPG:
 
             # Log net insight histograms every n steps
             # -1 for disabling completely
-            log_net_insights = 100,
+            log_net_insights = 150,
 
             # Action noise
             # The type of action noise can be either
@@ -654,7 +665,8 @@ class DDPG:
             # Additional nrmalization replay data to load when
             # calculating normalizations
             # Set to none if you don't want to load extra data
-            normalization_extradata = 'checkpoints/step_990000__memory.dat',
+            #normalization_extradata = 'checkpoints/step_30000__memory.dat',
+            normalization_extradata = None,
 
             # Whether to offer gradient action spaces instead of the ones from the environment
             # The policy is then limted to outputting a gradient and cannot change the action from
@@ -673,6 +685,6 @@ class DDPG:
             # Feed in this number of past observations as additional data to the net
             # This will increase the observation size by the given factor
             # None if you want to disable it
-            feed_past = 0,
+            feed_past = 1,
 
         )
