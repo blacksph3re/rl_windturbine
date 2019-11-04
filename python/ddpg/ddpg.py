@@ -218,12 +218,12 @@ class DDPG:
         if(self.hparams.normalization_extradata):
             tmpbuffer = BasicBuffer(100000)
             tmpbuffer.load(self.hparams.normalization_extradata)
-            extrastates = [state for state, _, _, _, _, _ in tmpbuffer.get_buffer()]
-            extrarewards = [reward for _, _, reward, _, _, _ in tmpbuffer.get_buffer()]
+            extrastates = [state for state, _, _, _, _ in tmpbuffer.get_buffer()]
+            extrarewards = [reward for _, _, reward, _, _ in tmpbuffer.get_buffer()]
 
 
         # Calculate state max and min
-        states = [state for state, _, _, _, _, _ in self.replay_buffer.get_buffer()]
+        states = [state for state, _, _, _, _ in self.replay_buffer.get_buffer()]
 
         if(self.hparams.normalization_extradata):
             states = states + extrastates
@@ -254,7 +254,7 @@ class DDPG:
                                             torch.FloatTensor(c).to(self.device))
 
         # Same for rewards
-        rewards = [reward for _, _, reward, _, _, _ in self.replay_buffer.get_buffer()]
+        rewards = [reward for _, _, reward, _, _ in self.replay_buffer.get_buffer()]
 
         if(self.hparams.normalization_extradata):
             rewards = rewards + extrarewards
@@ -332,10 +332,17 @@ class DDPG:
         expected_Q = reward_batch + self.gamma * next_Q
         
         # update critic
+        # Idea: huber loss?
         q_loss = F.mse_loss(curr_Q, expected_Q.detach())
 
         q_loss.backward() 
         self.critic_optimizer.step()
+
+        # Update priorities if using prioritized experience replay
+        # TODO Should we correct importance sampling now?
+        if(self.hparams.prioritized_experience_replay):
+            td_error = (expected_Q.detach() - curr_Q.detach()).abs().cpu().data.numpy()
+            self.replay_buffer.update_priorities(indices, td_error)
 
         if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
             critic_state = dict(self.critic.cpu().named_parameters())
@@ -351,6 +358,8 @@ class DDPG:
                 self.logger.add_histogram_nofilter('critic-grads/linear3', np.log10(np.abs(critic_state['linear3.weight'].grad)+1e-20), time)
                 self.logger.add_histogram_nofilter('critic-grads/linear4', np.log10(np.abs(critic_state['linear4.weight'].grad)+1e-20), time)
             self.critic.to(self.device)
+
+            self.logger.add_histogram_nofilter('priorities', np.array(self.replay_buffer.get_priorities()), time)
 
 
         # update actor
@@ -522,7 +531,7 @@ class DDPG:
 
             # Number of steps to sample random actions
             # before starting to utilize the policy
-            random_exploration_steps = 1000,
+            random_exploration_steps = 6000,
 
             # Type of random exploration noise
             # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
@@ -539,7 +548,7 @@ class DDPG:
             # -1 being minimum action and 1 maximum
             # None means np.zeros(act_dim) as mu
             # If gradient actions are active, this is in gradient action space
-            random_exploration_mu = [0.5, -0.5],
+            random_exploration_mu = [-1, -1],
 
             # Number of steps after which to write out a checkpoint
             checkpoint_steps = 10000,
@@ -548,7 +557,7 @@ class DDPG:
             checkpoint_dir = "checkpoints",
 
             # Number of total epochs to run the training
-            epochs = 5000,
+            epochs = 10,
 
             # Number of steps to run after the training, testing the policy
             test_steps = 1000,
@@ -579,7 +588,7 @@ class DDPG:
 
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
-            critic_simple = False,
+            critic_simple = True,
 
             # Learning rate of the policy
             actor_lr = 1e-5,
@@ -588,7 +597,7 @@ class DDPG:
             actor_sizes = [64, 16],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
-            actor_simple = False,
+            actor_simple = True,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
@@ -665,7 +674,8 @@ class DDPG:
             # Additional nrmalization replay data to load when
             # calculating normalizations
             # Set to none if you don't want to load extra data
-            #normalization_extradata = 'checkpoints/step_30000__memory.dat',
+            #normalization_extradata = 'normalization_data/past_feeding_1.dat',
+            #normalization_extradata = 'normalization_data/no_past_feeding.dat',
             normalization_extradata = None,
 
             # Whether to offer gradient action spaces instead of the ones from the environment
@@ -686,5 +696,9 @@ class DDPG:
             # This will increase the observation size by the given factor
             # None if you want to disable it
             feed_past = 1,
+
+            # In prioritized experience replay the probability of a sample to be replayed is proportional to its TD error
+            # This allows critical samples to be replayed more often and thus the critic updating faster
+            prioritized_experience_replay = True,
 
         )

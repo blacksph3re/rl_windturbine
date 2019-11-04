@@ -82,7 +82,7 @@ class QBladeAdapter:
   # TODO get actual values for this
   def get_act_high(self):
     #return [10, 10, 10, 10, 10]
-    return [4e6, 90]
+    return [8e6, 90]
 
   # TODO get actual values for this
   def get_act_low(self):
