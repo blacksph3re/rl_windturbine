@@ -1,0 +1,8 @@
+\contentsline {section}{\numberline {0.1}Background:}{2}{section.0.1}% 
+\contentsline {section}{\numberline {0.2}Tasks}{2}{section.0.2}% 
+\contentsline {chapter}{\numberline {1}ein kapitel}{2}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}eine Grafik}{2}{section.1.1}% 
+\contentsline {subsection}{\numberline {1.1.1}Etwas Mathe}{2}{subsection.1.1.1}% 
+\contentsline {subsubsection}{\numberline {1.1.1.1}Verweise auf Literatur}{2}{subsubsection.1.1.1.1}% 
+\contentsline {paragraph}{\nonumberline etwas quelltext}{2}{lstnumber.-1.5}% 
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{3}{chapter*.5}% 

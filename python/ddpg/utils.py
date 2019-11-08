@@ -330,11 +330,6 @@ class BasicBuffer:
             print("Could not load memory: %s" % str(e))
 
 
-x = BasicBuffer(10)
-x.push(1,1,1,1,1, 1)
-x.push(2,2,2,2,2, 0.5)
-x.push(3,3,3,3,3, 0.1)
-
 class QBladeLogger:
 
     def __init__(self, logdir, log_steps):
@@ -343,29 +338,34 @@ class QBladeLogger:
         self.writer = SummaryWriter(logdir + '/' + str(datetime.now()))
 
     def logObservation(self, step, observation, prefix='obs'):
-        self.add_scalar('%s/rotational speed [rad/s]' % prefix, observation[0], step)
-        self.add_scalar('%s/power [W]' % prefix, observation[1], step)
-        self.add_scalar('%s/HH wind velocity [m/s]' % prefix, observation[2], step)
-        self.add_scalar('%s/yaw angle [deg]' % prefix, observation[3], step)
-        self.add_scalar('%s/pitch blade 1 [deg]' % prefix, observation[4], step)
-        self.add_scalar('%s/pitch blade 2 [deg]' % prefix, observation[5], step)
-        self.add_scalar('%s/pitch blade 3 [deg]' % prefix, observation[6], step)
-        self.add_scalar('%s/tower top bending local x [Nm]' % prefix, observation[7], step)
-        self.add_scalar('%s/tower top bending local y [Nm]' % prefix, observation[8], step)
-        self.add_scalar('%s/tower top bending local z [Nm]' % prefix, observation[9], step)
-        self.add_scalar('%s/oop bending blade 1 [Nm]' % prefix, observation[10], step)
-        self.add_scalar('%s/oop bending blade 2 [Nm]' % prefix, observation[11], step)
-        self.add_scalar('%s/oop bending blade 3 [Nm]' % prefix, observation[12], step)
-        self.add_scalar('%s/ip bending blade 1 [Nm]' % prefix, observation[13], step)
-        self.add_scalar('%s/ip bending blade 2 [Nm]' % prefix, observation[14], step)
-        self.add_scalar('%s/ip bending blade 3 [Nm]' % prefix, observation[15], step)
-        self.add_scalar('%s/oop tip deflection blade 1 [m]' % prefix, observation[16], step)
-        self.add_scalar('%s/oop tip deflection blade 2 [m]' % prefix, observation[17], step)
-        self.add_scalar('%s/oop tip deflection blade 3 [m]' % prefix, observation[18], step)
-        self.add_scalar('%s/ip tip deflection blade 1 [m]' % prefix, observation[19], step)
-        self.add_scalar('%s/ip tip deflection blade 2 [m]' % prefix, observation[20], step)
-        self.add_scalar('%s/ip tip deflection blade 3 [m]' % prefix, observation[21], step)
-        #self.add_scalar('%s/current time' % prefix, observation[22], step)
+        labels = {
+          0: 'rotational speed [rad/s]',
+          1: 'power [kW]',
+          2: 'HH wind velocity [m/s]',
+          3: 'yaw angle [deg]',
+          4: 'pitch blade 1 [deg]',
+          5: 'pitch blade 2 [deg]',
+          6: 'pitch blade 3 [deg]',
+          7: 'tower top bending local x [Nm]',
+          8: 'tower top bending local y [Nm]',
+          9: 'tower top bending local z [Nm]',
+          10: 'oop bending blade 1 [Nm]',
+          11: 'oop bending blade 2 [Nm]',
+          12: 'oop bending blade 3 [Nm]',
+          13: 'ip bending blade 1 [Nm]',
+          14: 'ip bending blade 2 [Nm]',
+          15: 'ip bending blade 3 [Nm]',
+          16: 'oop tip deflection blade 1 [m]',
+          17: 'oop tip deflection blade 2 [m]',
+          18: 'oop tip deflection blade 3 [m]',
+          19: 'ip tip deflection blade 1 [m]',
+          20: 'ip tip deflection blade 2 [m]',
+          21: 'ip tip deflection blade 3 [m]',
+          22: 'current time'
+        }
+
+        for i in range(0, len(observation)):
+            self.add_scalar('%s/%s'% (prefix, labels[i]), observation[i], step)
 
     def add_scalar(self, name, val, time):
         # Don't do anything if not in the logging step

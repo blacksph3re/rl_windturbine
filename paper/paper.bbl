@@ -1,0 +1,87 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{MWP{\etalchar{+}}13}
+
+\bibitem[BESK18]{burda_exploration_2018}
+\textsc{Burda}, Yuri ; \textsc{Edwards}, Harrison ; \textsc{Storkey}, Amos  ;
+  \textsc{Klimov}, Oleg:
+\newblock Exploration by {Random} {Network} {Distillation}.
+\newblock {In: }\emph{arXiv:1810.12894 [cs, stat]}
+\newblock  (2018), Oktober. --
+\newblock arXiv: 1810.12894
+
+\bibitem[BW14]{berglind_fatigue_2014}
+\textsc{Berglind}, J. J.~B. ; \textsc{Wisniewski}, Rafael:
+\newblock Fatigue {Estimation} {Methods} {Comparison} for {Wind} {Turbine}
+  {Control}.
+\newblock {In: }\emph{arXiv:1411.3925 [math]}
+\newblock  (2014), November. --
+\newblock arXiv: 1411.3925
+
+\bibitem[LHP{\etalchar{+}}15]{lillicrap_continuous_2015}
+\textsc{Lillicrap}, Timothy~P. ; \textsc{Hunt}, Jonathan~J. ; \textsc{Pritzel},
+  Alexander ; \textsc{Heess}, Nicolas ; \textsc{Erez}, Tom ; \textsc{Tassa},
+  Yuval ; \textsc{Silver}, David  ; \textsc{Wierstra}, Daan:
+\newblock {CONTINUOUS} {CONTROL} {WITH} {DEEP} {REINFORCEMENT} {LEARNING}.
+\newblock {In: }\emph{arXiv:1509.02971 [cs, stat]}
+\newblock  (2015), September. --
+\newblock arXiv: 1509.02971
+
+\bibitem[MKS{\etalchar{+}}13]{mnih_playing_2013}
+\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
+  ; \textsc{Graves}, Alex ; \textsc{Antonoglou}, Ioannis ; \textsc{Wierstra},
+  Daan  ; \textsc{Riedmiller}, Martin:
+\newblock Playing {Atari} with {Deep} {Reinforcement} {Learning}.
+\newblock {In: }\emph{arXiv:1312.5602 [cs]}
+\newblock  (2013), Dezember. --
+\newblock arXiv: 1312.5602
+
+\bibitem[MWP{\etalchar{+}}13]{marten_qblade:_2013}
+\textsc{Marten}, D ; \textsc{Wendler}, J ; \textsc{Pechlivanoglou}, G ;
+  \textsc{Nayeri}, C~N.  ; \textsc{Paschereit}, C~O.:
+\newblock {QBLADE}: {AN} {OPEN} {SOURCE} {TOOL} {FOR} {DESIGN} {AND}
+  {SIMULATION} {OF} {HORIZONTAL} {AND} {VERTICAL} {AXIS} {WIND} {TURBINES}.
+\newblock
+\newblock 3 (2013), Nr. 3, S.~6
+
+\bibitem[noaa]{noauthor_ddpg-explained-towardsdatascience_nodate}
+
+\newblock \emph{ddpg-explained-towardsdatascience}
+
+\bibitem[noab]{noauthor_deep-rl-skymind_nodate}
+
+\newblock \emph{deep-rl-skymind}
+
+\bibitem[noac]{noauthor_envelope-detection_nodate}
+
+\newblock \emph{envelope-detection}
+
+\bibitem[noad]{noauthor_rl-overview_nodate}
+
+\newblock \emph{rl-overview}
+
+\bibitem[PHD{\etalchar{+}}17]{plappert_parameter_2017}
+\textsc{Plappert}, Matthias ; \textsc{Houthooft}, Rein ; \textsc{Dhariwal},
+  Prafulla ; \textsc{Sidor}, Szymon ; \textsc{Chen}, Richard~Y. ;
+  \textsc{Chen}, Xi ; \textsc{Asfour}, Tamim ; \textsc{Abbeel}, Pieter  ;
+  \textsc{Andrychowicz}, Marcin:
+\newblock Parameter {Space} {Noise} for {Exploration}.
+\newblock {In: }\emph{arXiv:1706.01905 [cs, stat]}
+\newblock  (2017), Juni. --
+\newblock arXiv: 1706.01905
+
+\bibitem[SLH{\etalchar{+}}13]{silver_deterministic_2013}
+\textsc{Silver}, David ; \textsc{Lever}, Guy ; \textsc{Heess}, Nicolas ;
+  \textsc{Degris}, Thomas ; \textsc{Wierstra}, Daan  ; \textsc{Riedmiller},
+  Martin:
+\newblock Deterministic {Policy} {Gradient} {Algorithms}.
+\newblock
+\newblock  (2013), S.~9
+
+\bibitem[UO30]{uhlenbeck_theory_1930}
+\textsc{Uhlenbeck}, G.~E. ; \textsc{Ornstein}, L.~S.:
+\newblock On the {Theory} of the {Brownian} {Motion}.
+\newblock {In: }\emph{Physical Review}
+\newblock 36 (1930), September, Nr. 5, S. 823--841. --
+\newblock ISSN 0031--899X
+
+\end{thebibliography}

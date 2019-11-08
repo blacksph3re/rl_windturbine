@@ -146,3 +146,41 @@ One who should hold a specific rotational speed (seventh)
 ### **10/17**
 
 Unfortunately I can't really look at my simulations at the moment, because the server seems to be unavailable. However I fixed checkpoint writing and a bug of a duplicate reset at startup.
+
+### **10/18**
+
+The machine is still not available, so we resort to some theoretical things.
+
+An idea would be to rework the reward function a bit. Ideas are
+* Include rated rotational speed to punish exceeding it (0.1\*(x-0.6)^6)
+* Smoothing it with a running filter (averaging across the last 10 steps or so)
+
+* Using experiences from other trainings for normalization instead of misusing random exploration for this
+* Clipping rewards/losses as there have been some outliers
+
+Also we found that Openai gyms sometimes provide time derivative informations, which we could do too. We would only need to get rid of some noise there, as a single-step derivative will most likely be very noisy. We should do some signal processing there...
+
+Colleague said just concatenating the last k states to the current state would be enough for adding temporal difference information, as the net can do the subtraction itself. Maybe 
+
+Also we did some paper reading, the zico paper tries a REINFORCE algorithm which is basically policy gradients with a stochastic policy and an algorithm they present themselves (TRPS) but which is amazingly close to TRPO
+
+
+### **11/01**
+
+I have tried a couple of things, which didn't work at first due to broken normalizations and then due to whyever. I changed the death condition of the turbine to a high rotation speed, which makes it impossible for the simulation to stay in unnatural space for too long. This didn't help though. However it exposes a bit of a different behaviour - instead of going full nut mode, it stays pretty stable at a negative rotational speed.
+
+Furthermore, I started implementing prioritized experience replay, the replay buffer already works. However (because of floating point instability) I can't normalize my priorities to a probability distribution without a hassle :/ I'll implement a sumtree
+
+Also I believe that I should refactor again, the code has gotten too complex and unreadable for all the hparam settings. Maybe I can take some settings out (type of noise?) and split the ddpg class into two, a wrapper which does all the normalization, past feeding etc and an actual ddpg class.
+
+I started experimenting with feeding past observations, it didn't work for a while but I fixed it. Now it is having heavy loss explosions, though normalization works okay. I will try to leave it running a bit. It could be division by almost zero somewhere... It also stays below zero rpm, but way more noisy than the variant without past feeding
+
+### **11/04**
+
+Vanishing gradients, here we go again. I should reduce complexity? Mäh.
+
+### **11/06**
+
+I tracked down the vanishing gradients as well as the loss explosions to past feeding. This seems to introduce serious instability for some reason. Sending in only one observation stabilized everything. Also PER seems to do fine. It now converges to slowly rotating the turbine backwards, actually reacting on changes in a way...
+
+Okay I implemented a P-Controller instead of random exploration - I am actually shit at machine learning. With just a simple linear controller I can easily stabilize rotational speed at a fixed rpm...

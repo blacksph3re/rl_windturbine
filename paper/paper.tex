@@ -1,0 +1,101 @@
+\documentclass[hyperref,german,beleg]{cgvpub}
+
+\usepackage{acro}
+\input{abbreviations.tex}
+
+%weitere Optionen zum Ergänzen (in eckigen Klammern):
+% 
+% female	weibliche Titelbezeichnung bei Diplom
+% bibnum	numerische Literaturschlüssel
+% final 	für Abgabe	
+% lof			Abbildungsverzeichis
+% lot			Tabellenverzeichnis
+% noproblem	keine Aufgabenstellung
+% notoc			kein Inhaltsverzeichnis
+% twoside		zweiseitig
+\author{Nico Westerbeck}
+\title{Reinforcement-Learning Windturbine Controller}
+\birthday{10. Januar 1994}
+\placeofbirth{Bielefeld}
+\matno{3951488}
+
+\betreuer{Dr. Dmitrij Schlesinger}
+\bibfiles{literatur}
+\problem{
+  \section{Background:}
+  Here at the HFI Experimental fluid mechanics group, we have developed an
+  open source project called QBlade. QBlade is a simulation tool used for
+  testing wind turbines in the hostile environment that they normally operate.
+  We normally tackle problems of aerodynamic or structural optimization but
+  we have also a research focus on the development of the control systems of
+  the wind turbines. We currently have a research effort looking at developing
+  cluster-based controllers building on the work of Professor Bernd Noack who
+  is a guest professor at our group. In the last year or so (Nair, A. G., Yeh, C.-
+  A., Kaiser, E., Noack, B. R., Brunton, S. L., \& Taira, K. (2018). Cluster-based
+  feedback control of turbulent post-stall separated flows. Journal of Physics
+  Fluid Dynamics, (M), 1-32. Retrieved from http://arxiv.org/abs/1809.07220).
+  AI projects such as openAI have enabled he rapid development of neural
+  network in the field of control using reinforcement learning. The goal of this
+  project is to use QBlade as a wind turbine simulator and attempt to control
+  the pitch and rotor speed in a way that doesn’t cause the wind turbine to
+  shatter but instead to yield energy, i.e. reward and death condition. This first
+  stage of work should be considered as exploratory but will hopefully open up
+  avenues of controlling active flow control elements such as flaps.
+
+  \section{Tasks}
+  The major tasks of the project are as follows:
+  \begin{itemize}
+    \item Build up and interface between QBlade and python the model code so that an external code can run as a controller within a QBlade simulation.
+    \item Gain a rough understanding of the mechanics of wind turbines and their controllers.
+    \item Research reinforcement learning methods suitable for use as a windturbine controller and perform a literature review on these approaches.
+    \item Create a reinforcement learning agent which uses the Qblade interface for controllers to control a windturbine. 
+      \begin{itemize}
+        \item Inputs to the agent could be defined by the standartized controller input format to Nordex turbines, which consists of 39 real-valued sensor-inputs. However, initial tests can be conducted with whichever inputs are easiest to tackle. If required, further hidden state from the simulation can be exported to enrich data quality. If aiming for industrial quality, more inputs and also sensor faults could be optionally incorporated.
+        \item Outputs are in a minimum version pitch angles for the 3 blades and turbine torque. Optionally the agent should be able to control active element such as flaps on the blades.
+      \end{itemize}
+    \item Optimize the agent to deliver maximum energy yield.
+    \item Optimize under respect of certain boundary conditions (maximum pitch acceleration, maximum power, maximum blade load, blade touching the tower) and optionally other boundary conditions like long term turbine wear.
+    \item If necessary for the training process, scale the simulation to run at a larger scale.
+    \item Implement and attempt to get the agent to perform something close to sensible control of the wind turbine. Optionally evaluate the results against existing controllers and try to outperform them.
+    \item Optionally, create a conference paper, poster or blog post etc.. on the results. 
+  \end{itemize}
+}
+
+
+\copyrighterklaerung{Hier soll jeder Autor die von ihm eingeholten
+Zustimmungen der Copyright-Besitzer angeben bzw. die in Web Press
+Rooms angegebenen generellen Konditionen seiner Text- und
+Bild"ubernahmen zitieren.}
+\acknowledgments{Die Danksagung...}
+
+
+\begin{document}
+\chapter{Intro}
+
+Recent advancements in reinforcment learning have managed to tackle more and more complex problems, like StarCraft or Go. The range of topics, RL is applicable to, increases. However, so far, there hasn't been an effort to control a windturbine with a reinforcement learning algorithm. Current state of the art linear controllers are performing well in maintaining turbine control, and the optimization margin for these is small, as they achieve the theoretical maximum energy output up to rated windspeed and manage to keep the turbine intact above rated windspeeds.
+
+Trying it nontheless can still provide for some foundational knowledge for future developments. Park control becomes a bigger topic in wind-energy, where controlling all windturbines of a park together can increase overall energy yield or protect windturbines further down the windstream from wakes by turbines up front. C
+
+
+\chapter{Background}
+
+This section aims at facilitating the background knowledge necessary for understanding this paper. We fill first introduce windturbines and common terms around that
+
+\section{Windturbine control}
+% Quote wind-energy handbook, talk about how currently wind turbines are controlled.
+There are two mayor types of wind turbine designs, \ac{HAWT} and \ac{VAWT}, which differ by their rotation axis. In this work, we will only look at \ac{HAWT} and all mentions of windturbines mean \ac{HAWT} type turbines. Such a turbine is made up by 3 big components, a tower on which a nacelle is rested which in turn has a rotor in front. 
+The joint between tower and nacelle allows for rotation to turn the rotor into the wind. Except for recent ideas \quote{Howland_Lele_Dabiri_2019}, the best value for the rotational direction was to always turn the rotor directly into the wind, and for the sake of simplicity we will omit this control parameter from our simulation.
+In the nacelle there is, most importantly, an electrical generator, which can be given a specific torque. It will then slow down the rotor with that torque and at the same time generate energy proportional to rotor speed and torque.
+
+\section{QBlade}
+% Quickly introduce qblade as a simulation tool
+Our data source in this work is the open-source simulation tool QBlade \quote{Marten_Wendler_Pechlivanoglou_Nayeri_Paschereit_2013} developed at TU Berlin. QBlade is an accessible and performant tool with the primary purpose of designing and simulating wind turbines in a graphical user interface. Its simulation results are on par with current state-of-the-art proprietary simulation tools and it yields good computational efficiency. To be used in reinforcement learning, we designed an interface, over which the QBlade simulation can be embedded into an external environment. Most machine-learning frameworks are written in python, so we decided to compile QBlade into library format and expose the most fundamental functions to allow it to communicate with any programming language that can load libraries. As python has a ctypes interface to load c-code, we could link a python agent to the QBlade C++ environment.
+
+QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \quote{Jonkman_Butterfield_Musial_Scott_2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
+
+\section{Reinforcement learning}
+% 
+
+\section{RL on windturbines}
+
+\end{document}

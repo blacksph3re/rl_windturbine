@@ -13,11 +13,17 @@ class Critic(nn.Module):
         if(self.simple):
             self.linear1 = nn.Linear(self.obs_dim + self.action_dim, hidden_size_1)
             self.linear2 = nn.Linear(hidden_size_1, 1)
+            print('Initialized Critic with %d, %d, %d' % (self.obs_dim + self.action_dim, hidden_size_1, 1))
         else:
             self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
             self.linear2 = nn.Linear(hidden_size_1 + self.action_dim, hidden_size_2)
             self.linear3 = nn.Linear(hidden_size_2, hidden_size_3)
             self.linear4 = nn.Linear(hidden_size_3, 1)
+            print('Initialized Critic with %d, %d, %d, %d, %d' % (self.obs_dim + self.action_dim,
+                                                              hidden_size_1,
+                                                              hidden_size_2,
+                                                              hidden_size_3,
+                                                              1))
 
         self.init_weights(init_w)
 
@@ -28,6 +34,12 @@ class Critic(nn.Module):
         if(not self.simple):
             self.linear3.weight.data.uniform_(-init_w, init_w)
             self.linear4.weight.data.uniform_(-init_w, init_w)
+
+    def first_layer(self, x, a):
+        if(self.simple):
+            return F.relu(self.linear1(torch.cat([x, a], 1)))
+        else:
+            return F.relu(self.linear1(x))
 
     def forward_complex(self, x, a):
         xa = F.relu(self.linear1(x))
@@ -62,10 +74,12 @@ class Actor(nn.Module):
         if(self.simple):
             self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
             self.linear2 = nn.Linear(hidden_size_1, self.action_dim)
+            print("Initialized actor with %d, %d, %d" % (self.obs_dim, hidden_size_1, self.action_dim))
         else:
             self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
             self.linear2 = nn.Linear(hidden_size_1, hidden_size_2)
             self.linear3 = nn.Linear(hidden_size_2, self.action_dim)
+            print("Initialized actor with %d, %d, %d, %d" % (self.obs_dim, hidden_size_1, hidden_size_2, self.action_dim))
 
         self.init_weights(init_w)
 
@@ -74,6 +88,9 @@ class Actor(nn.Module):
         self.linear2.weight.data.uniform_(-init_w, init_w)
         if(not self.simple):
             self.linear3.weight.data.uniform_(-init_w, init_w)
+
+    def first_layer(self, obs):
+        return F.relu(self.linear1(obs))
 
     def forward_complex(self, obs):
         x = F.relu(self.linear1(obs))

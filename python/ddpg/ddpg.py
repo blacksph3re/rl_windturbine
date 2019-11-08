@@ -173,28 +173,27 @@ class DDPG:
     def get_action(self, obs, add_noise=False):
         action = None
         # Do some random exploration at the beginning
-        if(self.time < self.hparams.random_exploration_steps and add_noise):
-            action = self.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
-        else:
-            # Send the observation to the device, normalize it
-            # Then calculate the action and denormalize it
-            state = torch.FloatTensor(obs).unsqueeze(0).to(self.device)
 
-            if (self.hparams.normalize_observations):
-                state = self.normalize_state(state, True)
-            
-            # Run the network
-            action = self.actor.forward(state)
+        # Send the observation to the device, normalize it
+        # Then calculate the action and denormalize it
+        state = torch.FloatTensor(obs).unsqueeze(0).to(self.device)
 
-            # Add noise
+        if (self.hparams.normalize_observations):
+            state = self.normalize_state(state, True)
+        
+        # Run the network
+        action = self.actor.forward(state)
+
+        # Add noise
+        if(add_noise):
             noise = torch.FloatTensor(self.action_noise.get_noise(self.time)).to(self.device)
             action = action + noise
-            
-            if(self.hparams.normalize_actions):
-                action = self.denormalize_action(action, True)
-            
-            # Get it to the cpu
-            action = action.squeeze(0).cpu().detach().numpy()
+        
+        if(self.hparams.normalize_actions):
+            action = self.denormalize_action(action, True)
+        
+        # Get it to the cpu
+        action = action.squeeze(0).cpu().detach().numpy()
 
         action = np.clip(action, self.act_low, self.act_high)
 
@@ -345,21 +344,40 @@ class DDPG:
             self.replay_buffer.update_priorities(indices, td_error)
 
         if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
-            critic_state = dict(self.critic.cpu().named_parameters())
-            self.logger.add_histogram_nofilter('critic-weights/linear1', critic_state['linear1.weight'], time)
-            self.logger.add_histogram_nofilter('critic-weights/linear2', critic_state['linear2.weight'], time)
+            self.logger.add_histogram_nofilter('critic/l1-act', self.critic.first_layer(state_batch, action_batch).detach().cpu(), time)
 
+            critic_state = dict(self.critic.cpu().named_parameters())
+
+
+            self.logger.add_histogram_nofilter('critic-weights/linear1', critic_state['linear1.weight'], time)
+            self.logger.add_scalar_nofilter('critic/l1-dead', np.sum(critic_state['linear1.weight'].data.numpy() == 0), time)
             self.logger.add_histogram_nofilter('critic-grads/linear1', np.log10(np.abs(critic_state['linear1.weight'].grad)+1e-20), time)
+            self.logger.add_scalar_nofilter('critic/l1-grad-exp', np.sum(critic_state['linear1.weight'].grad.numpy() > 1e10), time)
+            self.logger.add_scalar_nofilter('critic/l1-vanishing-grad', np.sum(critic_state['linear1.weight'].grad.numpy() == 0), time)
+
+            self.logger.add_histogram_nofilter('critic-weights/linear2', critic_state['linear2.weight'], time)
+            self.logger.add_scalar_nofilter('critic/l2-dead', np.sum(critic_state['linear2.weight'].data.numpy() == 0), time)
             self.logger.add_histogram_nofilter('critic-grads/linear2', np.log10(np.abs(critic_state['linear2.weight'].grad)+1e-20), time)
+            self.logger.add_scalar_nofilter('critic/l2-grad-exp', np.sum(critic_state['linear2.weight'].grad.numpy() > 1e10), time)
+            self.logger.add_scalar_nofilter('critic/l2-vanishing-grad', np.sum(critic_state['linear2.weight'].grad.numpy() == 0), time)
 
             if('linear3.weight' in critic_state and 'linear4.weight' in critic_state):
                 self.logger.add_histogram_nofilter('critic-weights/linear3', critic_state['linear3.weight'], time)
-                self.logger.add_histogram_nofilter('critic-weights/linear4', critic_state['linear4.weight'], time)
+                self.logger.add_scalar_nofilter('critic/l3-dead', np.sum(critic_state['linear3.weight'].data.numpy() == 0), time)
                 self.logger.add_histogram_nofilter('critic-grads/linear3', np.log10(np.abs(critic_state['linear3.weight'].grad)+1e-20), time)
+                self.logger.add_scalar_nofilter('critic/l3-grad-exp', np.sum(critic_state['linear3.weight'].grad.numpy() > 1e10), time)
+                self.logger.add_scalar_nofilter('critic/l3-vanishing-grad', np.sum(critic_state['linear3.weight'].grad.numpy() == 0), time)
+
+                self.logger.add_histogram_nofilter('critic-weights/linear4', critic_state['linear4.weight'], time)
+                self.logger.add_scalar_nofilter('critic/l4-dead', np.sum(critic_state['linear4.weight'].data.numpy() == 0), time)
                 self.logger.add_histogram_nofilter('critic-grads/linear4', np.log10(np.abs(critic_state['linear4.weight'].grad)+1e-20), time)
+                self.logger.add_scalar_nofilter('critic/l4-grad-exp', np.sum(critic_state['linear4.weight'].grad.numpy() > 1e10), time)
+                self.logger.add_scalar_nofilter('critic/l4-vanishing-grad', np.sum(critic_state['linear4.weight'].grad.numpy() == 0), time)
+
+
             self.critic.to(self.device)
 
-            self.logger.add_histogram_nofilter('priorities', np.array(self.replay_buffer.get_priorities()), time)
+            self.logger.add_histogram_nofilter('priorities', np.log10(self.replay_buffer.get_priorities()+1e-20), time)
 
 
         # update actor
@@ -375,14 +393,26 @@ class DDPG:
 
 
         if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
+            self.logger.add_histogram_nofilter('actor/l1-act', self.actor.first_layer(state_batch).detach().cpu(), time)
             actor_state = dict(self.actor.cpu().named_parameters())
-            self.logger.add_histogram_nofilter('actor-weights/linear1', actor_state['linear1.weight'], time)
-            self.logger.add_histogram_nofilter('actor-weights/linear2', actor_state['linear2.weight'], time)
 
+
+            self.logger.add_scalar_nofilter('actor/l1-dead', np.sum(actor_state['linear1.weight'].data.numpy() == 0), time)
+            self.logger.add_scalar_nofilter('actor/l1-grad-exp', np.sum(actor_state['linear1.weight'].grad.numpy() > 1e10), time)
+            self.logger.add_scalar_nofilter('actor/l1-vanishing-grad', np.sum(actor_state['linear1.weight'].grad.numpy() == 0), time)
+            self.logger.add_histogram_nofilter('actor-weights/linear1', actor_state['linear1.weight'], time)
             self.logger.add_histogram_nofilter('actor-grads/linear1', np.log10(np.abs(actor_state['linear1.weight'].grad)+1e-20), time)
+
+            self.logger.add_scalar_nofilter('actor/l2-dead', np.sum(actor_state['linear2.weight'].data.numpy() == 0), time)
+            self.logger.add_scalar_nofilter('actor/l2-grad-exp', np.sum(actor_state['linear2.weight'].grad.numpy() > 1e10), time)
+            self.logger.add_scalar_nofilter('actor/l2-vanishing-grad', np.sum(actor_state['linear2.weight'].grad.numpy() == 0), time)
+            self.logger.add_histogram_nofilter('actor-weights/linear2', actor_state['linear2.weight'], time)
             self.logger.add_histogram_nofilter('actor-grads/linear2', np.log10(np.abs(actor_state['linear2.weight'].grad)+1e-20), time)
 
             if('linear3.weight' in actor_state):
+                self.logger.add_scalar_nofilter('actor/l3-dead', np.sum(actor_state['linear3.weight'].data.numpy() == 0), time)
+                self.logger.add_scalar_nofilter('actor/l3-grad-exp', np.sum(actor_state['linear3.weight'].grad.numpy() > 1e10), time)
+                self.logger.add_scalar_nofilter('actor/l3-vanishing-grad', np.sum(actor_state['linear3.weight'].grad.numpy() == 0), time)
                 self.logger.add_histogram_nofilter('actor-weights/linear3', actor_state['linear3.weight'], time)
                 self.logger.add_histogram_nofilter('actor-grads/linear3', np.log10(np.abs(actor_state['linear3.weight'].grad)+1e-20), time)
             self.actor.to(self.device)
@@ -420,7 +450,8 @@ class DDPG:
         if(done):
             self.killcount += 1
             self.epoch_killcount += 1
-            self.past_obs.clear()
+            if(self.hparams.feed_past):
+                self.past_obs.clear()
 
         [norm_reward] = self.normalize_reward([reward], False)
 
@@ -431,6 +462,10 @@ class DDPG:
             # do the learning which we missed up on during random exploration
             for i in range(0, self.hparams.random_exploration_steps):
                 self.update(self.batch_size, i)
+
+            # set all priorities in the replay buffer to maximum, so everything will get sampled (those with prio 1 most likely won't get sampled)
+            self.replay_buffer.update_priorities(range(0, len(self.replay_buffer)), 
+                                                 np.ones(len(self.replay_buffer)) * self.replay_buffer.max_priority)
 
         if (self.time > 0 and self.time % self.hparams.steps_per_epoch == 0):
             epoch = (self.time // self.hparams.steps_per_epoch)
@@ -446,7 +481,12 @@ class DDPG:
         if (self.time > self.hparams.random_exploration_steps and len(self.replay_buffer) > self.batch_size):
             self.update(self.batch_size)
 
-        action = self.get_action(state, True)
+        if(self.time < self.hparams.random_exploration_steps):
+            action = [2e7*state[0]-12e6,0]
+            action += self.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
+            action = np.clip(action, self.act_low, self.act_high)
+        else:
+            action = self.get_action(state, True)
 
         self.last_action = action
         self.last_state = state
@@ -531,24 +571,24 @@ class DDPG:
 
             # Number of steps to sample random actions
             # before starting to utilize the policy
-            random_exploration_steps = 6000,
+            random_exploration_steps = 20000,
 
             # Type of random exploration noise
             # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
             random_exploration_type = "correlated",
 
             # How strongly it is drawn towards mu
-            random_exploration_theta = 0.1,
+            random_exploration_theta = 0.05,
 
             # How strongly it wanders around
-            random_exploration_sigma = 0.2,
+            random_exploration_sigma = 0.02,
 
             # The default action to start with in random exploration
             # Also where most of the exploration will happen around
             # -1 being minimum action and 1 maximum
             # None means np.zeros(act_dim) as mu
             # If gradient actions are active, this is in gradient action space
-            random_exploration_mu = [-1, -1],
+            random_exploration_mu = [-1,-1],
 
             # Number of steps after which to write out a checkpoint
             checkpoint_steps = 10000,
@@ -557,19 +597,20 @@ class DDPG:
             checkpoint_dir = "checkpoints",
 
             # Number of total epochs to run the training
-            epochs = 10,
+            epochs = 2000,
 
             # Number of steps to run after the training, testing the policy
             test_steps = 1000,
 
             # Batch size for experience replay
             # The bigger the less it will overfit to specific samples
-            batch_size = 32,
+            # Also the bigger, the less likely vanishing gradients appear
+            batch_size = 128,
 
             # The discounting factor with which experiences in the future are regarded
             # less than experiences now. The higher, the further into the future the value function
             # will look but also the less stable it gets
-            gamma = 0.999,
+            gamma = 0.99,
 
             # The speed in which the target network follows the main network
             # Higher means faster learning but also more likely to fall into local
@@ -581,23 +622,23 @@ class DDPG:
             buffer_maxlen = 100000,
 
             # Learning rate of the Q approximator
-            critic_lr = 1e-2,
+            critic_lr = 1e-4,
 
             # Neural network sizes of the critic
-            critic_sizes = [128, 64, 32],
+            critic_sizes = [512, 128, 64],
 
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
-            critic_simple = True,
+            critic_simple = False,
 
             # Learning rate of the policy
-            actor_lr = 1e-5,
+            actor_lr = 1e-4,
 
             # Network sizes of the policy
-            actor_sizes = [64, 16],
+            actor_sizes = [128, 32],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
-            actor_simple = True,
+            actor_simple = False,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
@@ -647,7 +688,7 @@ class DDPG:
             action_noise_decay_steps = 50000,
 
             # Adding a uniform noise to the policy parameters helped facilitate exploration
-            parameter_noise = 0.01,
+            parameter_noise = False,
 
             # Adding noise to experience replay helps to prevent overfitting
             # Requires action and observation normalization
@@ -695,7 +736,7 @@ class DDPG:
             # Feed in this number of past observations as additional data to the net
             # This will increase the observation size by the given factor
             # None if you want to disable it
-            feed_past = 1,
+            feed_past = 0,
 
             # In prioritized experience replay the probability of a sample to be replayed is proportional to its TD error
             # This allows critical samples to be replayed more often and thus the critic updating faster

@@ -1,0 +1,58 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Arch Linux)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: paper.aux
+The style file: alphadin.bst
+Reallocated singl_function (elt_size=8) to 100 items from 50.
+Database file #1: literatur.bib
+Warning--I didn't find a database entry for "mnih_dqn-paper_2013"
+Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
+Warning--to sort, need author or key in noauthor_ddpg-explained-towardsdatascience_nodate
+Warning--to sort, need author or key in noauthor_rl-overview_nodate
+Warning--to sort, need author or key in noauthor_deep-rl-skymind_nodate
+Warning--to sort, need author or key in noauthor_envelope-detection_nodate
+Warning--Weder Verfasser noch Hrsg. in noauthor_ddpg-explained-towardsdatascience_nodate
+Warning--Weder Verfasser noch Hrsg. in noauthor_deep-rl-skymind_nodate
+Warning--Weder Verfasser noch Hrsg. in noauthor_envelope-detection_nodate
+Warning--Weder Verfasser noch Hrsg. in noauthor_rl-overview_nodate
+You've used 12 entries,
+            3183 wiz_defined-function locations,
+            698 strings with 6447 characters,
+and the built_in function-call counts, 7919 in all, are:
+= -- 846
+> -- 298
+< -- 329
++ -- 394
+- -- 117
+* -- 607
+:= -- 1483
+add.period$ -- 12
+call.type$ -- 12
+change.case$ -- 79
+chr.to.int$ -- 9
+cite$ -- 24
+duplicate$ -- 185
+empty$ -- 335
+format.name$ -- 155
+if$ -- 1364
+int.to.chr$ -- 4
+int.to.str$ -- 0
+missing$ -- 14
+newline$ -- 74
+num.names$ -- 24
+pop$ -- 81
+preamble$ -- 1
+purify$ -- 103
+quote$ -- 0
+skip$ -- 408
+stack$ -- 0
+substring$ -- 504
+swap$ -- 63
+text.length$ -- 47
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 96
+warning$ -- 8
+while$ -- 72
+width$ -- 16
+write$ -- 155
+(There were 9 warnings)
