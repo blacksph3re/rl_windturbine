@@ -600,7 +600,10 @@ class DDPG:
             epochs = 2000,
 
             # Number of steps to run after the training, testing the policy
-            test_steps = 1000,
+            test_steps = 50000,
+
+            # Whether, and where to write test results to
+            test_output = 'test_output',
 
             # Batch size for experience replay
             # The bigger the less it will overfit to specific samples
@@ -625,20 +628,20 @@ class DDPG:
             critic_lr = 1e-4,
 
             # Neural network sizes of the critic
-            critic_sizes = [512, 128, 64],
+            critic_sizes = [64, 32, 16],
 
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
-            critic_simple = False,
+            critic_simple = True,
 
             # Learning rate of the policy
             actor_lr = 1e-4,
 
             # Network sizes of the policy
-            actor_sizes = [128, 32],
+            actor_sizes = [32, 8],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
-            actor_simple = False,
+            actor_simple = True,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]

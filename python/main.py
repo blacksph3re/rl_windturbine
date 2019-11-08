@@ -82,6 +82,36 @@ def main():
       o = env.reset()
       a = agent.reset_finalize(o)
 
+  # Run a test run after training if wanted
+  if(hparams.test_steps):
+    print("Starting test run")
+    o = env.reset()
+    a = agent.prepare(o)
+    total_reward = 0
+    total_deaths = 0
+
+    for t in range(0, hparams.test_steps):
+      o, r, d = env.step(a)
+
+      total_reward += r
+
+      if(d):
+        total_deaths += 1
+        o = env.reset()
+
+      a = agent.get_action(o)
+
+    print("Test results:")
+    print("Total reward: %d" % total_reward)
+    print("Total deaths: %d" % total_deaths)
+
+    if(hparams.test_output):
+      with open(hparams.test_output, 'w') as f:
+        f.write(json.dumps({
+          "total_reward": total_reward,
+          "total_deaths": total_deaths,
+          "hparams": hparams.values()
+        }))
 
 
   env.storeProject("checkpoints/sampleproject.wpa")
