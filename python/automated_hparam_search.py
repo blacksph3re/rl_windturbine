@@ -3,13 +3,24 @@ import subprocess
 import json
 import os
 
-experiments = [
+'''experiments = [
   {"id": 0, "batch_size": 64},
   {"id": 1, "batch_size": 100},
   {"id": 2, "batch_size": 128},
   {"id": 3, "batch_size": 150},
   {"id": 4, "batch_size": 200},
   {"id": 5, "batch_size": 256},
+]'''
+
+experiments = [
+  {"id": 6, "critic_lr": 1e-2},
+  {"id": 7, "critic_lr": 1e-3},
+  {"id": 8, "critic_lr": 1e-5},
+  {"id": 9, "critic_lr": 1e-6},
+  {"id": 10, "actor_lr": 1e-2},
+  {"id": 10, "actor_lr": 1e-3},
+  {"id": 10, "actor_lr": 1e-5},
+  {"id": 10, "actor_lr": 1e-6},
 ]
 
 
@@ -29,13 +40,16 @@ def run_one(experiment):
 
   print('Launching experiment %d with hparams %s' % (id, hparams))
 
-  handle = subprocess.run('xvfb-run -a python main.py --hparams=%s' % hparams, shell=True)
-  handle.wait()
+  try:
+    handle = subprocess.run('xvfb-run -a python main.py --hparams=%s' % hparams, shell=True)
+    handle.wait()
 
-  with open(test_output, 'r') as f:
-    data = json.loads(f.read())
+    with open(test_output, 'r') as f:
+      data = json.loads(f.read())
 
-  return (id, data['total_reward'], data['total_deaths'])
+    return (id, data['total_reward'], data['total_deaths'])
+  except:
+    return (id, -1, -1)
 
 # Set the number of parallel runs here
 pool = Pool(3)

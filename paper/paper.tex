@@ -1,6 +1,7 @@
 \documentclass[hyperref,german,beleg]{cgvpub}
 
 \usepackage{acro}
+\usepackage{siunitx}
 \input{abbreviations.tex}
 
 %weitere Optionen zum Ergänzen (in eckigen Klammern):
@@ -70,6 +71,10 @@ Bild"ubernahmen zitieren.}
 
 
 \begin{document}
+\chapter{Abstract}
+Small 
+
+
 \chapter{Intro}
 
 Recent advancements in reinforcment learning have managed to tackle more and more complex problems, like StarCraft or Go. The range of topics, RL is applicable to, increases. However, so far, there hasn't been an effort to control a windturbine with a reinforcement learning algorithm. Current state of the art linear controllers are performing well in maintaining turbine control, and the optimization margin for these is small, as they achieve the theoretical maximum energy output up to rated windspeed and manage to keep the turbine intact above rated windspeeds.
@@ -83,19 +88,113 @@ This section aims at facilitating the background knowledge necessary for underst
 
 \section{Windturbine control}
 % Quote wind-energy handbook, talk about how currently wind turbines are controlled.
-There are two mayor types of wind turbine designs, \ac{HAWT} and \ac{VAWT}, which differ by their rotation axis. In this work, we will only look at \ac{HAWT} and all mentions of windturbines mean \ac{HAWT} type turbines. Such a turbine is made up by 3 big components, a tower on which a nacelle is rested which in turn has a rotor in front. 
-The joint between tower and nacelle allows for rotation to turn the rotor into the wind. Except for recent ideas \quote{Howland_Lele_Dabiri_2019}, the best value for the rotational direction was to always turn the rotor directly into the wind, and for the sake of simplicity we will omit this control parameter from our simulation.
-In the nacelle there is, most importantly, an electrical generator, which can be given a specific torque. It will then slow down the rotor with that torque and at the same time generate energy proportional to rotor speed and torque.
+There are two mayor types of wind turbine designs, \ac{HAWT} and \ac{VAWT}, which differ by their rotation axis. In this work, we will only look at \ac{HAWT} and all mentions of windturbines mean \ac{HAWT} type turbines. Such a turbine is made up by 3 big components, a tower on which a nacelle is rested which itself has a rotor in front. 
+The joint between tower and nacelle allows for rotation to turn the rotor into the wind. Except for recent ideas \cite{Howland_Lele_Dabiri_2019}, the best value for the rotational direction was to always yaw the rotor directly into the wind, and for the sake of simplicity we will omit this control parameter from our simulation and leave it at 0 degrees with wind facing straight onto the rotor.
+In the nacelle there is, most importantly, an electrical generator, which can be given a specific torque. It will then slow down the rotor with that torque and at the same time generate energy proportional to rotor speed and torque. This torque is one of the two more important control parameters, together with blade pitch. The blades are designed to operate on maximal aerodynamic efficiency when they are pitched at 0 degrees, increasing the pitch angle will (except for possible slight improvements in the first few degrees) reduce aerodynamic efficiency of the rotor.
+
+As described in \cite[sec 8.3]{Burton_Jenkins_Sharpe_Bossanyi_2011}, the normal controller design for windturbines divides the operation of a turbine into two parts, below rated and above rated. Rated is a windspeed, in which the turbine gives maximum energy on highest aerodynamic effiency. At this point, the generator runs on its maximum torque and the blades are pitched to the optimum angle of 0 degrees. At this point, the tip-speed-ratio, which is a good indicator for loads on the blades is at maximum too.
+Below that windspeed, the rotor generates less rotational torque than the maximum generator torque, thus the generator torque needs to be reduced to not slow the rotor down too much. Slowing the rotor down complicates the energy generation process, and though variable-speed wind turbines allow for some play, all windturbines are limited to a certain operational range. Fixed-speed wind turbines can only run on one single rotational speed and thus need to change the torque more agressively.
+Above rated windspeed, the blades need to be pitched out to stop the rotor from spinning at faster speeds than what the turbine was designed for. The generator torque can be kept at maximum in this area, but to protect the turbine from damage, aerodynamic efficiency of the rotor is reduced by turning the blades along their long axis and thus moving their angle of attack against the incoming air into a less optimal range.
+
+Additionally to this trivial control, optimizations to reduce vibrations and stress on the structures are implemented. The blades can be pitched individually and quickly enough to allow for different blade pitches during a single rotation of the rotor, which can be used to reduce the turbulence that hits the tower or to account for different windspeeds closer to the ground and further up in the air. Also, both generator torque and blade pitch can be used to counteract natural resonant frequencies of the structure, reducing material stress through extensive swinging of structural parts.
+
+Usually this control is implemented by two PID controllers, which are hand-designed as described in \cite[sec 8.4]{Burton_Jenkins_Sharpe_Bossanyi_2011}. Below rated windspeed, the controller for torque is active, above rated the one for pitch. The parameters to those controllers can be calculated according to the laws of control theory, and the resulting controllers work reasonably close to theoretical maximum. Still, in this work, we are trying to replace these hand-designed controllers with a reinforcement-learning algorithm.
+
 
 \section{QBlade}
 % Quickly introduce qblade as a simulation tool
-Our data source in this work is the open-source simulation tool QBlade \quote{Marten_Wendler_Pechlivanoglou_Nayeri_Paschereit_2013} developed at TU Berlin. QBlade is an accessible and performant tool with the primary purpose of designing and simulating wind turbines in a graphical user interface. Its simulation results are on par with current state-of-the-art proprietary simulation tools and it yields good computational efficiency. To be used in reinforcement learning, we designed an interface, over which the QBlade simulation can be embedded into an external environment. Most machine-learning frameworks are written in python, so we decided to compile QBlade into library format and expose the most fundamental functions to allow it to communicate with any programming language that can load libraries. As python has a ctypes interface to load c-code, we could link a python agent to the QBlade C++ environment.
+Our data source in this work is the open-source simulation tool QBlade \cite{Marten_Wendler_Pechlivanoglou_Nayeri_Paschereit_2013} developed at TU Berlin. QBlade is an accessible and performant tool with the primary purpose of designing and simulating wind turbines in a graphical user interface. Its simulation results are on par with current state-of-the-art proprietary simulation tools and it yields good computational efficiency. It uses an algorithm which approximates the 3D blade structures with 2D structures and corrects the results through several error terms. Though a full CFD simulation would yield higher accuracy, our computational resources don't allow for that. To be used in reinforcement learning, we designed an interface, over which the QBlade simulation can be embedded into an external environment. Most machine-learning frameworks are written in python, so we decided to compile QBlade into library format and expose the most fundamental functions to allow it to communicate with any programming language that can load libraries. As python has a ctypes interface to load c-code, we could link a python agent to the QBlade C++ environment.
 
-QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \quote{Jonkman_Butterfield_Musial_Scott_2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
+QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \cite{Jonkman_Butterfield_Musial_Scott_2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
+
+The interface is made of 7 functions, which allow for loading a project, resetting the simulation, setting controller inputs and getting environment measurements and advancing the simulation a timestep. The observations returned in getControlVars match those that are visible to standart industry controllers, which in turn are modelled after what can be measured on a real windturbine. Concretely, we measure:
+\begin{code}
+* rotational speed [rad/s]
+* power [kW]
+* wind velocity [m/s]
+* yaw angle [deg]
+* pitch blade 1 [deg]
+* pitch blade 2 [deg]
+* pitch blade 3 [deg]
+* tower top bending local x [Nm]
+* tower top bending local y [Nm]
+* tower top bending local z [Nm]
+* out-of-plane bending blade 1 [Nm]
+* out-of-plane bending blade 2 [Nm]
+* out-of-plane bending blade 3 [Nm]
+* in-plane bending blade 1 [Nm]
+* in-plane bending blade 2 [Nm]
+* in-plane bending blade 3 [Nm]
+* out-of-plane tip deflection blade 1 [m]
+* out-of-plane tip deflection blade 2 [m]
+* out-of-plane tip deflection blade 3 [m]
+* in-plane tip deflection blade 1 [m]
+* in-plane tip deflection blade 2 [m]
+* in-plane tip deflection blade 3 [m]
+* current time [s]
+\end{code}
+
+Because it has no semantic meaning, we mask away current time from our reinforcement learning agent. The inputs we can give to the turbine are:
+\begin{code}
+* generator torque [Nm]
+* yaw angle [deg]
+* pitch blade 1 [deg]
+* pitch blade 2 [deg]
+* pitch blade 3 [deg]
+\end{code}
+
+As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to \num{4e6} Nm% TODO insert formula here
+Because changing torque from zero to maximum in one timestep is not realistic for a real turbine, we restrict it to move a maximum of \num{3e5} Nm per one timestep of 0.1 seconds. If our agent chooses a value outside of that area, we set it to the closest value inside of that area.
+Blades can be pitched between 0 and 90 degrees, 0 being not pitched out at all and operating at maximum efficiency and 90 resulting in no aerodynamic torque from the rotor whatsoever. A sensible pitch motor can only turn the blades at a limited speed, we assume a limit of 5 degrees per second and again set controller inputs to a sensible value inside that. The simulation theoretically accepts a full pitch change in one timestep, however as inertia on the blade is so high for such a change, the blades break instantly and the rest of the simulation needs to be reset.
+
+QBlade simulates blade damage, also high rotational speeds cause blades to fall off. QBlade is not validated to realistically simulate these extreme conditions and thus posed a problem to our controllers. In the course of our experiments, we decided to reset the simulation at an rotational speed of 4 rad/s, as our turbine operates at ca 0.8 rad/s. Also, high generator torque inputs cause the simulation to rotate the rotor backwards with a negative energy yield, effectively creating a multimillion-dollar leafblower. As this is neither a realistic scenario, we also reset the simulation at -0.5 rad/s. 
 
 \section{Reinforcement learning}
-% 
+
 
 \section{RL on windturbines}
+
+
+\chapter{Early experimentation}
+%Early experiments, taking a reference implementation and openai gym training. Then finding out qblade is screwed...
+
+\chapter{Experimentation}
+
+\section{Designing reward functions}
+
+\section{Action Noise}
+
+\section{Random exploration}
+
+\section{Parameter noise}
+
+\section{Replay noise}
+
+\section{Simplifying the architecture}
+
+\section{Normalization}
+
+\section{Gradient actionspace}
+
+\section{Feeding past timesteps}
+
+\section{Prioritized experience replay}
+
+\section{Automatized hyperparameter search}
+
+\chapter{Evaluation}
+
+% What should I put here?
+
+\chapter{Future work}
+
+% Reworking reward functions
+% Trying different algorithms for better stability?
+% Pretraining the policy with a reference controller
+% Whatever comes to our mind
+
+\chapter{Conclusion}
+
+% It's pretty hard to create a working controller for a windturbine, apparently RL needs some more foundational research.
 
 \end{document}

@@ -52,7 +52,7 @@ class QBladeAdapter:
     self._setControlVars = qbladeLib._Z14setControlVarsPd
     self._setControlVars.argtypes = [ctypes.POINTER(ctypes.c_double)]
     self._getControlVars = qbladeLib._Z14getControlVarsPd
-    self._setControlVars.argtypes = [ctypes.POINTER(ctypes.c_double)]
+    self._getControlVars.argtypes = [ctypes.POINTER(ctypes.c_double)]
     self._advanceSingleTimestep = qbladeLib._Z21advanceSingleTimestepv
 
   def del_functions(self):

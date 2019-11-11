@@ -361,7 +361,7 @@ class QBladeLogger:
           19: 'ip tip deflection blade 1 [m]',
           20: 'ip tip deflection blade 2 [m]',
           21: 'ip tip deflection blade 3 [m]',
-          22: 'current time'
+          22: 'current time [s]'
         }
 
         for i in range(0, len(observation)):

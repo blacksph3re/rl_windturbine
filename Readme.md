@@ -184,3 +184,13 @@ Vanishing gradients, here we go again. I should reduce complexity? Mäh.
 I tracked down the vanishing gradients as well as the loss explosions to past feeding. This seems to introduce serious instability for some reason. Sending in only one observation stabilized everything. Also PER seems to do fine. It now converges to slowly rotating the turbine backwards, actually reacting on changes in a way...
 
 Okay I implemented a P-Controller instead of random exploration - I am actually shit at machine learning. With just a simple linear controller I can easily stabilize rotational speed at a fixed rpm...
+
+### **11/08**
+
+It was pure luck hitting the one working version. I couldn't reproduce even with the same hyperparameters again. Now I decided to just let automated hyperparameter search run and search for a good version while I write my paper. It can run over the weekend or so.
+
+I had several cases of vanishing actor gradients and for some reason increasing the batch size made it better. So though a higher batch-size should reduce the variance of the samples, I got higher gradients. A possible explanation would be that the high noise in the low batch sizes sent my network flying off somewhere, and my relu activation being far left. I tried to plot my activations (for the first layer) and they were for some reason all the same value, 0.174. I don't know how that could even happen. By randon weight initialization, they should really not be all the same, with a few exceptions being higher than that.
+
+However, I am off writing down the things now while waiting for some automatized hparam searching. I let the thing run 2k episodes and then test for 50k steps, gathering the total returns and deaths in the testing phase. It's also still writing logs while doing so.
+
+New observation: Training is really stable until ca 30k steps after the first time maniac-forwards mode. Then, q loss explodes and things go badly. Also, I had another run which looked kinda good over big spans of time. Again the q loss explosion. I switched to huber loss now.

@@ -331,8 +331,10 @@ class DDPG:
         expected_Q = reward_batch + self.gamma * next_Q
         
         # update critic
-        # Idea: huber loss?
-        q_loss = F.mse_loss(curr_Q, expected_Q.detach())
+        if(self.hparams.critic_loss == 'huber'):
+            q_loss = F.smooth_l1_loss(curr_Q, expected_Q.detach())
+        else:
+            q_loss = F.mse_loss(curr_Q, expected_Q.detach())
 
         q_loss.backward() 
         self.critic_optimizer.step()
@@ -633,6 +635,11 @@ class DDPG:
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
             critic_simple = True,
+
+            # Loss function for the critic
+            # default is mean square error
+            # Other values: "mse", "huber"
+            critic_loss = 'huber',
 
             # Learning rate of the policy
             actor_lr = 1e-4,
