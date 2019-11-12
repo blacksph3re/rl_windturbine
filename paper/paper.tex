@@ -2,7 +2,9 @@
 
 \usepackage{acro}
 \usepackage{siunitx}
-\input{abbreviations.tex}
+\usepackage{mathtools}
+\usepackage{commath}
+\input{abbreviations}
 
 %weitere Optionen zum Ergänzen (in eckigen Klammern):
 % 
@@ -89,26 +91,27 @@ This section aims at facilitating the background knowledge necessary for underst
 \section{Windturbine control}
 % Quote wind-energy handbook, talk about how currently wind turbines are controlled.
 There are two mayor types of wind turbine designs, \ac{HAWT} and \ac{VAWT}, which differ by their rotation axis. In this work, we will only look at \ac{HAWT} and all mentions of windturbines mean \ac{HAWT} type turbines. Such a turbine is made up by 3 big components, a tower on which a nacelle is rested which itself has a rotor in front. 
-The joint between tower and nacelle allows for rotation to turn the rotor into the wind. Except for recent ideas \cite{Howland_Lele_Dabiri_2019}, the best value for the rotational direction was to always yaw the rotor directly into the wind, and for the sake of simplicity we will omit this control parameter from our simulation and leave it at 0 degrees with wind facing straight onto the rotor.
+The joint between tower and nacelle allows for rotation to turn the rotor into the wind. Except for recent ideas \cite{howlandWindFarmPower2019}, the best value for the rotational direction was to always yaw the rotor directly into the wind, and for the sake of simplicity we will omit this control parameter from our simulation and leave it at 0 degrees with wind facing straight onto the rotor.
 In the nacelle there is, most importantly, an electrical generator, which can be given a specific torque. It will then slow down the rotor with that torque and at the same time generate energy proportional to rotor speed and torque. This torque is one of the two more important control parameters, together with blade pitch. The blades are designed to operate on maximal aerodynamic efficiency when they are pitched at 0 degrees, increasing the pitch angle will (except for possible slight improvements in the first few degrees) reduce aerodynamic efficiency of the rotor.
 
-As described in \cite[sec 8.3]{Burton_Jenkins_Sharpe_Bossanyi_2011}, the normal controller design for windturbines divides the operation of a turbine into two parts, below rated and above rated. Rated is a windspeed, in which the turbine gives maximum energy on highest aerodynamic effiency. At this point, the generator runs on its maximum torque and the blades are pitched to the optimum angle of 0 degrees. At this point, the tip-speed-ratio, which is a good indicator for loads on the blades is at maximum too.
+As described in \cite[sec 8.3]{burtonWindEnergyHandbook2011}, the normal controller design for windturbines divides the operation of a turbine into two parts, below rated and above rated. Rated is a windspeed, in which the turbine gives maximum energy on highest aerodynamic effiency. At this point, the generator runs on its maximum torque and the blades are pitched to the optimum angle of 0 degrees. At this point, the tip-speed-ratio, which is a good indicator for loads on the blades is at maximum too.
 Below that windspeed, the rotor generates less rotational torque than the maximum generator torque, thus the generator torque needs to be reduced to not slow the rotor down too much. Slowing the rotor down complicates the energy generation process, and though variable-speed wind turbines allow for some play, all windturbines are limited to a certain operational range. Fixed-speed wind turbines can only run on one single rotational speed and thus need to change the torque more agressively.
 Above rated windspeed, the blades need to be pitched out to stop the rotor from spinning at faster speeds than what the turbine was designed for. The generator torque can be kept at maximum in this area, but to protect the turbine from damage, aerodynamic efficiency of the rotor is reduced by turning the blades along their long axis and thus moving their angle of attack against the incoming air into a less optimal range.
 
 Additionally to this trivial control, optimizations to reduce vibrations and stress on the structures are implemented. The blades can be pitched individually and quickly enough to allow for different blade pitches during a single rotation of the rotor, which can be used to reduce the turbulence that hits the tower or to account for different windspeeds closer to the ground and further up in the air. Also, both generator torque and blade pitch can be used to counteract natural resonant frequencies of the structure, reducing material stress through extensive swinging of structural parts.
 
-Usually this control is implemented by two PID controllers, which are hand-designed as described in \cite[sec 8.4]{Burton_Jenkins_Sharpe_Bossanyi_2011}. Below rated windspeed, the controller for torque is active, above rated the one for pitch. The parameters to those controllers can be calculated according to the laws of control theory, and the resulting controllers work reasonably close to theoretical maximum. Still, in this work, we are trying to replace these hand-designed controllers with a reinforcement-learning algorithm.
+Usually this control is implemented by two PID controllers, which are hand-designed as described in \cite[sec 8.4]{burtonWindEnergyHandbook2011}. Below rated windspeed, the controller for torque is active, above rated the one for pitch. The parameters to those controllers can be calculated according to the laws of control theory, and the resulting controllers work reasonably close to theoretical maximum. % TODO find reference
+ Still, in this work, we are trying to replace these hand-designed controllers with a reinforcement-learning algorithm.
 
 
 \section{QBlade}
 % Quickly introduce qblade as a simulation tool
-Our data source in this work is the open-source simulation tool QBlade \cite{Marten_Wendler_Pechlivanoglou_Nayeri_Paschereit_2013} developed at TU Berlin. QBlade is an accessible and performant tool with the primary purpose of designing and simulating wind turbines in a graphical user interface. Its simulation results are on par with current state-of-the-art proprietary simulation tools and it yields good computational efficiency. It uses an algorithm which approximates the 3D blade structures with 2D structures and corrects the results through several error terms. Though a full CFD simulation would yield higher accuracy, our computational resources don't allow for that. To be used in reinforcement learning, we designed an interface, over which the QBlade simulation can be embedded into an external environment. Most machine-learning frameworks are written in python, so we decided to compile QBlade into library format and expose the most fundamental functions to allow it to communicate with any programming language that can load libraries. As python has a ctypes interface to load c-code, we could link a python agent to the QBlade C++ environment.
+Our data source in this work is the open-source simulation tool QBlade \cite{martenQBLADEOPENSOURCE2013} developed at TU Berlin. QBlade is an accessible and performant tool with the primary purpose of designing and simulating wind turbines in a graphical user interface. Its simulation results are on par with current state-of-the-art proprietary simulation tools and it yields good computational efficiency. It uses an algorithm which approximates the 3D blade structures with 2D structures and corrects the results through several error terms. Though a full CFD simulation would yield higher accuracy, our computational resources don't allow for that. To be used in reinforcement learning, we designed an interface, over which the QBlade simulation can be embedded into an external environment. Most machine-learning frameworks are written in python, so we decided to compile QBlade into library format and expose the most fundamental functions to allow it to communicate with any programming language that can load libraries. As python has a ctypes interface to load c-code, we could link a python agent to the QBlade C++ environment.
 
-QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \cite{Jonkman_Butterfield_Musial_Scott_2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
+QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \cite{jonkmanDefinition5MWReference2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
 
 The interface is made of 7 functions, which allow for loading a project, resetting the simulation, setting controller inputs and getting environment measurements and advancing the simulation a timestep. The observations returned in getControlVars match those that are visible to standart industry controllers, which in turn are modelled after what can be measured on a real windturbine. Concretely, we measure:
-\begin{code}
+\begin{verbatim}
 * rotational speed [rad/s]
 * power [kW]
 * wind velocity [m/s]
@@ -132,16 +135,16 @@ The interface is made of 7 functions, which allow for loading a project, resetti
 * in-plane tip deflection blade 2 [m]
 * in-plane tip deflection blade 3 [m]
 * current time [s]
-\end{code}
+\end{verbatim}
 
 Because it has no semantic meaning, we mask away current time from our reinforcement learning agent. The inputs we can give to the turbine are:
-\begin{code}
+\begin{verbatim}
 * generator torque [Nm]
 * yaw angle [deg]
 * pitch blade 1 [deg]
 * pitch blade 2 [deg]
 * pitch blade 3 [deg]
-\end{code}
+\end{verbatim}
 
 As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to \num{4e6} Nm% TODO insert formula here
 Because changing torque from zero to maximum in one timestep is not realistic for a real turbine, we restrict it to move a maximum of \num{3e5} Nm per one timestep of 0.1 seconds. If our agent chooses a value outside of that area, we set it to the closest value inside of that area.
@@ -151,6 +154,39 @@ QBlade simulates blade damage, also high rotational speeds cause blades to fall 
 
 \section{Reinforcement learning}
 
+This section should aim to give a brief overview into Reinforcement Learning assumptions and derive briefly a couple of methods until in the end, we will describe \ac{DDPG}, the method we utilized to control our virtual windturbine.
+
+\subsection{Environment assumptions}
+
+At first, we need to do some assumptions on our environment. The concept environment encapsulates the reality or simulation that the reinforcement learning algorithm works in. This could be an actual cyber-physical system or a simulation. The first assumption to this environment is that this system operates over time and we can discretize time into timesteps. Our environment here is the simulated wind turbine, but it could be a computer game \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, a physics simulation\cite{brockmanOpenAIGym2016} or even an actual existing wind turbine \cite{kolterDesignAnalysisLearning2012}. 
+In every timestep, the environment supplies us with a state, also sometimes called observation, and a scalar reward. The observed state doesn't have to represent the entirety of the state of the simulation, in fact it usually is only a small subset. For our wind turbine example, the observed state is limited to what can be measured with sensors on a wind turbine, in an arcade game it could be the pixel output or in a physical simulation it could be some key values in the simulation. 
+The reward is a scalar value which judges the current state of the simulation. A higher reward means the current state is better than that of a lower reward. Sometimes, the reward function is obvious from the system, as in an arcade game it would surely be the score or in chess it could be 1 for win, -1 for lose and 0 for not decided yet. However in our paper, we will dedicate a section on how we designed our reward function. In general reinforcement learning theory, it is assumed to exist and be supplied by the environment.
+In every timestep, the agent supplies an action in the form of a tensor. This action could be button presses in an arcade game or blade pitch in a windturbine simulation. The mission of the agent is to pick actions which maximize cumulative reward. In other words, it should steer the environment to achieve best performance.
+Additionally to the state and reward, an environment can optionally send out a done signal, which indicates a state in which further simulation is not possible and the environment wants to be reset to an initial state. In a chess game, this would be a loss or a win, and with a windturbine that could for example be fatal structural damage.
+
+The algorithms we looked at further assume that the state progressions can be modelled as a Markov-Chain, as in that what happens at timestep t+1 is only dependent on the hidden state at timestep t, not also on for example t-10. As the hidden state could for example be the full RAM of the simulation, we can safely assume that a simulation only calculates the next timestep on what is in the RAM at the current timestep. Also, Markov-Chains allow for several states as an outcome of any state, and that we can model the transition between these state with a probablistic model.
+
+
+\subsection{Q-Learning}
+
+At first we will present a very basic algorithm for a machine learning agent, which is based on the basic Bellman-Equation \cite{bellmanTheoryDynamicProgramming1954}
+
+\begin{equation}
+Q(s, a) = r + \max_{a'}Q(s', a')
+\end{equation}
+
+
+% Bellman equation
+
+
+
+\subsection{PG}
+
+
+\subsection{DDPG}
+% Also problems with ddpg
+
+
 
 \section{RL on windturbines}
 
@@ -158,27 +194,99 @@ QBlade simulates blade damage, also high rotational speeds cause blades to fall 
 \chapter{Early experimentation}
 %Early experiments, taking a reference implementation and openai gym training. Then finding out qblade is screwed...
 
+At the start of our experimentation, we took off with a well-known problem and a proven implementation. We used the OpenAI-Pendulum task, in which a pendulum in gravity needs to be held upright by applying a force to it. OpenAI Gyms generally serve as benchmarks for reinforcement learning algorithms and most foundational papers and articles evaluate their solutions based on how well they perform in OpenAI Gyms. Starting with a reference-implementation in pytorch by \cite{DeepDeterministicPolicy}, we experimented with the pendulum environment. We observed that the algorithm got stuck in a local optimum, where it rotates the pendulum instead of holding it upright, for long periods of the training process. Only with high noise, we could get it to hold a pendulum upright. We also tried to run the HalfCheetah task, where a two-dimensional dog-like being should be brought to running and moving its joints, but the results were more a crawling and shaking towards the goal. However, we hoped that the implementation might yield results on our windturbine environment already and exchanged the OpenAI gym for qblade.
+
+The first runs looked marvellous, perfectly holding rated speed, until we found out that those perfect values were prescribed by a setting in the qblade project file, and disabling this setting marked the beginning of our actual experimentation phase.
+
 \chapter{Experimentation}
+
+On our first experimentation steps, we did not yet have experience with how the qblade simulation behaves with a random or not well designed controller. Our observation was, that the simulation was resting between two different states, which we want to call \ac{FMM} and \ac{BMM}.
+
+\ac{FMM} is characterized by a rotational speed of ca 5 times rated speed, at 4.3 rad/s. At this speed, for some reason, the rotor will not speed up anymore. However, severe vibrations and sometimes the case of a disjointed blade happen. Especially in the case of a blade flying off, deflection values skyrocket up to several orders of magnitude higher than values seen in normal operation, and with one or more missing blades, the rotor will quickly stop rotating. This state is usually reached by a too low generator torque while not pitching out blades and sometimes stays stable for several thousand steps until a blade falls off.
+
+\ac{BMM} is characterized by a negative rotational speed, up to -3.8 rad/s. This can be reached by setting a higher generator torque than the rotor torque which is produced by aerodynamic lift on the blades. Also in this state, extreme vibrations and sometimes blades flying off can be observed, and like \ac{FMM} this state is stable until a blade falls off. 
+
 
 \section{Designing reward functions}
 
-\section{Action Noise}
+As qblade doesn't provide a built-in reward function, we needed to craft our own reward function based on the observed state. We considered several possible variants. We will first introduce all of them and give a more detailed explanation later
 
-\section{Random exploration}
+\begin{itemize}
 
-\section{Parameter noise}
+\item \textbf{Rated speed} Hold a rated speed. Observe current rotational speed \(s_{rot}\) and with given rated speed \(s^*_{rot}\) calculate reward \(r(s) = -\abs{\frac{s_{rot} - s^*_{rot}}{s^*_{rot}}}\)
 
-\section{Replay noise}
+\item \textbf{Rated power} Hold a rated power. Observe current power \(s_{pow}\) and with given rated power \(s^*_{pow}\) calculate reward \(r(s) = -\abs{\frac{s_{pow} - s^*_{pow}}{s^*_{pow}}}\)
 
-\section{Simplifying the architecture}
+\item \textbf{Maximal power} Generate the maximum power possible. Observe current power \(s_{pow}\) and with given normalization constant \(c\) calculate \(r(s) = s_{pow} * c\)
 
-\section{Normalization}
+\item \textbf{Penalize current stress} Penalize high blade bending. Observe current bending \(s_{bend}\) and with given normalization constant \(c\) and another reward function \(r(s)\) calculate new reward \(r'(s) = r(s) - c * s_{bend} \)
 
-\section{Gradient actionspace}
+\item \textbf{Penalize accumulated stress} Penalize accumulated structural stress. With \(x = rainflow(s_0...s_t\) being the rainflow table and \(p(x)\) being a function that maps from rainflow outputs to a scalar penalty, calculate \(r'(s_0...s_t) = r(s_t) - p(rainflow(s_0...s_t))\)
 
-\section{Feeding past timesteps}
+\end{itemize}
 
-\section{Prioritized experience replay}
+\textbf{Rated speed} is the easiest of the rewards, as holding a rated speed can be achieved by either pitch or torque or a combination of the two. So both a high pitch and a high torque will stop it from running faster than it should. We used this reward for our first working version.
+\textbf{Rated power} is a bit more difficult. For reaching rated power, a certain aerodynamic torque is required, so pitching the blades out completely won't deliver rated power. However especially if setting an artificial rated power lower than what the turbine was built for, there is a certain play in how strongly to use blade pitch and how much needs to be done through torque.
+\textbf{Maximal power} is an intuitive reward, but might yield unrealistic results. This rewards high power regardless of the stress that is induced to the turbine, so a good policy might spin the turbine at high speeds beyond any turbine specification and then apply maximum torque. So this reward makes more sense when combined with a stress penalty.
+\textbf{Penalize current stress} is the easiest stress penalty, where a penalty proportional to the current bending of the structure can be used. As there are several bending modes on most of the components of the windturbine, a combination or selection of modes and components should be taken before. We decided to limit us to out-of-plane bending of the blade tips. This is a simple variant which leaves out bending in the middle of the blades, bending in the rotational plane, vibration or bending of the tower and torsional stress on the shaft.
+\textbf{Penalize accumulated stress} is a more complete, but time dependent variant. \ac{RFC} is a commonly used method for calculating structural fatigue in windturbines \cite{berglindFatigueEstimationMethods2014}. \ac{RFC} takes in a bending signal over time and returns a table with amplitudes and their frequency, as in how often the structure swung how far. It filters out some higher-frequency swinging in between two lower frequency swings and thus also works for structures that swing in more than one frequency. To use it as a penalty, we needed to create a function that maps from that table to a scalar penalty. This penalty accumulates past stress, so it increases over time. We suspect this penalty to be hard to learn, as it reacts slowly to changes and a once given penalty will never be lifted again.
+
+Most of our experimentation we did with rewarding rated speed.
+
+\section{Aiding exploration}
+
+As in the beginning we observed our algorithm to get stuck in either \ac{FMM} or \ac{BMM}, we wanted to improve exploration. Exploration is a common problem in reinforcement learning, as algorithms tend to stay in local maxima. 
+
+\subsection{Action Noise}
+
+We first added a gaussian noise to our actions and after not seeing any improvemnts, switched to an Ornstein-Uhlenbeck process \cite{uhlenbeckTheoryBrownianMotion1930} as recommended in the DDPG paper \cite[formula (7)]{lillicrapCONTINUOUSCONTROLDEEP2015}. Additionally to the DDPG paper, we let the sigma parameter decay over time, so that the noise gets less when training has proceeded.
+
+\subsection{Random exploration}
+
+The TD3-paper \cite{fujimotoAddressingFunctionApproximation2018} utilizes a random exploration phase, in which a completely random policy \cite{mozerDiscoveringStructureReactive1990} initially explores the environment, before the actual agent switches in. We implemented the random walk at first through gaussian noise and then through an Ornstein-Uhlenbeck process. The later version creates less vibration through less excessive changes in control parameters. As we found that both random policies rarely explore a sensible operational range, we later added an expert PID controller, which implements torque control, and combined that with our Ornstein-Uhlenbeck process. We set the parameters to that controller by experimentation.
+
+\subsection{Parameter noise}
+
+As we still didn't see good results, we tried adding parameter-space noise \cite{plappertParameterSpaceNoise2017} to the actor function, as the paper promised better exploration. We could not observe any improvements and deactivated parameter space noise for the working version.
+
+\section{Zero Gradients}
+All our efforts to aid exploration by adding noise did not yield better exploration, so we had a look at our gradients and found that all our actor gradients are zero. The critic had gradients, but only in the later levels of the net. Eventually, we solved this problem by both simplyfing the architecture and utilizing normalization.
+
+\subsection{Simplifying the architecture}
+
+We tackled this problem by at first reducing the number and size of layers from the example implementation to one fully connected layer of 64 neurons in the critic and one fully connected layer of 32 neurons in the actor. The reference-implementation of \cite{DeepDeterministicPolicy} utilized 3 levels in the critic with 1024, 512 and 300 fully connected neurons and in the actor 2 levels of 512 and 128 fully connected neurons. Reducing complexity partially tackled the problem of zero gradients, we could then observe small gradients which however vanished over time.
+
+\subsection{Normalization}
+
+More effectively, we added data normalization. We normalized the data so states, actions and reward always stayed between 1 and -1. This finally fixed our problem of zero gradients and we could observe normal learning. We recommend this technique as a default technique for every reinforcement learning algorithm, as we can not imagine any drawbacks of normalizing input data. As in our simulation, where our state reflects measurements from very different parts of the simulation, some values in the state-array were 8 orders of magnitude different from others. As most of the high-magnitude values are vibrations, the net could not create a link between these and the state-action, while low-magnitude values like rotational speed were not considered due to their small absolute values.
+
+\section{High action gradients}
+
+We observed that our controller delivers high action gradients and reacts strongly between timesteps. This creates vibrations in the structure and especially high blade pitch changes lead to blades breaking or falling off. We tried different methods to circumvent this.
+
+\subsection{Gradient actionspace}
+
+At first, we implemented gradient actionspaces, where the controller output is not an absolute pitch or torque value but a difference to the last output, starting with everything set to 0. This way, we could clip the action gradients by reducing the gradient action space, so that in each timestep, only a fraction of the actual action space could be traversed. If the controller would output a positive change at maximum pitch/torque or a negative change at minimum pitch, this would be ignored. This did effectively limit action gradients, but also stopped us from getting sensible results.
+
+\subsection{Feeding past timesteps}
+
+Another idea was that we feed the last n timesteps concatenated to the current observations. We hoped that this way, the agent could derive its own gradients internally. The result of this were high and very noisy q-losses and no convergence whatsoever. Though we still had gradients, we suspect that our relu-activations might have drifted far off to the low end, and thus could not recover.
+
+\subsection{Clipping action gradients}
+
+We eventually solved the problem with the high action gradients by still letting the controller output absolute actions across the entire action spaces, but if gradients exceed a certain threshold, the actual action taken is set to the nearest value with sensible gradients. Though the actions returned from the policy are still wildly unstable, they at least didn't result in death of the turbine anymore and still we didn't hinder convergence through our gradient actionspace.
+
+\section{Improvements without sense}
+
+\subsection{Prioritized experience replay}
+
+\subsection{Data augmentation}
+
+We still had some parts of the code left where there wasn't any noise involved, so we decided to add some to the training process. Data-augmentation with noise is a common technique when using neural networks \cite[p.347]{bishopNeuralNetworksPattern1995} to reduce overfitting, so we expected it to also make our model generalize better. There have been some experiments with data augmentation in reinforcement learning \cite{cobbeQuantifyingGeneralizationReinforcement2019}, but it is not often mentioned on tutorials or blog posts. We implemented by adding a small noise term to the sampled states, actions and next states \((s, a, s')\) when performing experience replay. We didn't really see any indication of bad generalization, but as implementing it wasn't a big issue and normally doesn't bring any disadvantages, we still added this feature and set the noise level to a very small value.
+
+\section{Exploding Q-Loss}
+
+We observed that our Q-Loss, especially after a death, explodes into e15 magnitude values, while most of the times it stayed around e2 magnitude. Instable Q-Losses are a general problem with DQN and DDPG, and some literature \cite{fujimotoAddressingFunctionApproximation2018} proposes to use two Q networks, of which only the minimum is used for training. We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. Also, we believe that adding double Q networks such as in \cite{fujimotoAddressingFunctionApproximation2018} would also solve this problem.
 
 \section{Automatized hyperparameter search}
 
@@ -186,12 +294,18 @@ QBlade simulates blade damage, also high rotational speeds cause blades to fall 
 
 % What should I put here?
 
+% Holds power, doesn't diverge, way to many actions, super noisy, we are at least somewhere close to sensible
+% Different reward function
+% Different wind speed
+
 \chapter{Future work}
 
 % Reworking reward functions
 % Trying different algorithms for better stability?
 % Pretraining the policy with a reference controller
 % Whatever comes to our mind
+% Punishment for high action gradients
+% Switch reward functions during training?
 
 \chapter{Conclusion}
 

@@ -1,8 +1,36 @@
 \contentsline {section}{\numberline {0.1}Background:}{2}{section.0.1}% 
 \contentsline {section}{\numberline {0.2}Tasks}{2}{section.0.2}% 
-\contentsline {chapter}{\numberline {1}ein kapitel}{2}{chapter.1}% 
-\contentsline {section}{\numberline {1.1}eine Grafik}{2}{section.1.1}% 
-\contentsline {subsection}{\numberline {1.1.1}Etwas Mathe}{2}{subsection.1.1.1}% 
-\contentsline {subsubsection}{\numberline {1.1.1.1}Verweise auf Literatur}{2}{subsubsection.1.1.1.1}% 
-\contentsline {paragraph}{\nonumberline etwas quelltext}{2}{lstnumber.-1.5}% 
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{3}{chapter*.5}% 
+\contentsline {chapter}{\numberline {1}Abstract}{3}{chapter.1}% 
+\contentsline {chapter}{\numberline {2}Intro}{4}{chapter.2}% 
+\contentsline {chapter}{\numberline {3}Background}{5}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Windturbine control}{5}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}QBlade}{6}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Reinforcement learning}{8}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{8}{subsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.3.2}Q-Learning}{9}{subsection.3.3.2}% 
+\contentsline {subsection}{\numberline {3.3.3}PG}{10}{subsection.3.3.3}% 
+\contentsline {subsection}{\numberline {3.3.4}DDPG}{10}{subsection.3.3.4}% 
+\contentsline {section}{\numberline {3.4}RL on windturbines}{10}{section.3.4}% 
+\contentsline {chapter}{\numberline {4}Early experimentation}{11}{chapter.4}% 
+\contentsline {chapter}{\numberline {5}Experimentation}{12}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}Designing reward functions}{12}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Aiding exploration}{14}{section.5.2}% 
+\contentsline {subsection}{\numberline {5.2.1}Action Noise}{14}{subsection.5.2.1}% 
+\contentsline {subsection}{\numberline {5.2.2}Random exploration}{14}{subsection.5.2.2}% 
+\contentsline {subsection}{\numberline {5.2.3}Parameter noise}{14}{subsection.5.2.3}% 
+\contentsline {section}{\numberline {5.3}Zero Gradients}{14}{section.5.3}% 
+\contentsline {subsection}{\numberline {5.3.1}Simplifying the architecture}{15}{subsection.5.3.1}% 
+\contentsline {subsection}{\numberline {5.3.2}Normalization}{15}{subsection.5.3.2}% 
+\contentsline {section}{\numberline {5.4}High action gradients}{15}{section.5.4}% 
+\contentsline {subsection}{\numberline {5.4.1}Gradient actionspace}{15}{subsection.5.4.1}% 
+\contentsline {subsection}{\numberline {5.4.2}Feeding past timesteps}{16}{subsection.5.4.2}% 
+\contentsline {subsection}{\numberline {5.4.3}Clipping action gradients}{16}{subsection.5.4.3}% 
+\contentsline {section}{\numberline {5.5}Improvements without sense}{16}{section.5.5}% 
+\contentsline {subsection}{\numberline {5.5.1}Prioritized experience replay}{16}{subsection.5.5.1}% 
+\contentsline {subsection}{\numberline {5.5.2}Data augmentation}{16}{subsection.5.5.2}% 
+\contentsline {section}{\numberline {5.6}Exploding Q-Loss}{16}{section.5.6}% 
+\contentsline {section}{\numberline {5.7}Automatized hyperparameter search}{17}{section.5.7}% 
+\contentsline {chapter}{\numberline {6}Evaluation}{18}{chapter.6}% 
+\contentsline {chapter}{\numberline {7}Future work}{19}{chapter.7}% 
+\contentsline {chapter}{\numberline {8}Conclusion}{20}{chapter.8}% 
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{21}{chapter*.4}% 

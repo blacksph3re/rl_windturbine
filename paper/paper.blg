@@ -4,55 +4,70 @@ The top-level auxiliary file: paper.aux
 The style file: alphadin.bst
 Reallocated singl_function (elt_size=8) to 100 items from 50.
 Database file #1: literatur.bib
-Warning--I didn't find a database entry for "mnih_dqn-paper_2013"
+Warning--entry type for "DeepDeterministicPolicy" isn't style-file defined
+--line 2 of file literatur.bib
+Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
+--line 150 of file literatur.bib
+Warning--I didn't find a database entry for "cobbeQuantifyingGeneralizationReinforcement2019"
+Warning--I didn't find a database entry for "huber1964"
 Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
-Warning--to sort, need author or key in noauthor_ddpg-explained-towardsdatascience_nodate
-Warning--to sort, need author or key in noauthor_rl-overview_nodate
-Warning--to sort, need author or key in noauthor_deep-rl-skymind_nodate
-Warning--to sort, need author or key in noauthor_envelope-detection_nodate
-Warning--Weder Verfasser noch Hrsg. in noauthor_ddpg-explained-towardsdatascience_nodate
-Warning--Weder Verfasser noch Hrsg. in noauthor_deep-rl-skymind_nodate
-Warning--Weder Verfasser noch Hrsg. in noauthor_envelope-detection_nodate
-Warning--Weder Verfasser noch Hrsg. in noauthor_rl-overview_nodate
-You've used 12 entries,
+Warning--to sort, need author or key in DeepDeterministicPolicy
+Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
+Warning--Es gibt einen Jahrgang, aber kein Jahr in bellmanTheoryDynamicProgramming1954
+Warning--empty edition in bishopNeuralNetworksPattern1995
+Warning--Es gibt nur eine Verlagsangabe in bishopNeuralNetworksPattern1995
+Warning--empty edition in burtonWindEnergyHandbook2011
+Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
+Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
+Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
+Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
+Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
+Warning--empty booktitle in kolterDesignAnalysisLearning2012
+Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
+Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
+Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReactive1990
+Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
+Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
+Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
+You've used 15 entries,
             3183 wiz_defined-function locations,
-            698 strings with 6447 characters,
-and the built_in function-call counts, 7919 in all, are:
-= -- 846
-> -- 298
-< -- 329
-+ -- 394
-- -- 117
-* -- 607
-:= -- 1483
-add.period$ -- 12
-call.type$ -- 12
-change.case$ -- 79
-chr.to.int$ -- 9
-cite$ -- 24
-duplicate$ -- 185
-empty$ -- 335
-format.name$ -- 155
-if$ -- 1364
-int.to.chr$ -- 4
+            726 strings with 7717 characters,
+and the built_in function-call counts, 12302 in all, are:
+= -- 1323
+> -- 396
+< -- 422
++ -- 497
+- -- 157
+* -- 944
+:= -- 2159
+add.period$ -- 14
+call.type$ -- 15
+change.case$ -- 99
+chr.to.int$ -- 15
+cite$ -- 34
+duplicate$ -- 246
+empty$ -- 674
+format.name$ -- 209
+if$ -- 2284
+int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 14
-newline$ -- 74
-num.names$ -- 24
-pop$ -- 81
+missing$ -- 15
+newline$ -- 88
+num.names$ -- 42
+pop$ -- 152
 preamble$ -- 1
-purify$ -- 103
+purify$ -- 129
 quote$ -- 0
-skip$ -- 408
+skip$ -- 515
 stack$ -- 0
-substring$ -- 504
-swap$ -- 63
-text.length$ -- 47
-text.prefix$ -- 0
+substring$ -- 1286
+swap$ -- 71
+text.length$ -- 69
+text.prefix$ -- 2
 top$ -- 0
-type$ -- 96
-warning$ -- 8
-while$ -- 72
-width$ -- 16
-write$ -- 155
-(There were 9 warnings)
+type$ -- 112
+warning$ -- 18
+while$ -- 107
+width$ -- 18
+write$ -- 188
+(There were 22 warnings)

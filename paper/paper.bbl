@@ -1,87 +1,106 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
-\begin{thebibliography}{MWP{\etalchar{+}}13}
+\begin{thebibliography}{MWP{\etalchar{+}}}
 
-\bibitem[BESK18]{burda_exploration_2018}
-\textsc{Burda}, Yuri ; \textsc{Edwards}, Harrison ; \textsc{Storkey}, Amos  ;
-  \textsc{Klimov}, Oleg:
-\newblock Exploration by {Random} {Network} {Distillation}.
-\newblock {In: }\emph{arXiv:1810.12894 [cs, stat]}
-\newblock  (2018), Oktober. --
-\newblock arXiv: 1810.12894
+\bibitem[BCP{\etalchar{+}}]{brockmanOpenAIGym2016}
+\textsc{Brockman}, Greg ; \textsc{Cheung}, Vicki ; \textsc{Pettersson}, Ludwig
+  ; \textsc{Schneider}, Jonas ; \textsc{Schulman}, John ; \textsc{Tang}, Jie  ;
+  \textsc{Zaremba}, Wojciech:
+\newblock {{OpenAI Gym}}.
+\newblock
 
-\bibitem[BW14]{berglind_fatigue_2014}
+\bibitem[Bel]{bellmanTheoryDynamicProgramming1954}
+\textsc{Bellman}, Richard:
+\newblock The Theory of Dynamic Programming.
+\newblock
+\newblock 60, Nr. 6, S. 503--516. --
+\newblock ISSN 0002--9904
+
+\bibitem[Bis]{bishopNeuralNetworksPattern1995}
+\textsc{Bishop}, Christopher~M.:
+\newblock \emph{Neural Networks for Pattern Recognition}.
+\newblock {Clarendon Press ; Oxford University Press}. --
+\newblock ISBN 978--0--19--853849--3 978--0--19--853864--6
+
+\bibitem[BJSB]{burtonWindEnergyHandbook2011}
+\textsc{Burton}, Tony ; \textsc{Jenkins}, Nick ; \textsc{Sharpe}, David  ;
+  \textsc{Bossanyi}, Ervin:
+\newblock \emph{Wind {{Energy Handbook}}: {{Burton}}/{{Wind Energy Handbook}}}.
+\newblock {John Wiley \& Sons, Ltd}. --
+\newblock ISBN 978--1--119--99271--4 978--0--470--69975--1
+
+\bibitem[BW]{berglindFatigueEstimationMethods2014}
 \textsc{Berglind}, J. J.~B. ; \textsc{Wisniewski}, Rafael:
-\newblock Fatigue {Estimation} {Methods} {Comparison} for {Wind} {Turbine}
-  {Control}.
-\newblock {In: }\emph{arXiv:1411.3925 [math]}
-\newblock  (2014), November. --
-\newblock arXiv: 1411.3925
+\newblock Fatigue {{Estimation Methods Comparison}} for {{Wind Turbine
+  Control}}.
+\newblock
 
-\bibitem[LHP{\etalchar{+}}15]{lillicrap_continuous_2015}
+\bibitem[Dee]{DeepDeterministicPolicy}
+
+\newblock \emph{Deep {{Deterministic Policy Gradients Explained}}}
+
+\bibitem[FHM]{fujimotoAddressingFunctionApproximation2018}
+\textsc{Fujimoto}, Scott ; \textsc{van Hoof}, Herke  ; \textsc{Meger}, David:
+\newblock Addressing {{Function Approximation Error}} in {{Actor}}-{{Critic
+  Methods}}.
+\newblock
+
+\bibitem[HLD]{howlandWindFarmPower2019}
+\textsc{Howland}, Michael~F. ; \textsc{Lele}, Sanjiva~K.  ; \textsc{Dabiri},
+  John~O.:
+\newblock Wind Farm Power Optimization through Wake Steering.
+\newblock
+\newblock 116, Nr. 29, S. 14495--14500. --
+\newblock ISSN 0027--8424, 1091--6490
+
+\bibitem[JBMS]{jonkmanDefinition5MWReference2009}
+\textsc{Jonkman}, J. ; \textsc{Butterfield}, S. ; \textsc{Musial}, W.  ;
+  \textsc{Scott}, G.
+\newblock \emph{Definition of a 5-{{MW Reference Wind Turbine}} for {{Offshore
+  System Development}}}
+
+\bibitem[KJT]{kolterDesignAnalysisLearning2012}
+\textsc{Kolter}, J.~Z. ; \textsc{Jackowski}, Z.  ; \textsc{Tedrake}, R.:
+\newblock Design, Analysis, and Learning Control of a Fully Actuated Micro Wind
+  Turbine, {IEEE}. --
+\newblock ISBN 978--1--4577--1096--4 978--1--4577--1095--7
+  978--1--4577--1094--0 978--1--4673--2102--0, S. 2256--2263
+
+\bibitem[LHP{\etalchar{+}}]{lillicrapCONTINUOUSCONTROLDEEP2015}
 \textsc{Lillicrap}, Timothy~P. ; \textsc{Hunt}, Jonathan~J. ; \textsc{Pritzel},
   Alexander ; \textsc{Heess}, Nicolas ; \textsc{Erez}, Tom ; \textsc{Tassa},
   Yuval ; \textsc{Silver}, David  ; \textsc{Wierstra}, Daan:
-\newblock {CONTINUOUS} {CONTROL} {WITH} {DEEP} {REINFORCEMENT} {LEARNING}.
-\newblock {In: }\emph{arXiv:1509.02971 [cs, stat]}
-\newblock  (2015), September. --
-\newblock arXiv: 1509.02971
+\newblock {{CONTINUOUS CONTROL WITH DEEP REINFORCEMENT LEARNING}}.
+\newblock
 
-\bibitem[MKS{\etalchar{+}}13]{mnih_playing_2013}
-\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
-  ; \textsc{Graves}, Alex ; \textsc{Antonoglou}, Ioannis ; \textsc{Wierstra},
-  Daan  ; \textsc{Riedmiller}, Martin:
-\newblock Playing {Atari} with {Deep} {Reinforcement} {Learning}.
-\newblock {In: }\emph{arXiv:1312.5602 [cs]}
-\newblock  (2013), Dezember. --
-\newblock arXiv: 1312.5602
+\bibitem[MB]{mozerDiscoveringStructureReactive1990}
+\textsc{Mozer}, Michael~C. ; \textsc{Bachrach}, Jonathan:
+\newblock Discovering the {{Structure}} of a {{Reactive Environment}} by
+  {{Exploration}}.
+\newblock
+\newblock 2, Nr. 4, S. 447--457. --
+\newblock ISSN 0899--7667, 1530--888X
 
-\bibitem[MWP{\etalchar{+}}13]{marten_qblade:_2013}
+\bibitem[MWP{\etalchar{+}}]{martenQBLADEOPENSOURCE2013}
 \textsc{Marten}, D ; \textsc{Wendler}, J ; \textsc{Pechlivanoglou}, G ;
   \textsc{Nayeri}, C~N.  ; \textsc{Paschereit}, C~O.:
-\newblock {QBLADE}: {AN} {OPEN} {SOURCE} {TOOL} {FOR} {DESIGN} {AND}
-  {SIMULATION} {OF} {HORIZONTAL} {AND} {VERTICAL} {AXIS} {WIND} {TURBINES}.
+\newblock {{QBLADE}}: {{AN OPEN SOURCE TOOL FOR DESIGN AND SIMULATION OF
+  HORIZONTAL AND VERTICAL AXIS WIND TURBINES}}.
 \newblock
-\newblock 3 (2013), Nr. 3, S.~6
+\newblock 3, Nr. 3, S.~6
 
-\bibitem[noaa]{noauthor_ddpg-explained-towardsdatascience_nodate}
-
-\newblock \emph{ddpg-explained-towardsdatascience}
-
-\bibitem[noab]{noauthor_deep-rl-skymind_nodate}
-
-\newblock \emph{deep-rl-skymind}
-
-\bibitem[noac]{noauthor_envelope-detection_nodate}
-
-\newblock \emph{envelope-detection}
-
-\bibitem[noad]{noauthor_rl-overview_nodate}
-
-\newblock \emph{rl-overview}
-
-\bibitem[PHD{\etalchar{+}}17]{plappert_parameter_2017}
+\bibitem[PHD{\etalchar{+}}]{plappertParameterSpaceNoise2017}
 \textsc{Plappert}, Matthias ; \textsc{Houthooft}, Rein ; \textsc{Dhariwal},
   Prafulla ; \textsc{Sidor}, Szymon ; \textsc{Chen}, Richard~Y. ;
   \textsc{Chen}, Xi ; \textsc{Asfour}, Tamim ; \textsc{Abbeel}, Pieter  ;
   \textsc{Andrychowicz}, Marcin:
-\newblock Parameter {Space} {Noise} for {Exploration}.
-\newblock {In: }\emph{arXiv:1706.01905 [cs, stat]}
-\newblock  (2017), Juni. --
-\newblock arXiv: 1706.01905
-
-\bibitem[SLH{\etalchar{+}}13]{silver_deterministic_2013}
-\textsc{Silver}, David ; \textsc{Lever}, Guy ; \textsc{Heess}, Nicolas ;
-  \textsc{Degris}, Thomas ; \textsc{Wierstra}, Daan  ; \textsc{Riedmiller},
-  Martin:
-\newblock Deterministic {Policy} {Gradient} {Algorithms}.
+\newblock Parameter {{Space Noise}} for {{Exploration}}.
 \newblock
-\newblock  (2013), S.~9
 
-\bibitem[UO30]{uhlenbeck_theory_1930}
+\bibitem[UO]{uhlenbeckTheoryBrownianMotion1930}
 \textsc{Uhlenbeck}, G.~E. ; \textsc{Ornstein}, L.~S.:
-\newblock On the {Theory} of the {Brownian} {Motion}.
-\newblock {In: }\emph{Physical Review}
-\newblock 36 (1930), September, Nr. 5, S. 823--841. --
+\newblock On the {{Theory}} of the {{Brownian Motion}}.
+\newblock
+\newblock 36, Nr. 5, S. 823--841. --
 \newblock ISSN 0031--899X
 
 \end{thebibliography}
