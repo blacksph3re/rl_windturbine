@@ -286,12 +286,19 @@ We still had some parts of the code left where there wasn't any noise involved, 
 
 \section{Exploding Q-Loss}
 
-We observed that our Q-Loss, especially after a death, explodes into e15 magnitude values, while most of the times it stayed around e2 magnitude. Instable Q-Losses are a general problem with DQN and DDPG, and some literature \cite{fujimotoAddressingFunctionApproximation2018} proposes to use two Q networks, of which only the minimum is used for training. We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. Also, we believe that adding double Q networks such as in \cite{fujimotoAddressingFunctionApproximation2018} would also solve this problem.
+We observed that our Q-Loss, especially after a death, explodes into e15 magnitude values, while most of the times it stayed around e2 magnitude. Instable Q-Losses are a general problem with DQN and DDPG, and some literature \cite{fujimotoAddressingFunctionApproximation2018} proposes to use two Q networks, of which only the minimum is used for training. 
+
+\subsection{Huber loss}
+We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. However we still saw some loss explosions.
+
+\subsection{Double critic}
+Adding twin critic networks such as in \cite{fujimotoAddressingFunctionApproximation2018} eventually solved our problem with loss explosions completely.
 
 \section{Automatized hyperparameter search}
 
 \chapter{Evaluation}
 
+We name our final variant of \ac{DDPG} \ac{DDDDDPPG}. Our variant is different to \cite{fujimotoAddressingFunctionApproximation2018} in that we don't use target policy smoothing. However, we just have more D.
 % What should I put here?
 
 % Holds power, doesn't diverge, way to many actions, super noisy, we are at least somewhere close to sensible

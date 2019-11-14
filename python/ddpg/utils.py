@@ -216,6 +216,8 @@ class BasicBuffer:
         if(priority == 0):
             priority = 1e-15
 
+        done = 1 if done else 0
+
         experience = (state, action, np.array([reward]), next_state, done)
 
         self.max_priority = max(self.max_priority, priority)

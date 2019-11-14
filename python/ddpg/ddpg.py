@@ -55,7 +55,7 @@ class DDPG:
         
         self.actor = Actor(self.obs_dim, self.act_dim, hparams.actor_sizes[0], hparams.actor_sizes[1], hparams.init_weight_limit, hparams.actor_simple).to(self.device)
         self.actor_target = Actor(self.obs_dim, self.act_dim, hparams.actor_sizes[0], hparams.actor_sizes[1], hparams.init_weight_limit, hparams.actor_simple).to(self.device)
-    
+
         # Copy target parameters
         for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
             target_param.data.copy_(param.data)
@@ -65,7 +65,21 @@ class DDPG:
         # optimizers
         self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=hparams.critic_lr)
         self.actor_optimizer  = optim.Adam(self.actor.parameters(), lr=hparams.actor_lr)
-    
+
+        # If in twin critic mode, add another critic
+        if(self.hparams.twin_critics):
+            self.critic2 = Critic(self.obs_dim, self.act_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2], hparams.init_weight_limit, hparams.critic_simple).to(self.device)
+            self.critic2_target = Critic(self.obs_dim, self.act_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2], hparams.init_weight_limit, hparams.critic_simple).to(self.device)
+            for target_param, param in zip(self.critic2_target.parameters(), self.critic2.parameters()):
+                target_param.data.copy_(param.data)
+            self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=hparams.critic_lr)
+
+        if(self.hparams.critic_loss == 'huber'):
+            self.critic_loss_function = F.smooth_l1_loss
+        else:
+            self.critic_loss_function = F.mse_loss
+
+        # Buffor for experience replay
         self.replay_buffer = BasicBuffer(hparams.buffer_maxlen)
 
         # Noises
@@ -330,19 +344,40 @@ class DDPG:
         next_Q = self.critic_target.forward(next_state_batch, next_actions.detach())
         expected_Q = reward_batch + self.gamma * next_Q
         
+        # If using twin q, take minimum of the two next_Q estimations and replace that with the current one
+        if(self.hparams.twin_critics):
+            self.critic2_optimizer.zero_grad()
+            curr_Q2 = self.critic2.forward(state_batch, action_batch)
+            next_Q2 = self.critic2_target.forward(next_state_batch, next_actions.detach())
+            expected_Q = reward_batch + self.gamma * torch.min(next_Q, next_Q2)
+
+            q2_loss = self.critic_loss_function(curr_Q2, expected_Q.detach())
+            q2_loss.backward()
+            self.critic2_optimizer.step()
+            self.logger.add_scalar('Loss/q2', q2_loss, time)
+            self.logger.add_scalar('Loss/next-q2-mean', next_Q2.mean().detach().cpu(), time)
+
+
         # update critic
-        if(self.hparams.critic_loss == 'huber'):
-            q_loss = F.smooth_l1_loss(curr_Q, expected_Q.detach())
-        else:
-            q_loss = F.mse_loss(curr_Q, expected_Q.detach())
+        q_loss = self.critic_loss_function(curr_Q, expected_Q.detach())
 
         q_loss.backward() 
         self.critic_optimizer.step()
+        self.logger.add_scalar('Loss/q', q_loss, time)
+        self.logger.add_scalar('Loss/next_Q_mean', next_Q.mean().detach().cpu(), time)
+
+
 
         # Update priorities if using prioritized experience replay
         # TODO Should we correct importance sampling now?
         if(self.hparams.prioritized_experience_replay):
-            td_error = (expected_Q.detach() - curr_Q.detach()).abs().cpu().data.numpy()
+            # In twin critic mode, take the max value of the two, 
+            # Thus, if any of the two nets is performing badly on thet sample,
+            # we'll sample it more often.
+            if(self.hparams.twin_critics):
+                td_error = (expected_Q.detach() - torch.max(curr_Q.detach(), curr_Q2.detach())).abs().cpu().data.numpy()
+            else:
+                td_error = (expected_Q.detach() - curr_Q.detach()).abs().cpu().data.numpy()
             self.replay_buffer.update_priorities(indices, td_error)
 
         if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
@@ -383,15 +418,14 @@ class DDPG:
 
 
         # update actor
-        self.actor_optimizer.zero_grad()
-        policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
+        if(time%self.hparams.actor_delay == 0):
+            self.actor_optimizer.zero_grad()
+            policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
 
-        policy_loss.backward()
+            policy_loss.backward()
 
-        self.actor_optimizer.step()
-
-        self.logger.add_scalar('Loss/q', q_loss, time)
-        self.logger.add_scalar('Loss/policy', policy_loss, time)
+            self.actor_optimizer.step()
+            self.logger.add_scalar('Loss/policy', policy_loss, time)
 
 
         if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
@@ -641,14 +675,24 @@ class DDPG:
             # Other values: "mse", "huber"
             critic_loss = 'huber',
 
+            # Whether to use duelling critics
+            # In this variant, two critics try to estimate q
+            # and only the lower estimation will be chosen
+            # Helps prevent loss explosions and overestimation
+            twin_critics = True,
+
             # Learning rate of the policy
-            actor_lr = 1e-4,
+            actor_lr = 1e-5,
 
             # Network sizes of the policy
             actor_sizes = [32, 8],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
             actor_simple = True,
+
+            # Only update the actor every n critic updates
+            # 1 for updating every critic update
+            actor_delay = 2,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
@@ -666,11 +710,11 @@ class DDPG:
             logdir = "logs",
 
             # Log data every n steps
-            log_steps = 15,
+            log_steps = 16,
 
             # Log net insight histograms every n steps
             # -1 for disabling completely
-            log_net_insights = 150,
+            log_net_insights = 128,
 
             # Action noise
             # The type of action noise can be either
