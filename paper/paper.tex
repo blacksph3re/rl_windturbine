@@ -146,7 +146,8 @@ Because it has no semantic meaning, we mask away current time from our reinforce
 * pitch blade 3 [deg]
 \end{verbatim}
 
-As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to \num{4e6} Nm% TODO insert formula here
+After a while of experimenting with the unrestricted simulation, we added some bounds to our control parameters. In our final version, we had the following restrictions:
+As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial and in our simulations, wind will always come from the front. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to \num{4e6} Nm.
 Because changing torque from zero to maximum in one timestep is not realistic for a real turbine, we restrict it to move a maximum of \num{3e5} Nm per one timestep of 0.1 seconds. If our agent chooses a value outside of that area, we set it to the closest value inside of that area.
 Blades can be pitched between 0 and 90 degrees, 0 being not pitched out at all and operating at maximum efficiency and 90 resulting in no aerodynamic torque from the rotor whatsoever. A sensible pitch motor can only turn the blades at a limited speed, we assume a limit of 5 degrees per second and again set controller inputs to a sensible value inside that. The simulation theoretically accepts a full pitch change in one timestep, however as inertia on the blade is so high for such a change, the blades break instantly and the rest of the simulation needs to be reset.
 
@@ -208,6 +209,7 @@ On our first experimentation steps, we did not yet have experience with how the 
 
 
 \section{Designing reward functions}
+\label{rewardfunctions}
 
 As qblade doesn't provide a built-in reward function, we needed to craft our own reward function based on the observed state. We considered several possible variants. We will first introduce all of them and give a more detailed explanation later
 
@@ -223,6 +225,8 @@ As qblade doesn't provide a built-in reward function, we needed to craft our own
 
 \item \textbf{Penalize accumulated stress} Penalize accumulated structural stress. With \(x = rainflow(s_0...s_t\) being the rainflow table and \(p(x)\) being a function that maps from rainflow outputs to a scalar penalty, calculate \(r'(s_0...s_t) = r(s_t) - p(rainflow(s_0...s_t))\)
 
+\item \textbf{Penalize action gradients} Penalize high action gradients. With \(a_t\) being the current action, \(a_{t-1}\) the last action, \(c\) a penalty constant and \(r(s)\) another reward function, calculate: \(r'(s, a) = r(s) - c * (a_t - a_{t-1})\)
+
 \end{itemize}
 
 \textbf{Rated speed} is the easiest of the rewards, as holding a rated speed can be achieved by either pitch or torque or a combination of the two. So both a high pitch and a high torque will stop it from running faster than it should. We used this reward for our first working version.
@@ -230,8 +234,9 @@ As qblade doesn't provide a built-in reward function, we needed to craft our own
 \textbf{Maximal power} is an intuitive reward, but might yield unrealistic results. This rewards high power regardless of the stress that is induced to the turbine, so a good policy might spin the turbine at high speeds beyond any turbine specification and then apply maximum torque. So this reward makes more sense when combined with a stress penalty.
 \textbf{Penalize current stress} is the easiest stress penalty, where a penalty proportional to the current bending of the structure can be used. As there are several bending modes on most of the components of the windturbine, a combination or selection of modes and components should be taken before. We decided to limit us to out-of-plane bending of the blade tips. This is a simple variant which leaves out bending in the middle of the blades, bending in the rotational plane, vibration or bending of the tower and torsional stress on the shaft.
 \textbf{Penalize accumulated stress} is a more complete, but time dependent variant. \ac{RFC} is a commonly used method for calculating structural fatigue in windturbines \cite{berglindFatigueEstimationMethods2014}. \ac{RFC} takes in a bending signal over time and returns a table with amplitudes and their frequency, as in how often the structure swung how far. It filters out some higher-frequency swinging in between two lower frequency swings and thus also works for structures that swing in more than one frequency. To use it as a penalty, we needed to create a function that maps from that table to a scalar penalty. This penalty accumulates past stress, so it increases over time. We suspect this penalty to be hard to learn, as it reacts slowly to changes and a once given penalty will never be lifted again.
+\textbf{Penalize action gradients} is an option which is useful in contexts where high action gradients are impossible on the real system. Instead of clipping them, penalizing them could include action gradients into the learning process. We only expect sensible results with a stateful agent which knows at least the last action it took or one which has recurrent connections, as otherwise the last action taken is unknown to the agent.
 
-Most of our experimentation we did with rewarding rated speed.
+Most of our experimentation we did with rewarding rated speed, as we expected this reward function to be the easiest to learn.
 
 \section{Aiding exploration}
 
@@ -247,7 +252,7 @@ The TD3-paper \cite{fujimotoAddressingFunctionApproximation2018} utilizes a rand
 
 \subsection{Parameter noise}
 
-As we still didn't see good results, we tried adding parameter-space noise \cite{plappertParameterSpaceNoise2017} to the actor function, as the paper promised better exploration. We could not observe any improvements and deactivated parameter space noise for the working version.
+As we still didn't see good results, we tried adding parameter-space noise \cite{plappertParameterSpaceNoise2017} to the actor function, as the paper promised better exploration. We could not observe any improvements and deactivated parameter space noise.
 
 \section{Zero Gradients}
 All our efforts to aid exploration by adding noise did not yield better exploration, so we had a look at our gradients and found that all our actor gradients are zero. The critic had gradients, but only in the later levels of the net. Eventually, we solved this problem by both simplyfing the architecture and utilizing normalization.
@@ -258,7 +263,7 @@ We tackled this problem by at first reducing the number and size of layers from 
 
 \subsection{Normalization}
 
-More effectively, we added data normalization. We normalized the data so states, actions and reward always stayed between 1 and -1. This finally fixed our problem of zero gradients and we could observe normal learning. We recommend this technique as a default technique for every reinforcement learning algorithm, as we can not imagine any drawbacks of normalizing input data. As in our simulation, where our state reflects measurements from very different parts of the simulation, some values in the state-array were 8 orders of magnitude different from others. As most of the high-magnitude values are vibrations, the net could not create a link between these and the state-action, while low-magnitude values like rotational speed were not considered due to their small absolute values.
+More effectively, we added data normalization. We normalized the data so states, actions and reward always stayed between 1 and -1. This finally fixed our problem of zero gradients and we could observe normal learning. We recommend this technique as a default technique for every reinforcement learning algorithm, as we can not imagine any drawbacks of normalizing input data. As in our simulation, where our state reflects measurements from very different parts of the simulation, some values in the state-array were 8 orders of magnitude different from others. As most of the high-magnitude values are vibrations, the net could not create a link between these and the state-action, while low-magnitude values like rotational speed were not considered due to their small absolute values. At first, we used observed states and rewards from the random exploration phase to calculate maximum/minimum values. As sometimes after random exploration, extreme values were observed, we started normalising on the replay data of a previous run, in which many simulation states were explored.
 
 \section{High action gradients}
 
@@ -274,7 +279,7 @@ Another idea was that we feed the last n timesteps concatenated to the current o
 
 \subsection{Clipping action gradients}
 
-We eventually solved the problem with the high action gradients by still letting the controller output absolute actions across the entire action spaces, but if gradients exceed a certain threshold, the actual action taken is set to the nearest value with sensible gradients. Though the actions returned from the policy are still wildly unstable, they at least didn't result in death of the turbine anymore and still we didn't hinder convergence through our gradient actionspace.
+We eventually solved the problem with the high action gradients by still letting the controller output absolute actions across the entire action spaces, but if gradients exceed a certain threshold, the actual action taken is set to the nearest value with sensible gradients. Though the actions returned from the policy are still wildly unstable, they at least didn't result in death of the turbine anymore and still we didn't hinder convergence through our gradient actionspace. We at first hid this clipping from the replay buffer, but then decided to store the actual values taken, as the models then don't have to also learn the clipping effect. We observed better learning when not hiding the clipping from the replay buffer.
 
 \section{Improvements without sense}
 
@@ -292,13 +297,28 @@ We observed that our Q-Loss, especially after a death, explodes into e15 magnitu
 We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. However we still saw some loss explosions.
 
 \subsection{Double critic}
-Adding twin critic networks such as in \cite{fujimotoAddressingFunctionApproximation2018} eventually solved our problem with loss explosions completely.
+Adding twin critic networks such as in \cite{fujimotoAddressingFunctionApproximation2018} eventually solved our problem with loss explosions completely, however the thing didn't learn anymore. To use it in conjunction with \ac{PER}, we needed to decide for a priority formula and decided to take the minimum of the two q values, after the maximum showed biasing towards one of the networks
+
+\subsection{Batch normalization}
+As in deep learning, batch normalization is helpful for increasing lr and thus to skip over local maxima, we tried to add batch normalization between the layers. The authors suspected problems with the noise in RL, however it looked good.
 
 \section{Automatized hyperparameter search}
+
+To test all the above things, we tried simulations with different hyperparameters. 
 
 \chapter{Evaluation}
 
 We name our final variant of \ac{DDPG} \ac{DDDDDPPG}. Our variant is different to \cite{fujimotoAddressingFunctionApproximation2018} in that we don't use target policy smoothing. However, we just have more D.
+
+\section{First working version}
+How we achieved first successes, hparams, etc
+
+\section{HParam tuning}
+We tried different hyper parameters. To evaluate our controller, we measure the time the simulation stayed within a sensible range. We define sensible as rotational speeds between 0 and 1.2 rad/s. We let each simulation run 1 million steps. As during our random exploration, the simulation was always in sensible range, we remove the random exploration phase from our evaluation. 
+
+\section{Comparison to industry controllers}
+We aren't even close
+
 % What should I put here?
 
 % Holds power, doesn't diverge, way to many actions, super noisy, we are at least somewhere close to sensible
@@ -306,13 +326,34 @@ We name our final variant of \ac{DDPG} \ac{DDDDDPPG}. Our variant is different t
 % Different wind speed
 
 \chapter{Future work}
-
 % Reworking reward functions
 % Trying different algorithms for better stability?
 % Pretraining the policy with a reference controller
+% Expert policy in instable conditions
 % Whatever comes to our mind
 % Punishment for high action gradients
 % Switch reward functions during training?
+% Interest from TU Berlin from control elements guy
+
+\section{Reward functions}
+
+We did all our training under the simple hold-speed reward function. A realistic reward function however would incorporate power generated and damage incurred. As soon as a stable agent under the hold speed reward function was created, using different rewards could bring the performance of the controller closer to that of industry controllers. A complex reward function like what we proposed in section \ref{rewardfunctions} however also makes learning more difficult, and thus would need more work in refining the algorithm.
+
+\section{Switch reward functions during training}
+To combine the learning ease of a simple reward function with the performance of a complex reward, we could imagine fading over between a simple and complex reward function. In early stages of training, the network is conditioned to only output anything sane, while in later training it could optimize power or damage prevention more.
+
+
+\section{Expert policy training}
+
+We could imagine that first training the policy to output expert actions would improve learning. We imagine a phase at the beginning and after random exploration, where observations from the random exploration phase are fed into the expert controller and the policy is trained to estimate those values directly. This way, after random exploration, the agent would start off with a policy which behaves like the expert controller but can deviate from that in future training, by taking into account q values. A possible algorithm for this could look like:
+
+Alternatively, we could imagine leaving the expert policy training active the whole time, not just once after random exploration, but to reduce the learning rate gradually. This way, in initial training, predicting the expert policies actions would have a higher impact than what the Q-function would suggest, whereas in later training with the smaller learning rate, deviations from the expert policy would be punished less and the policy is allowed to deviate further from the expert policy. This would involve two backward passes per training iteration.
+
+\section{Expert policy in instable conditions}
+When the turbine is reaching a dangerous state (high/low rotational speed, high vibrations), we could fall back to our expert controller to save the situation. This would result in a safe controller, that upon insane policies would fall back to sane behavior. It would degrade exploration beyond what we doom safe, so a controller with this fallback method would never explore a death condition. This would not necessarily hinder learning, as a complete death condition might not be necessary to explore to see the decreasing loss gradient leading to it. However, seeing a death condition could result in more extreme Q-predictions and thus more incentive to stay clear of a death.
+
+\section{Active control elements}
+There is ongoing research into adding active control elements to windturbine blades such as flaps. A difficulty incurred in that research is the design of a controller, as the high-dimensional action space makes it difficult for a human to engineer a controller. Using our automatically learning agent could enable a first working version to that research, providing a first direction or even lead to performance increases over not using active control elements in a turbine.
 
 \chapter{Conclusion}
 

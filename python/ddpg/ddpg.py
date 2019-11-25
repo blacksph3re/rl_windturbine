@@ -183,6 +183,21 @@ class DDPG:
         m, c = self.reward_normalizer_params_gpu if gpu else self.reward_normalizer_params
         return reward * m + c
 
+    def clip_action(self, action):
+        if(self.hparams.clip_action_gradients):
+            max_threshold = np.array(self.hparams.act_max_grad)
+            action_grads = action - self.last_action
+
+            # Limit higher values
+            indices = action_grads > max_threshold
+            action[indices] = self.last_action[indices] + max_threshold[indices]
+
+            # Limit smaller values
+            indices = action_grads < -max_threshold
+            action[indices] = self.last_action[indices] - max_threshold[indices]
+
+        action = np.clip(action, self.act_low, self.act_high)
+        return action
 
     def get_action(self, obs, add_noise=False):
         action = None
@@ -209,7 +224,7 @@ class DDPG:
         # Get it to the cpu
         action = action.squeeze(0).cpu().detach().numpy()
 
-        action = np.clip(action, self.act_low, self.act_high)
+        action = self.clip_action(action)
 
         return action
 
@@ -375,7 +390,7 @@ class DDPG:
             # Thus, if any of the two nets is performing badly on thet sample,
             # we'll sample it more often.
             if(self.hparams.twin_critics):
-                td_error = (expected_Q.detach() - torch.max(curr_Q.detach(), curr_Q2.detach())).abs().cpu().data.numpy()
+                td_error = (expected_Q.detach() - torch.min(curr_Q.detach(), curr_Q2.detach())).abs().cpu().data.numpy()
             else:
                 td_error = (expected_Q.detach() - curr_Q.detach()).abs().cpu().data.numpy()
             self.replay_buffer.update_priorities(indices, td_error)
@@ -486,6 +501,7 @@ class DDPG:
         if(done):
             self.killcount += 1
             self.epoch_killcount += 1
+            self.last_action = np.zeros(self.act_dim)
             if(self.hparams.feed_past):
                 self.past_obs.clear()
 
@@ -520,7 +536,7 @@ class DDPG:
         if(self.time < self.hparams.random_exploration_steps):
             action = [2e7*state[0]-12e6,0]
             action += self.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
-            action = np.clip(action, self.act_low, self.act_high)
+            action = self.clip_action(action)
         else:
             action = self.get_action(state, True)
 
@@ -540,8 +556,8 @@ class DDPG:
         self.logger.add_scalar('Reward/real', reward, self.time)
 
         if(self.time > self.hparams.random_exploration_steps):
-            self.logger.logAction(self.time, self.normalize_action(action), 'act_norm')
-            self.logger.logObservation(self.time, self.normalize_state(state), 'obs_norm')
+            #self.logger.logAction(self.time, self.normalize_action(action), 'act_norm')
+            #self.logger.logObservation(self.time, self.normalize_state(state), 'obs_norm')
             self.logger.add_scalar('Reward/norm', norm_reward, self.time)
 
 
@@ -607,7 +623,7 @@ class DDPG:
 
             # Number of steps to sample random actions
             # before starting to utilize the policy
-            random_exploration_steps = 20000,
+            random_exploration_steps = 2000,
 
             # Type of random exploration noise
             # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
@@ -661,14 +677,14 @@ class DDPG:
             buffer_maxlen = 100000,
 
             # Learning rate of the Q approximator
-            critic_lr = 1e-4,
+            critic_lr = 1e-3,
 
             # Neural network sizes of the critic
             critic_sizes = [64, 32, 16],
 
             # Whether to use a 4-layer or a 2-layer structure
             # for the critic
-            critic_simple = True,
+            critic_simple = False,
 
             # Loss function for the critic
             # default is mean square error
@@ -679,20 +695,23 @@ class DDPG:
             # In this variant, two critics try to estimate q
             # and only the lower estimation will be chosen
             # Helps prevent loss explosions and overestimation
-            twin_critics = True,
+            twin_critics = False,
 
             # Learning rate of the policy
-            actor_lr = 1e-5,
+            actor_lr = 1e-3,
 
             # Network sizes of the policy
             actor_sizes = [32, 8],
 
             # Whether to use a 2-layer or a 3-layer structure for the actor
-            actor_simple = True,
+            actor_simple = False,
 
             # Only update the actor every n critic updates
             # 1 for updating every critic update
             actor_delay = 2,
+
+            # Whether to use batch normalization in both the actor and critic
+            batch_normalization = True,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
@@ -705,6 +724,7 @@ class DDPG:
             # Upper and lower limits for actions, will be overwritten by environment act limits
             act_high = [0.],
             act_low = [0.],
+            act_max_grad = [0.],
 
             # Where to store tensorboard logs
             logdir = "logs",
@@ -770,8 +790,8 @@ class DDPG:
             # calculating normalizations
             # Set to none if you don't want to load extra data
             #normalization_extradata = 'normalization_data/past_feeding_1.dat',
-            #normalization_extradata = 'normalization_data/no_past_feeding.dat',
-            normalization_extradata = None,
+            normalization_extradata = 'normalization_data/no_past_feeding.dat',
+            #normalization_extradata = None,
 
             # Whether to offer gradient action spaces instead of the ones from the environment
             # The policy is then limted to outputting a gradient and cannot change the action from
@@ -794,6 +814,9 @@ class DDPG:
 
             # In prioritized experience replay the probability of a sample to be replayed is proportional to its TD error
             # This allows critical samples to be replayed more often and thus the critic updating faster
-            prioritized_experience_replay = True,
+            prioritized_experience_replay = False,
+
+            # Whether to clip action gradients at the maximum level returned from the environment
+            clip_action_gradients = True,
 
         )

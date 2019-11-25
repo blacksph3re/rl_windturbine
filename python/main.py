@@ -45,6 +45,7 @@ def main():
   hparams.act_dim = env.get_act_dim()
   hparams.act_high = env.get_act_high()
   hparams.act_low = env.get_act_low()
+  hparams.act_max_grad = env.get_act_max_grad()
 
   checkpoint_steps = hparams.checkpoint_steps
   checkpoint_dir = hparams.checkpoint_dir

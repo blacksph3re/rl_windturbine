@@ -36,7 +36,7 @@ class QBladeAdapter:
     print("creating qblade instance")
     self._qbladeLib._Z14createInstancev()
 
-    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR_NEW.wpa")
+    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
     print("loading qblade project")
     self._loadProject(x)
 
@@ -91,11 +91,20 @@ class QBladeAdapter:
     #return [0, 0, 0, 0, 0]
     return [0, 0]
 
+  def get_act_max_grad(self):
+    return [3e5, 0.5]
+
+
   def calc_reward(self, observation, action):
+    if(self.calc_death(observation)):
+      death_penalty = 3
+    else:
+      death_penalty = 0
+
     rated_power = 3200
     rated_speed = 0.8
     #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
-    return 1-np.abs((observation[1]-rated_power)/rated_power)
+    return 1-np.abs((observation[1]-rated_power)/rated_power)-death_penalty
     #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
     #return np.clip(5 
     #  - np.abs((observation[1]-rated_power)/rated_power)
@@ -110,7 +119,7 @@ class QBladeAdapter:
            np.abs(observation[17]) > broken_state or \
            np.abs(observation[18]) > broken_state or \
            observation[0] > 4 or \
-           observation[0] < -0.5
+           observation[0] < -1
 
   def padAction(self, action):
     action = [action[0], 0, action[1], action[1], action[1]]
@@ -121,17 +130,6 @@ class QBladeAdapter:
     action = np.clip(action, self.get_act_low(), self.get_act_high())
     action = np.nan_to_num(self.padAction(action))
 
-    # Make sure action gradients don't exceed a certain threshold
-    action_grads = action - self.lastAction
-    max_threshold = np.array([3e5, 1, 0.5, 0.5, 0.5])
-
-    # Limit higher values
-    indices = action_grads > max_threshold
-    action[indices] = self.lastAction[indices] + max_threshold[indices]
-
-    # Limit smaller values
-    indices = action_grads < -max_threshold
-    action[indices] = self.lastAction[indices] - max_threshold[indices]
 
     in_data = (ctypes.c_double * 5)(*action)
     self._setControlVars(in_data)

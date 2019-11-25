@@ -194,3 +194,34 @@ I had several cases of vanishing actor gradients and for some reason increasing 
 However, I am off writing down the things now while waiting for some automatized hparam searching. I let the thing run 2k episodes and then test for 50k steps, gathering the total returns and deaths in the testing phase. It's also still writing logs while doing so.
 
 New observation: Training is really stable until ca 30k steps after the first time maniac-forwards mode. Then, q loss explodes and things go badly. Also, I had another run which looked kinda good over big spans of time. Again the q loss explosion. I switched to huber loss now.
+
+### **11/25**
+
+I have read some papers around batch normalization, understanding that it achieves between-layer normalization and thus allows for higher learning rates. It adds some more parameters to learn in turn.
+
+Also it would be helpful to restrict actions in the ddpg module to store the real actions in the replay buffer.
+
+TODOs paper:
+- Abstract (3h)
+- RL/env: add formulae (1h)
+- RL/Q learning (4h)
+- RL/PQ (8h)
+- RL/DDPG (6h)
+- Exp/Exploration/Action noise: Add formulae and reasoning (2h)
+- Exp/Exploration/Random exploration: Add formulae, more detail (2h)
+- Exp/Exploration/Parameter noise: More detail (1h)
+- Exp/VanGrad/Simple architecture: More detail, cross reference to complexities from other papers (1h)
+- Exp/VanGrad/Norm: Cross-references to other norm papers (30m)
+- Exp/ActGrad/GradAct: Add formulae, more detail (1.5h)
+- Exp/ActGrad/FeedPast: Add formulae (1h)
+- Exp/ActGrad/Clip: Add formulae (1h)
+- Exp/Nonsense/PER: Write (4h)
+- Exp/Nonsense/Data aug: Add details (30m)
+- Exp/QLoss/Huber: Much more math (2h)
+- Exp/QLoss/Twin: Much more explanation (4h)
+- Exp/QLoss/BN: Much more expl (3h)
+- Eval/First: Describe hparams, describe results (15h)
+- Eval/Second: Describe hparams, results (4h)
+- Eval/Comparison: Compare (5h)
+- Future: Write (8h)
+- Concl: Write (15h)

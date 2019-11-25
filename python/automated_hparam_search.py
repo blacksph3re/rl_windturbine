@@ -12,7 +12,7 @@ import os
   {"id": 5, "batch_size": 256},
 ]'''
 
-experiments = [
+'''experiments = [
   {"id": 6, "critic_lr": 1e-2},
   {"id": 7, "critic_lr": 1e-3},
   {"id": 8, "critic_lr": 1e-5},
@@ -21,6 +21,26 @@ experiments = [
   {"id": 10, "actor_lr": 1e-3},
   {"id": 10, "actor_lr": 1e-5},
   {"id": 10, "actor_lr": 1e-6},
+]'''
+
+experiments = [
+  {"id": 11, "twin_critics": True},
+  {"id": 12, "twin_critics": True, "critic_loss": 'mse'},
+  {"id": 13, "critic_simple": False},
+  {"id": 14, "actor_simple": False},
+  {"id": 15, "actor_simple": False, "critic_simple": False},
+  {"id": 16, "replay_noise": 0},
+  {"id": 17, "replay_noise": 1e-4},
+  {"id": 18, "replay_noise": 1e-3},
+  {"id": 19, "replay_noise": 1e-2},
+  {"id": 20, "tau": 1e-3},
+  {"id": 21, "tau": 1e-4},
+  {"id": 22, "tau": 5e-2},
+  {"id": 23, "tau": 0.1},
+  {"id": 24, "gamma": 0.9},
+  {"id": 25, "gamma": 0.999},
+  {"id": 26, "gamma": 0.9999},
+  {"id": 27, "gamma": 0.8},
 ]
 
 
@@ -52,7 +72,7 @@ def run_one(experiment):
     return (id, -1, -1)
 
 # Set the number of parallel runs here
-pool = Pool(3)
+pool = Pool(1)
 results = pool.map(run_one, experiments)
 
 for (id, reward, deaths) in results:
