@@ -374,18 +374,24 @@ class QBladeLogger:
         if(time%self.log_steps != 0):
             return
 
-        self.writer.add_scalar(name, val, time)
+        self.add_scalar_nofilter(name, val, time)
 
     def add_scalar_nofilter(self, name, val, time):
-        self.writer.add_scalar(name, val, time)
+        try:
+            self.writer.add_scalar(name, val, time)
+        except Exception as e:
+            print(e)
 
     def add_histogram(self, name, val, time):
         if(time%self.log_steps != 0):
             return
-        self.writer.add_histogram(name, val, time)
+        self.add_histogram_nofilter(name, val, time)
 
     def add_histogram_nofilter(self, name, val, time):
-        self.writer.add_histogram(name, val, time)
+        try:
+            self.writer.add_histogram(name, val, time)
+        except Exception as e:
+            print(e)
 
     def logAction(self, step, action, prefix='act'):
         self.add_scalar('%s/generator torque [Nm]' % prefix, action[0], step)

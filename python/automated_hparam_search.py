@@ -28,16 +28,16 @@ experiments = [
   {"id": 12, "twin_critics": True, "critic_loss": 'mse'},
   {"id": 13, "critic_simple": False},
   {"id": 14, "actor_simple": False},
-  {"id": 15, "actor_simple": False, "critic_simple": False},
+  {"id": 15, "actor_simple": False, "critic_simple": False}, # Worked kinda
   {"id": 16, "replay_noise": 0},
   {"id": 17, "replay_noise": 1e-4},
   {"id": 18, "replay_noise": 1e-3},
   {"id": 19, "replay_noise": 1e-2},
-  {"id": 20, "tau": 1e-3},
+  {"id": 20, "tau": 1e-3}, # Worked kinda
   {"id": 21, "tau": 1e-4},
   {"id": 22, "tau": 5e-2},
   {"id": 23, "tau": 0.1},
-  {"id": 24, "gamma": 0.9},
+  {"id": 24, "gamma": 0.9}, # Worked kinda
   {"id": 25, "gamma": 0.999},
   {"id": 26, "gamma": 0.9999},
   {"id": 27, "gamma": 0.8},

@@ -9,7 +9,6 @@ Warning--entry type for "DeepDeterministicPolicy" isn't style-file defined
 Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
 --line 150 of file literatur.bib
 Warning--I didn't find a database entry for "cobbeQuantifyingGeneralizationReinforcement2019"
-Warning--I didn't find a database entry for "huber1964"
 Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
 Warning--to sort, need author or key in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
@@ -22,6 +21,7 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMeth
 Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
+Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
 Warning--empty booktitle in kolterDesignAnalysisLearning2012
 Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
 Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
@@ -29,45 +29,45 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReac
 Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
-You've used 15 entries,
+You've used 16 entries,
             3183 wiz_defined-function locations,
-            726 strings with 7717 characters,
-and the built_in function-call counts, 12302 in all, are:
-= -- 1323
-> -- 396
-< -- 422
-+ -- 497
-- -- 157
-* -- 944
-:= -- 2159
-add.period$ -- 14
-call.type$ -- 15
-change.case$ -- 99
-chr.to.int$ -- 15
-cite$ -- 34
-duplicate$ -- 246
-empty$ -- 674
-format.name$ -- 209
-if$ -- 2284
+            731 strings with 7823 characters,
+and the built_in function-call counts, 12765 in all, are:
+= -- 1374
+> -- 404
+< -- 434
++ -- 508
+- -- 160
+* -- 974
+:= -- 2238
+add.period$ -- 15
+call.type$ -- 16
+change.case$ -- 103
+chr.to.int$ -- 16
+cite$ -- 36
+duplicate$ -- 261
+empty$ -- 706
+format.name$ -- 214
+if$ -- 2375
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 15
-newline$ -- 88
-num.names$ -- 42
-pop$ -- 152
+missing$ -- 16
+newline$ -- 94
+num.names$ -- 45
+pop$ -- 160
 preamble$ -- 1
-purify$ -- 129
+purify$ -- 135
 quote$ -- 0
-skip$ -- 515
+skip$ -- 534
 stack$ -- 0
-substring$ -- 1286
-swap$ -- 71
-text.length$ -- 69
-text.prefix$ -- 2
+substring$ -- 1327
+swap$ -- 73
+text.length$ -- 72
+text.prefix$ -- 3
 top$ -- 0
-type$ -- 112
-warning$ -- 18
-while$ -- 107
-width$ -- 18
-write$ -- 188
+type$ -- 120
+warning$ -- 19
+while$ -- 111
+width$ -- 19
+write$ -- 201
 (There were 22 warnings)

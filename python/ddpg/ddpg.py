@@ -154,7 +154,6 @@ class DDPG:
         self.time = 0
         self.last_state = np.zeros(self.obs_dim)
         self.last_action = np.zeros(self.act_dim)
-        self.last_death = False
         self.epoch_reward = 0
         self.killcount = 0
         self.epoch_killcount = 0
@@ -191,7 +190,7 @@ class DDPG:
             # Limit higher values
             indices = action_grads > max_threshold
             action[indices] = self.last_action[indices] + max_threshold[indices]
-
+        
             # Limit smaller values
             indices = action_grads < -max_threshold
             action[indices] = self.last_action[indices] - max_threshold[indices]
@@ -199,10 +198,8 @@ class DDPG:
         action = np.clip(action, self.act_low, self.act_high)
         return action
 
-    def get_action(self, obs, add_noise=False):
-        action = None
-        # Do some random exploration at the beginning
 
+    def get_action(self, obs, add_noise=False):
         # Send the observation to the device, normalize it
         # Then calculate the action and denormalize it
         state = torch.FloatTensor(obs).unsqueeze(0).to(self.device)
@@ -226,20 +223,24 @@ class DDPG:
 
         action = self.clip_action(action)
 
+        assert(not np.any(np.isnan(action)))
+
         return action
 
 
     def prepare(self, state):
+        self.last_action = np.zeros(self.act_dim)
         state = self.feed_past_obs(state)
         if(self.hparams.action_gradients):
             return self.real_last_action
-        action = self.get_action(state, True)
+        action = self.get_action(state, False)
         self.last_action = action
         self.last_state = state
         return action
 
     def reset_finalize(self, obs):
-        return self.prepare(obs)
+        action = self.prepare(obs)
+        return action
 
     def calc_normalizations(self):
         # Load additional data if wanted
@@ -314,6 +315,50 @@ class DDPG:
 
         assert(len(state) == self.obs_dim)
         return state
+
+    def pretrain_policy(self):
+        optimizer = optim.Adam(self.actor.parameters(), lr=self.hparams.pretrain_policy_lr)
+        validation_size = int(len(self.replay_buffer) / 0.03)
+        validation_indices = np.random.choice(len(self.replay_buffer), validation_size)
+        self.replay_buffer.update_priorities(validation_indices, np.ones(validation_size)*1e-10)
+
+        validation_states, validation_actions, _, _, _ = zip(*self.replay_buffer.get_buffer()[validation_indices])
+
+        validation_states = torch.FloatTensor(validation_states).to(self.device)
+        validation_actions = torch.FloatTensor(validation_actions).to(self.device)
+
+        if(self.hparams.normalize_observations):
+            validation_states = self.normalize_state(validation_states, True)
+
+        if(self.hparams.normalize_actions):
+            validation_actions = self.normalize_action(validation_actions, True)
+
+        for i in range(0, self.hparams.pretrain_policy_steps):
+            state_batch, action_batch, _, _, _, _ = self.replay_buffer.sample(self.hparams.pretrain_policy_batch_size)
+            state_batch = torch.FloatTensor(state_batch).to(self.device)
+            action_batch = torch.FloatTensor(action_batch).to(self.device)
+            
+            if(self.hparams.normalize_observations):
+                state_batch = self.normalize_state(state_batch, True)
+
+            if(self.hparams.normalize_actions):
+                action_batch = self.normalize_action(action_batch, True)
+
+            optimizer.zero_grad()
+            prediction = self.actor.forward(state_batch)
+            loss = F.mse_loss(prediction, action_batch)
+            loss.backward()
+            optimizer.step()
+
+            validation_loss = F.mse_loss(self.actor.forward(validation_states), validation_actions)
+
+            self.logger.add_scalar('Loss/pretrain', loss, i)
+            self.logger.add_scalar('Loss/pretrain_val', validation_loss, i)
+
+        self.replay_buffer.update_priorities(validation_indices, np.ones(validation_size) * self.replay_buffer.max_priority)
+
+        for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
+            target_param.data.copy_(param.data)
 
     def update(self, batch_size, time = None):
         time = time or self.time
@@ -396,8 +441,6 @@ class DDPG:
             self.replay_buffer.update_priorities(indices, td_error)
 
         if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
-            self.logger.add_histogram_nofilter('critic/l1-act', self.critic.first_layer(state_batch, action_batch).detach().cpu(), time)
-
             critic_state = dict(self.critic.cpu().named_parameters())
 
 
@@ -444,7 +487,6 @@ class DDPG:
 
 
         if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
-            self.logger.add_histogram_nofilter('actor/l1-act', self.actor.first_layer(state_batch).detach().cpu(), time)
             actor_state = dict(self.actor.cpu().named_parameters())
 
 
@@ -489,6 +531,9 @@ class DDPG:
 
     def step(self, state, reward, done):
 
+        assert(not np.any(np.isnan(state)))
+        assert(not np.isnan(reward))
+
         state = self.feed_past_obs(state)
 
         # Append last action to observation if using action gradients
@@ -501,7 +546,6 @@ class DDPG:
         if(done):
             self.killcount += 1
             self.epoch_killcount += 1
-            self.last_action = np.zeros(self.act_dim)
             if(self.hparams.feed_past):
                 self.past_obs.clear()
 
@@ -511,13 +555,21 @@ class DDPG:
             print("Random exploration finished, preparing normal run")
             self.calc_normalizations()
 
+            # If wanted, pretrain the policy to actions from random exploration
+            if(self.hparams.pretrain_policy_steps):
+                print('Pretraining the policy for %d steps' % self.hparams.pretrain_policy_steps)
+                self.pretrain_policy()
+
             # do the learning which we missed up on during random exploration
-            for i in range(0, self.hparams.random_exploration_steps):
+            print('Training on random exploration data for %d steps' % self.hparams.random_exploration_training_steps)
+            for i in range(0, self.hparams.random_exploration_training_steps):
                 self.update(self.batch_size, i)
 
             # set all priorities in the replay buffer to maximum, so everything will get sampled (those with prio 1 most likely won't get sampled)
             self.replay_buffer.update_priorities(range(0, len(self.replay_buffer)), 
                                                  np.ones(len(self.replay_buffer)) * self.replay_buffer.max_priority)
+
+            print('Done, starting normal run')
 
         if (self.time > 0 and self.time % self.hparams.steps_per_epoch == 0):
             epoch = (self.time // self.hparams.steps_per_epoch)
@@ -542,7 +594,6 @@ class DDPG:
 
         self.last_action = action
         self.last_state = state
-        self.last_death = done
 
         if(self.hparams.action_gradients):
             self.real_last_action += action * self.action_grad_denormalizer
@@ -625,6 +676,9 @@ class DDPG:
             # before starting to utilize the policy
             random_exploration_steps = 2000,
 
+            # How many steps to train the agent after random exploration
+            random_exploration_training_steps = 2000,
+
             # Type of random exploration noise
             # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
             random_exploration_type = "correlated",
@@ -677,7 +731,7 @@ class DDPG:
             buffer_maxlen = 100000,
 
             # Learning rate of the Q approximator
-            critic_lr = 1e-3,
+            critic_lr = 1e-4,
 
             # Neural network sizes of the critic
             critic_sizes = [64, 32, 16],
@@ -698,7 +752,7 @@ class DDPG:
             twin_critics = False,
 
             # Learning rate of the policy
-            actor_lr = 1e-3,
+            actor_lr = 1e-5,
 
             # Network sizes of the policy
             actor_sizes = [32, 8],
@@ -730,7 +784,7 @@ class DDPG:
             logdir = "logs",
 
             # Log data every n steps
-            log_steps = 16,
+            log_steps = 4,
 
             # Log net insight histograms every n steps
             # -1 for disabling completely
@@ -784,7 +838,7 @@ class DDPG:
             # after the random exploration phase
             # After that, rewards will mostly be between -1 and 1 internally
             # Though min and max from the random exploration phase is assumed
-            normalize_rewards = True,
+            normalize_rewards = False,
 
             # Additional nrmalization replay data to load when
             # calculating normalizations
@@ -818,5 +872,15 @@ class DDPG:
 
             # Whether to clip action gradients at the maximum level returned from the environment
             clip_action_gradients = True,
+
+            # How many steps to pretrain the policy after random exploration to predict the actions of the
+            # expert controller
+            pretrain_policy_steps = 5000,
+
+            # Batch size to use in pretraining
+            pretrain_policy_batch_size = 32,
+
+            # The learning rate to use on pretraining
+            pretrain_policy_lr = 5e-5,
 
         )

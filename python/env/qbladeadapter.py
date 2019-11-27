@@ -36,9 +36,7 @@ class QBladeAdapter:
     print("creating qblade instance")
     self._qbladeLib._Z14createInstancev()
 
-    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
-    print("loading qblade project")
-    self._loadProject(x)
+    self.load_default_project()
 
     print("qblade init done")
 
@@ -64,11 +62,22 @@ class QBladeAdapter:
     del self._getControlVars
     del self._advanceSingleTimestep
 
+  def load_default_project(self):
+    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
+    print("loading qblade project")
+    self._loadProject(x)
 
   def reset(self):
     print('Resetting simulation')
     self._initializeSimulation(ctypes.c_int(0))
     self.lastAction = np.zeros(5)
+    self.storeAction(np.zeros(self.get_act_dim()))
+
+    # Do some steps with zero action
+    #action = np.zeros(self.get_act_dim())
+    #for i in range(0, 5):
+    #  self.step(action)
+
     print('reset done')
 
     return self.maskObservation(self.extractObservation())
@@ -95,9 +104,9 @@ class QBladeAdapter:
     return [3e5, 0.5]
 
 
-  def calc_reward(self, observation, action):
-    if(self.calc_death(observation)):
-      death_penalty = 3
+  def calc_reward(self, observation, action, death):
+    if(death):
+      death_penalty = 0.5
     else:
       death_penalty = 0
 
@@ -112,6 +121,11 @@ class QBladeAdapter:
     #return -np.abs(observation[0]-rated_speed)
 
   def calc_death(self, observation):
+    # If there are nan values, accumulate, after a few, die
+    if(np.any(np.isnan(observation))):
+      return True
+
+    observation = np.nan_to_num(observation)
 
     # 63 is the rotor size, so if anything bends further than that, it's broken off.
     broken_state = 20
@@ -119,7 +133,7 @@ class QBladeAdapter:
            np.abs(observation[17]) > broken_state or \
            np.abs(observation[18]) > broken_state or \
            observation[0] > 4 or \
-           observation[0] < -1
+           observation[0] < -0.2
 
   def padAction(self, action):
     action = [action[0], 0, action[1], action[1], action[1]]
@@ -129,7 +143,6 @@ class QBladeAdapter:
     # Copy action to control vars
     action = np.clip(action, self.get_act_low(), self.get_act_high())
     action = np.nan_to_num(self.padAction(action))
-
 
     in_data = (ctypes.c_double * 5)(*action)
     self._setControlVars(in_data)
@@ -141,7 +154,6 @@ class QBladeAdapter:
     out_data = (ctypes.c_double * 23)()
     self._getControlVars(out_data)
     observation = [out_data[i] for i in range(0, 23)]
-    observation = np.nan_to_num(observation)
 
     return observation
 
@@ -154,7 +166,12 @@ class QBladeAdapter:
     self._advanceSingleTimestep()
 
     observation = self.extractObservation()
-    return self.maskObservation(observation), self.calc_reward(observation, action), self.calc_death(observation)
+    death = self.calc_death(observation)
+    observation = np.nan_to_num(observation)
+    reward = self.calc_reward(observation, action, death)
+    observation = self.maskObservation(observation)
+
+    return observation, reward, death
 
   def render(self):
     pass

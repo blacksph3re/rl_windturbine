@@ -198,14 +198,15 @@ New observation: Training is really stable until ca 30k steps after the first ti
 ### **11/25**
 
 I have read some papers around batch normalization, understanding that it achieves between-layer normalization and thus allows for higher learning rates. It adds some more parameters to learn in turn.
+BN works pretty well, on my laptop I could use a LR of 1e-3 and it still worked. Also better with the complex networks
 
-Also it would be helpful to restrict actions in the ddpg module to store the real actions in the replay buffer.
+Also it would be helpful to restrict actions in the ddpg module to store the real actions in the replay buffer. I have tried it but it seems to have a bug still.
 
 TODOs paper:
 - Abstract (3h)
 - RL/env: add formulae (1h)
 - RL/Q learning (4h)
-- RL/PQ (8h)
+- RL/PG (8h)
 - RL/DDPG (6h)
 - Exp/Exploration/Action noise: Add formulae and reasoning (2h)
 - Exp/Exploration/Random exploration: Add formulae, more detail (2h)
