@@ -226,3 +226,12 @@ TODOs paper:
 - Eval/Comparison: Compare (5h)
 - Future: Write (8h)
 - Concl: Write (15h)
+
+
+
+### Kritik paper
+
+nicht so sehr Tagebuch-style, die aktuelle Experimentations-Sektion komplett einstampfen. Ah doch nicht.
+
+Mehr Bilder
+

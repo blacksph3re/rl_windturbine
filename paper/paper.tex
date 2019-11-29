@@ -159,10 +159,10 @@ This section should aim to give a brief overview into Reinforcement Learning ass
 
 \subsection{Environment assumptions}
 
-At first, we need to do some assumptions on our environment. The concept environment encapsulates the reality or simulation that the reinforcement learning algorithm works in. This could be an actual cyber-physical system or a simulation. The first assumption to this environment is that this system operates over time and we can discretize time into timesteps. Our environment here is the simulated wind turbine, but it could be a computer game \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, a physics simulation\cite{brockmanOpenAIGym2016} or even an actual existing wind turbine \cite{kolterDesignAnalysisLearning2012}. 
-In every timestep, the environment supplies us with a state \(x\), also sometimes called observation, and a scalar reward \(r\) for taking an action \(a\) in that state. In theory, the full trajectory \((x_0, a_0, ..., x_t)\) could be needed to describe the full state of the simulation at timestep t \(s_t\). However, the algorithms we looked at assume that the state progressions can be modelled as a Markov-Chain of observations, as in that what happens at timestep t+1 is only dependent on the observation at timestep t, not also on for example t-10. In Markov Chains, there is a state transition probability \(p(x_{t+1}|x_t, a_t)\) for each transition, which we aim to learn. Because we assume the observation \(x\) to be fully descriptive, we will use \(s_t = x_t\). In reality, the observed state doesn't have to represent the entirety of the state of the simulation, in fact it usually is only a small subset. For our wind turbine example, the observed state is limited to what can be measured with sensors on a wind turbine, in an arcade game it could be the pixel output or in a physical simulation it could be some key values in the simulation.
+At first, we need to do some assumptions on our environment $\varepsilon$. The concept environment encapsulates the reality or simulation that the reinforcement learning algorithm works in. This could be an actual cyber-physical system or a simulation. The first assumption to this environment is that this system operates over time and we can discretize time into timesteps. Our environment here is the simulated wind turbine, but it could be a computer game \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, a physics simulation\cite{brockmanOpenAIGym2016} or even an actual existing wind turbine \cite{kolterDesignAnalysisLearning2012}. 
+In every timestep, the environment supplies us with an observation \(x\) and a scalar reward \(r\) for taking an action \(a\) in that state. In theory, the full trajectory \((x_0, a_0, ..., x_t)\) could be needed to describe the full state of the simulation at timestep t \(s_t\). However, the algorithms we looked at assume that the state progressions can be modelled as a \ac{MDP} of observations, as in that what will happen at timestep t+1 is only dependent on the observation at timestep t, not also on for example t-10. In \ac{MDP}, the state transition probability \(p(x_{t+1}|x_t, a_t)\) is fully descriptive, as in it is equal to \(p(x_{t+1}|x_0, a_0, ..., x_t, a_t\). Because we assume the observation \(x\) to be fully descriptive, we will use the term state as equivalent to observation \(s_t = x_t\). In reality, the observed state doesn't have to represent the entirety of the state of the simulation, in fact it usually is only a small subset. For our wind turbine example, the observed state is limited to what can be measured with sensors on a wind turbine, in an arcade game it could be the pixel output or in a physical simulation it could be some key values in the simulation.
 
-The reward \(r\) is a scalar value which judges the current state of the simulation. A higher reward means the current state is better than that of a lower reward. Sometimes, the reward function is obvious from the system, as in an arcade game it would surely be the score or in chess it could be 1 for win, -1 for lose and 0 for not decided yet. In our paper, we will dedicate a section on how we designed our reward function, whereas in general reinforcement learning theory, it is assumed to exist and be supplied by the environment.
+The reward \(r\) is a scalar value which judges the action taken in the current state of the simulation. A higher reward means the action is better than that of a lower reward. Sometimes, the reward function is obvious from the system, as in an arcade game it would surely be the score or in chess it could be 1 for win, -1 for lose and 0 for not decided yet. In both cases, sometimes a certain timespan passes before a reward for an action kicks in, which is also to be learned. In our paper, we will dedicate a section on how we designed our reward function, whereas in general reinforcement learning theory, it is assumed to exist and be supplied by the environment.
 
 In every timestep, the agent supplies an action \(a\). This action could be button presses in an arcade game or blade pitch in a windturbine simulation. The mission of the agent is to pick actions which maximize cumulative reward. In other words, it should steer the environment to achieve best performance.
 
@@ -198,10 +198,11 @@ We furthermore define \(\pi_{prob}: S \rightarrow P(A)\) a probablistic policy t
 HUGE MESS OVER
 
 Some terms which we use
-\begin{itmeize}
+\begin{itemize}
   \item \textbf{Return} A return with respect of a policy and a starting state s gives the accumulative reward of following that policy from state s until the future. As we have a stochastic environment, we have to add an expectation term, so it is the expected accumulative reward of following that policy. Furthermore a return can be discounted or undiscounted. Discounting means we multiply a discounting factor $\gamma \in [0,1]$ to rewards in the fashion of $r_0 \gamma^0 + r_1 \gamma^1 + r_2 \gamma^2 ...$, which results in distant future rewards being weighted less than closer ones.
   \item \textbf{Optimal policy} The theoretical construct of a policy that always takes the best action with respect to accumulative reward. Though we rarely know this policy, there must always be at least one policy which gives the highest returns of all possible policies
   \item \textbf{Value} The value of a state s is the return of that state following the optimal policy.
+  \item \textbf{Trajectory} A trajectory is a sequence of states and actions $(s_0, a_0, s_1, ..., a_{i-1}, s_i)$
 \end{itemize}
 
 \subsection{Q-Learning}
@@ -212,8 +213,7 @@ At first we will present a very basic algorithm for a machine learning agent, wh
 Q(s, a) = r + \max_{a'}Q(s', a')
 \end{equation}
 
-This equation uses the notion of a state-value function, also called Q function. In the Bellman Equation, it describes the total accumulated return until infinity taking an action a in state s and then following the optimal policy afterwards. 
-
+This equation uses the notion of a state-value function, also called Q function. In the Bellman Equation, it describes the total accumulated return until infinity taking an action $a$ in state $s$, receiving reward $r$, ending up in state $s'$ and then following the optimal policy afterwards. With the help of this function, we can compare different actions in our current state. And also, this small definition gives us a hint on how to create this function. We could initialize an array for all states and actions and then repeatedly loop through the array and fill it according to the above equation. However, this table is only computationally feasible when we have small finite state and action spaces. If any of the two spaces is big or even continuous, we have to replace the table by an estimator for Q.
 
 The idea behind Q-Learning is that we want to learn the Q function from observations which we have. Assuming we already know the Q value for the next state \(Q(s_{t+1}, a_{t+1})\), we can then calculate the current Q value \( Q(s_t, a_t) = r_t + \gamma Q(s_{t+1}, a_{t+1}) \). Unfortunately, we don't have a definite Q for the next state, so we need to use our estimation which we have already. This estimation is most likely noisy or even plain wrong, so we want to only gradually update our Q. For this, we define our learning target for learning step i as
 \begin{equation}
@@ -238,13 +238,13 @@ Thus we just derived a method to train a Q function under the assumption of a po
 
 \subsection{Policy Gradients}
 
-We will at first give an intuitive explanation of a basic algorithm which forms the basis for many modern reinforcement leaarning algorithms, including the one we chose. The algorithm is called Policy Gradients or REINFORCE and was originally presented by \cite{williamsSimpleStatisticalGradientfollowing}.
+We will at first give an intuitive explanation of a basic algorithm which forms the basis for many modern reinforcement learning algorithms, including the one we chose. The algorithm is called REINFORCE and was originally presented by \cite{williamsSimpleStatisticalGradientfollowing}. Then we will add a Q term to it according to \cite{suttonPolicyGradientMethods} and is called \ac{PG}. \cite{degrisOffPolicyActorCritic2013} generalized that term and made an off-policy version of policy gradients. That version was then used by \cite{silverDeterministicPolicyGradient2013} and the stochastic policy was replaced by a deterministic one, the algorithm was called \ac{DPG}. This algorithm finally lays the basis for \ac{DDPG} by \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, which is what we used until finally optimizing it towards \ac{TD3} \cite{fujimotoAddressingFunctionApproximation2018}.
 
 Let's assume we have a probablistic policy $\pi: S \rightarrow P(A)$ which is parametrized by $\theta$. An intuitive way of improving this policy could be to increase the gradient of the best possible action $a^*$ for a state $s$:
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha \Delta \pi_{\theta_i}(a^*|s)
 \end{equation}
-We could do this for all states we see and would end up with an iterative way of improving our policy. However, we might not know the best action for any state. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. We can use this and, for all actions and states, do
+We could do this for all states we see and would end up with an iterative way of improving our policy. However, we might not know the best action for any state. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. \cite{suttonPolicyGradientMethods} include Q-learning into the REINFORCE algorithm and call the resulting algorithm \ac{PG}. So, with our newly gained Q, for all actions and states, do
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha Q(s, a)\Delta \pi_{\theta_i}(a|s)
 \end{equation}
@@ -261,21 +261,23 @@ This update equation is our basic policy gradient equation.
 
 
 \subsection{DDPG}
-% Also problems with ddpg
 
 
 
 \section{RL on windturbines}
+We are aware of one paper \cite{kolterDesignAnalysisLearning2012} which tried RL on windturbines already, we want to dedicate a section to it. The team behind that paper built a miniature model of a windturbine and used a variation of the policy gradient algorithm to control it.
 
+\chapter{Experimentation}
 
-\chapter{Early experimentation}
-%Early experiments, taking a reference implementation and openai gym training. Then finding out qblade is screwed...
+Unfortunately, we are not able to provide a scientific comparison between different methods, as our learning proved too instable to derive sane metrics from it. Thus, this section will be structured as an assortment of problems and their solutions
+
+\section{Gym Experiments}
 
 At the start of our experimentation, we took off with a well-known problem and a proven implementation. We used the OpenAI-Pendulum task, in which a pendulum in gravity needs to be held upright by applying a force to it. OpenAI Gyms generally serve as benchmarks for reinforcement learning algorithms and most foundational papers and articles evaluate their solutions based on how well they perform in OpenAI Gyms. Starting with a reference-implementation in pytorch by \cite{DeepDeterministicPolicy}, we experimented with the pendulum environment. We observed that the algorithm got stuck in a local optimum, where it rotates the pendulum instead of holding it upright, for long periods of the training process. Only with high noise, we could get it to hold a pendulum upright. We also tried to run the HalfCheetah task, where a two-dimensional dog-like being should be brought to running and moving its joints, but the results were more a crawling and shaking towards the goal. However, we hoped that the implementation might yield results on our windturbine environment already and exchanged the OpenAI gym for qblade.
 
 The first runs looked marvellous, perfectly holding rated speed, until we found out that those perfect values were prescribed by a setting in the qblade project file, and disabling this setting marked the beginning of our actual experimentation phase.
 
-\chapter{Experimentation}
+\section{Starting with qblade}
 
 On our first experimentation steps, we did not yet have experience with how the qblade simulation behaves with a random or not well designed controller. Our observation was, that the simulation was resting between two different states, which we want to call \ac{FMM} and \ac{BMM}.
 
@@ -373,6 +375,14 @@ We added a small period of direct pretraining of the policy on the actions taken
 
 \subsection{Prioritized experience replay}
 
+\cite{schaulPrioritizedExperienceReplay2016} proposed a method to sample experiences from the replay buffer according to how much they benefit training, and not just uniformly. In their paper, they showed how especially cliffwalk problems, but effectively all problems, benefit from using prioritized experience replay. In their case, they use it for \ac{DQN}, but we will apply it to \ac{DDPG}, as our windturbine problem is also such a problem in which rewards are sparse.
+
+As knowing how much a sample benefits training is difficult, they propose to approximate this importance by the temporal difference error $\tau = y - Q(s, a)$. This difference, which in Q learning is comparable to the loss of the approximator, tells us how far off the prediction was in this step. So, alongside with the experiences, a sampling probability for each item $p_i$ is stored in the replay buffer. To be able to efficiently sample from it, we implemented it as proposed in their paper in the form of a sum-tree.
+
+When replaying, the sampling probability of a sample is set to $P(j) = \frac{p_j^{\alpha}}{\sum_i{p_i^{\alpha}}}$, $\alpha$ being a hyperparameter allowing to fade between uniform sampling ($\alpha=0$) and only priority sampling ($\alpha=1$). New samples are always stored with maximum priority, and to correct for oversampling bias, a correction term is applied to the temporal difference error: $w_j = \frac{(N*P(j))^{-\beta}}{\max_i{w_i}}$. It is simply multiplied to the real TD-error. $\beta$ is a parameter describing how strongly to correct oversampling, where $\beta=1$ is full correction and $\beta=0$ no correction at all.
+
+We decided to split policy and critic updates, as the oversampling effects could also happen to policy updates, and still sample uniformly for policy updates.
+
 \subsection{Data augmentation}
 
 We still had some parts of the code left where there wasn't any noise involved, so we decided to add some to the training process. Data-augmentation with noise is a common technique when using neural networks \cite[p.347]{bishopNeuralNetworksPattern1995} to reduce overfitting, so we expected it to also make our model generalize better. There have been some experiments with data augmentation in reinforcement learning \cite{cobbeQuantifyingGeneralizationReinforcement2019}, but it is not often mentioned on tutorials or blog posts. We implemented by adding a small noise term to the sampled states, actions and next states \((s, a, s')\) when performing experience replay. We didn't really see any indication of bad generalization, but as implementing it wasn't a big issue and normally doesn't bring any disadvantages, we still added this feature and set the noise level to a very small value.
@@ -453,6 +463,6 @@ There is ongoing research into adding active control elements to windturbine bla
 
 \chapter{Conclusion}
 
-% It's pretty hard to create a working controller for a windturbine, apparently RL needs some more foundational research.
+% It's pretty hard to create a working controller for a windturbine, apparently RL needs some more foundational research or we are just not able to
 
 \end{document}

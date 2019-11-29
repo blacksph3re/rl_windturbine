@@ -8,7 +8,7 @@ Warning--entry type for "DeepDeterministicPolicy" isn't style-file defined
 --line 2 of file literatur.bib
 Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
 --line 150 of file literatur.bib
-Warning--I didn't find a database entry for "cobbeQuantifyingGeneralizationReinforcement2019"
+Warning--I didn't find a database entry for "degrisOffPolicyActorCritic2013"
 Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
 Warning--to sort, need author or key in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
@@ -18,6 +18,7 @@ Warning--Es gibt nur eine Verlagsangabe in bishopNeuralNetworksPattern1995
 Warning--empty edition in burtonWindEnergyHandbook2011
 Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
 Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
+Warning--Es gibt einen Jahrgang, aber kein Jahr in cobbeQuantifyingGeneralizationReinforcement2019
 Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
@@ -26,48 +27,53 @@ Warning--empty booktitle in kolterDesignAnalysisLearning2012
 Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
 Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReactive1990
+Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihPlayingAtariDeep2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
+Warning--Es gibt einen Jahrgang, aber kein Jahr in silverDeterministicPolicyGradient2013
+Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
+Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
-You've used 16 entries,
+Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
+You've used 22 entries,
             3183 wiz_defined-function locations,
-            731 strings with 7823 characters,
-and the built_in function-call counts, 12765 in all, are:
-= -- 1374
-> -- 404
-< -- 434
-+ -- 508
-- -- 160
-* -- 974
-:= -- 2238
-add.period$ -- 15
-call.type$ -- 16
-change.case$ -- 103
-chr.to.int$ -- 16
-cite$ -- 36
-duplicate$ -- 261
-empty$ -- 706
-format.name$ -- 214
-if$ -- 2375
+            758 strings with 9088 characters,
+and the built_in function-call counts, 17323 in all, are:
+= -- 1844
+> -- 594
+< -- 646
++ -- 760
+- -- 235
+* -- 1287
+:= -- 3120
+add.period$ -- 21
+call.type$ -- 22
+change.case$ -- 148
+chr.to.int$ -- 22
+cite$ -- 48
+duplicate$ -- 364
+empty$ -- 881
+format.name$ -- 316
+if$ -- 3132
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 16
-newline$ -- 94
-num.names$ -- 45
-pop$ -- 160
+missing$ -- 22
+newline$ -- 127
+num.names$ -- 63
+pop$ -- 233
 preamble$ -- 1
-purify$ -- 135
+purify$ -- 192
 quote$ -- 0
-skip$ -- 534
+skip$ -- 783
 stack$ -- 0
-substring$ -- 1327
-swap$ -- 73
-text.length$ -- 72
-text.prefix$ -- 3
+substring$ -- 1600
+swap$ -- 103
+text.length$ -- 103
+text.prefix$ -- 4
 top$ -- 0
-type$ -- 120
-warning$ -- 19
-while$ -- 111
-width$ -- 19
-write$ -- 201
-(There were 22 warnings)
+type$ -- 168
+warning$ -- 25
+while$ -- 158
+width$ -- 27
+write$ -- 273
+(There were 28 warnings)

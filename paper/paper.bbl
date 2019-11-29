@@ -34,6 +34,12 @@
   Control}}.
 \newblock
 
+\bibitem[CKH{\etalchar{+}}]{cobbeQuantifyingGeneralizationReinforcement2019}
+\textsc{Cobbe}, Karl ; \textsc{Klimov}, Oleg ; \textsc{Hesse}, Chris ;
+  \textsc{Kim}, Taehoon  ; \textsc{Schulman}, John:
+\newblock Quantifying {{Generalization}} in {{Reinforcement Learning}}.
+\newblock
+
 \bibitem[Dee]{DeepDeterministicPolicy}
 
 \newblock \emph{Deep {{Deterministic Policy Gradients Explained}}}
@@ -86,6 +92,13 @@
 \newblock 2, Nr. 4, S. 447--457. --
 \newblock ISSN 0899--7667, 1530--888X
 
+\bibitem[MKS{\etalchar{+}}]{mnihPlayingAtariDeep2013}
+\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
+  ; \textsc{Graves}, Alex ; \textsc{Antonoglou}, Ioannis ; \textsc{Wierstra},
+  Daan  ; \textsc{Riedmiller}, Martin:
+\newblock Playing {{Atari}} with {{Deep Reinforcement Learning}}.
+\newblock
+
 \bibitem[MWP{\etalchar{+}}]{martenQBLADEOPENSOURCE2013}
 \textsc{Marten}, D ; \textsc{Wendler}, J ; \textsc{Pechlivanoglou}, G ;
   \textsc{Nayeri}, C~N.  ; \textsc{Paschereit}, C~O.:
@@ -102,11 +115,40 @@
 \newblock Parameter {{Space Noise}} for {{Exploration}}.
 \newblock
 
+\bibitem[SLH{\etalchar{+}}]{silverDeterministicPolicyGradient2013}
+\textsc{Silver}, David ; \textsc{Lever}, Guy ; \textsc{Heess}, Nicolas ;
+  \textsc{Degris}, Thomas ; \textsc{Wierstra}, Daan  ; \textsc{Riedmiller},
+  Martin:
+\newblock Deterministic {{Policy Gradient Algorithms}}.
+\newblock
+\newblock , S.~9
+
+\bibitem[SMSM]{suttonPolicyGradientMethods}
+\textsc{Sutton}, Richard~S. ; \textsc{McAllester}, David~A. ; \textsc{Singh},
+  Satinder~P.  ; \textsc{Mansour}, Yishay:
+\newblock Policy {{Gradient Methods}} for {{Reinforcement Learning}} with
+  {{Function Approximation}}.
+\newblock
+\newblock , S.~7
+
+\bibitem[SQAS]{schaulPrioritizedExperienceReplay2016}
+\textsc{Schaul}, Tom ; \textsc{Quan}, John ; \textsc{Antonoglou}, Ioannis  ;
+  \textsc{Silver}, David:
+\newblock Prioritized {{Experience Replay}}.
+\newblock
+
 \bibitem[UO]{uhlenbeckTheoryBrownianMotion1930}
 \textsc{Uhlenbeck}, G.~E. ; \textsc{Ornstein}, L.~S.:
 \newblock On the {{Theory}} of the {{Brownian Motion}}.
 \newblock
 \newblock 36, Nr. 5, S. 823--841. --
 \newblock ISSN 0031--899X
+
+\bibitem[Wil]{williamsSimpleStatisticalGradientfollowing}
+\textsc{Williams}, Ronald~J.:
+\newblock Simple Statistical Gradient-Following Algorithms for Connectionist
+  Reinforcement Learning.
+\newblock
+\newblock , S.~28
 
 \end{thebibliography}

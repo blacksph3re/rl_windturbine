@@ -84,7 +84,7 @@ class QBladeAdapter:
 
   def get_obs_dim(self):
     #return 23
-    return 22
+    return 2
 
   def get_act_dim(self):
     #return 5
@@ -106,19 +106,19 @@ class QBladeAdapter:
 
   def calc_reward(self, observation, action, death):
     if(death):
-      death_penalty = 0.5
+      death_penalty = 0.5 if observation[0] > 0 else 3
     else:
       death_penalty = 0
 
     rated_power = 3200
     rated_speed = 0.8
     #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
-    return 1-np.abs((observation[1]-rated_power)/rated_power)-death_penalty
+    #return 1-np.abs((observation[1]-rated_power)/rated_power)-death_penalty
     #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
     #return np.clip(5 
     #  - np.abs((observation[1]-rated_power)/rated_power)
     #  - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -10, 10)
-    #return -np.abs(observation[0]-rated_speed)
+    return 1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty
 
   def calc_death(self, observation):
     # If there are nan values, accumulate, after a few, die
@@ -132,8 +132,8 @@ class QBladeAdapter:
     return np.abs(observation[16]) > broken_state or \
            np.abs(observation[17]) > broken_state or \
            np.abs(observation[18]) > broken_state or \
-           observation[0] > 4 or \
-           observation[0] < -0.2
+           observation[0] > 3 or \
+           observation[0] < -0.5
 
   def padAction(self, action):
     action = [action[0], 0, action[1], action[1], action[1]]
@@ -149,23 +149,26 @@ class QBladeAdapter:
 
     self.lastAction = action
 
-  def extractObservation(self):
+  def extractObservation(self, remove_nan=True):
     # 23 values are hardcoded in the library
     out_data = (ctypes.c_double * 23)()
     self._getControlVars(out_data)
     observation = [out_data[i] for i in range(0, 23)]
 
+    if(remove_nan):
+      observation = np.nan_to_num(observation)
+
     return observation
 
   def maskObservation(self, obs):
-    return np.array(obs[0:22])
+    return np.array(obs[0:2])
 
   def step(self, action):
 
     self.storeAction(action)
     self._advanceSingleTimestep()
 
-    observation = self.extractObservation()
+    observation = self.extractObservation(False)
     death = self.calc_death(observation)
     observation = np.nan_to_num(observation)
     reward = self.calc_reward(observation, action, death)

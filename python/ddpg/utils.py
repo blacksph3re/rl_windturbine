@@ -131,13 +131,16 @@ A tree structure, where every of the nodes is the sum of all the leaves below
 This can be used to do efficient sampling (without np.random.choice fucking me up)
 The weights buffer is a buffer with the tree weights stored like
 1  2 3  4 5 6 7  8 9 10 11 12 13 14 15...
+Note that alpha=0 is not supported!
 '''
 class SumTree:
-    def __init__(self, max_size):
+    def __init__(self, max_size, alpha=1):
         self.max_size = max_size
+        self.alpha = alpha
         self.tree_layers = int(np.log2(max_size)) + 1
         self.tree_size = np.sum([2**x for x in range(0, self.tree_layers)])
         self.weights = np.zeros(self.tree_size + self.max_size)
+        self.leaf_weights = np.zeros(self.max_size)
 
     # Get the weight trajectory for the leaf
     # All the weights from the leaf to the root node are in here
@@ -156,13 +159,43 @@ class SumTree:
 
         return trajectory
 
+    # Return the weights directly
     def get_leaf_weights(self):
+        return self.leaf_weights
+
+    def get_sum(self):
+        return np.sum(self.leaf_weights)
+
+    # Return the weights potentiated by alpha
+    def get_leaf_weights_alpha(self):
         return self.weights[self.tree_size:]
+
+    # We already have the sum of all items stored
+    def get_sum_alpha(self):
+        return self.weights[0]
+
+    # Sets a new alpha
+    # Warning, incurs complete recomputation
+    def set_alpha(self, alpha):
+        assert(alpha != 0)
+        self.alpha = alpha
+        self.recompute()
+
+    # Recompute all weights to correct for floating point imprecision
+    # Also necessary when changing alpha
+    def recompute(self):
+        self.weights = np.zeros(self.tree_size + self.max_size)
+        for i in range(0, self.max_size):
+            self.update_entry(i, self.leaf_weights[i])
+
+    # The root node holds the sum of all weights
+    def sum_weights(self):
+        return self.weights[0]
 
     # Update a leaf and propagate the sums back through the net
     def update_entry(self, leaf_idx, weight):
-        assert(weight >= 0)
-        weight = float(weight)
+        self.leaf_weights[leaf_idx] = float(weight)
+        weight = float(weight)**self.alpha
 
         trajectory = self.leaf_trajectory(leaf_idx)
         # Get the previous weight at this position
@@ -170,21 +203,26 @@ class SumTree:
         # Add the difference to all the nodes in the trajectory
         self.weights[trajectory] += weight_diff
 
-    # Samples an item from the tree
+    # Samples an index from the tree
+    # Takes into account weights
     def sample(self):
         # Assert not empty
         assert(self.weights[0] != 0)
 
-        return self.sample_rec(2, self.weights[0]) - 1 - self.tree_size
+        return self.sample_rec(2) - 1 - self.tree_size
 
     # Make one branch decision
     # Index is a 1-terminated index in the tree, pointing to the left node of the two between which to decide
     # Regularization is the weight of the parent node
     # It returns the 1-terminated index in the weights
-    def sample_rec(self, index, regularization):
+    def sample_rec(self, index):
         # Make a decision between the two weights
-        prob_left = self.weights[index-1]/regularization
-        go_left = np.random.uniform() < prob_left
+        prob_left = self.weights[index-1]
+        prob_right = self.weights[index]
+        regularization = prob_left + prob_right
+        assert(regularization != 0)
+
+        go_left = np.random.uniform() < (prob_left/regularization)
 
         if(not go_left):
             index += 1
@@ -194,17 +232,17 @@ class SumTree:
             return index
 
         # If not, continue recursively
-        return self.sample_rec(index * 2, self.weights[index - 1])
+        return self.sample_rec(index * 2)
 
 # A "Basic" Buffer which stores entries and can sample them by priority
 class BasicBuffer:
 
-    def __init__(self, max_size):
+    def __init__(self, max_size, alpha=1):
         self.max_size = max_size
         self.iterator = 0 # Next position to write to
         self.full = False # Whether we are full
         self.buffer = np.array([(None, None, None, None, None) for _ in range(max_size)])
-        self.priorities = SumTree(max_size)
+        self.priorities = SumTree(max_size, alpha)
         self.max_priority = 1
 
     def push(self, state, action, reward, next_state, done, priority=None):
@@ -237,6 +275,15 @@ class BasicBuffer:
             self.max_priority = max(self.max_priority, p)
             self.priorities.update_entry(i, p)
 
+    # Gets the prioritized to the power of alpha and normalized to sum to 1
+    def get_probabilities(self, indices):
+        weights = self.priorities.get_leaf_weights_alpha()[indices]
+        weights = weights/self.priorities.get_sum_alpha()
+        return weights
+
+    def get_priorities(self):
+        return self.priorities.get_leaf_weights()[0:len(self)]
+
     def get_buffer(self):
         if(self.full):
             return self.buffer
@@ -258,8 +305,6 @@ class BasicBuffer:
 
         return (state_batch, action_batch, reward_batch, next_state_batch, done_batch, indices)
 
-    def get_priorities(self):
-        return self.priorities.get_leaf_weights()[0:len(self)]
 
     def sample_sequence(self, batch_size):
         state_batch = []
@@ -290,7 +335,7 @@ class BasicBuffer:
     def save(self, file):
         data = {
             "buffer": self.buffer[0:len(self)],
-            "priorities": self.priorities.get_leaf_weights()[0:len(self)]
+            "priorities": self.priorities.get_leaf_weights()[0:len(self)],
         }
 
         with open(file, "wb") as f:

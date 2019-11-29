@@ -279,6 +279,21 @@
   author = {Bishop, Christopher M.}
 }
 
+@article{cobbeQuantifyingGeneralizationReinforcement2019,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1812.02341},
+  primaryClass = {cs, stat},
+  title = {Quantifying {{Generalization}} in {{Reinforcement Learning}}},
+  url = {http://arxiv.org/abs/1812.02341},
+  abstract = {In this paper, we investigate the problem of overfitting in deep reinforcement learning. Among the most common benchmarks in RL, it is customary to use the same environments for both training and testing. This practice offers relatively little insight into an agent's ability to generalize. We address this issue by using procedurally generated environments to construct distinct training and test sets. Most notably, we introduce a new environment called CoinRun, designed as a benchmark for generalization in RL. Using CoinRun, we find that agents overfit to surprisingly large training sets. We then show that deeper convolutional architectures improve generalization, as do methods traditionally found in supervised learning, including L2 regularization, dropout, data augmentation and batch normalization.},
+  urldate = {2019-11-12},
+  date = {2019-07-14},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  author = {Cobbe, Karl and Klimov, Oleg and Hesse, Chris and Kim, Taehoon and Schulman, John},
+  file = {/home/sph3re/Zotero/storage/6JPS6GSY/Cobbe et al. - 2019 - Quantifying Generalization in Reinforcement Learni.pdf;/home/sph3re/Zotero/storage/MJ8QVC3I/1812.html}
+}
+
 @article{huber1964,
   title = {Robust Estimation of a Location Parameter},
   volume = {35},
@@ -300,5 +315,54 @@
   pages = {28},
   author = {Williams, Ronald J},
   file = {/home/sph3re/Programming/windturbine/paper/literature/Williams1992_Article_SimpleStatisticalGradient-foll.pdf}
+}
+
+@article{bjorckUnderstandingBatchNormalization,
+  langid = {english},
+  title = {Understanding {{Batch Normalization}}},
+  abstract = {Batch normalization (BN) is a technique to normalize activations in intermediate layers of deep neural networks. Its tendency to improve accuracy and speed up training have established BN as a favorite technique in deep learning. Yet, despite its enormous success, there remains little consensus on the exact reason and mechanism behind these improvements. In this paper we take a step towards a better understanding of BN, following an empirical approach. We conduct several experiments, and show that BN primarily enables training with larger learning rates, which is the cause for faster convergence and better generalization. For networks without BN we demonstrate how large gradient updates can result in diverging loss and activations growing uncontrollably with network depth, which limits possible learning rates. BN avoids this problem by constantly correcting activations to be zero-mean and of unit standard deviation, which enables larger gradient steps, yields faster convergence and may help bypass sharp local minima. We further show various ways in which gradients and activations of deep unnormalized networks are ill-behaved. We contrast our results against recent findings in random matrix theory, shedding new light on classical initialization schemes and their consequences.},
+  pages = {12},
+  author = {Bjorck, Nils and Gomes, Carla P and Selman, Bart and Weinberger, Kilian Q},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/7996-understanding-batch-normalization.pdf}
+}
+
+@article{suttonPolicyGradientMethods,
+  langid = {english},
+  title = {Policy {{Gradient Methods}} for {{Reinforcement Learning}} with {{Function Approximation}}},
+  abstract = {Function approximation is essential to reinforcement learning, but the standard approach of approximating a value function and determining a policy from it has so far proven theoretically intractable. In this paper we explore an alternative approach in which the policy is explicitly represented by its own function approximator, independent of the value function, and is updated according to the gradient of expected reward with respect to the policy parameters. Williams's REINFORCE method and actor-critic methods are examples of this approach. Our main new result is to show that the gradient can be written in a form suitable for estimation from experience aided by an approximate action-value or advantage function. Using this result, we prove for the first time that a version of policy iteration with arbitrary differentiable function approximation is convergent to a locally optimal policy.},
+  pages = {7},
+  author = {Sutton, Richard S and McAllester, David A and Singh, Satinder P and Mansour, Yishay},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/1713-policy-gradient-methods-for-reinforcement-learning-with-function-approximation.pdf}
+}
+
+
+@article{degrisOffPolicyActorCritic201,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1205.4839},
+  primaryClass = {cs},
+  title = {Off-{{Policy Actor}}-{{Critic}}},
+  url = {http://arxiv.org/abs/1205.4839},
+  abstract = {This paper presents the first actor-critic algorithm for off-policy reinforcement learning. Our algorithm is online and incremental, and its per-time-step complexity scales linearly with the number of learned weights. Previous work on actor-critic algorithms is limited to the on-policy setting and does not take advantage of the recent advances in off-policy gradient temporal-difference learning. Off-policy techniques, such as Greedy-GQ, enable a target policy to be learned while following and obtaining data from another (behavior) policy. For many problems, however, actor-critic methods are more practical than action value methods (like Greedy-GQ) because they explicitly represent the policy; consequently, the policy can be stochastic and utilize a large action space. In this paper, we illustrate how to practically combine the generality and learning potential of off-policy learning with the flexibility in action selection given by actor-critic methods. We derive an incremental, linear time and space complexity algorithm that includes eligibility traces, prove convergence under assumptions similar to previous off-policy algorithms, and empirically show better or comparable performance to existing algorithms on standard reinforcement-learning benchmark problems.},
+  urldate = {2019-11-28},
+  date = {2013-06-20},
+  keywords = {Computer Science - Machine Learning},
+  author = {Degris, Thomas and White, Martha and Sutton, Richard S.},
+  file = {/home/sph3re/Zotero/storage/M8JKGVI7/Degris et al. - 2013 - Off-Policy Actor-Critic.pdf;/home/sph3re/Zotero/storage/BMB4EL4P/1205.html}
+}
+
+@article{schaulPrioritizedExperienceReplay2016,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1511.05952},
+  primaryClass = {cs},
+  title = {Prioritized {{Experience Replay}}},
+  url = {http://arxiv.org/abs/1511.05952},
+  abstract = {Experience replay lets online reinforcement learning agents remember and reuse experiences from the past. In prior work, experience transitions were uniformly sampled from a replay memory. However, this approach simply replays transitions at the same frequency that they were originally experienced, regardless of their significance. In this paper we develop a framework for prioritizing experience, so as to replay important transitions more frequently, and therefore learn more efficiently. We use prioritized experience replay in Deep Q-Networks (DQN), a reinforcement learning algorithm that achieved human-level performance across many Atari games. DQN with prioritized experience replay achieves a new state-of-the-art, outperforming DQN with uniform replay on 41 out of 49 games.},
+  urldate = {2019-11-29},
+  date = {2016-02-25},
+  keywords = {Computer Science - Machine Learning},
+  author = {Schaul, Tom and Quan, John and Antonoglou, Ioannis and Silver, David},
+  file = {/home/sph3re/Zotero/storage/Z8CT7GZT/Schaul et al. - 2016 - Prioritized Experience Replay.pdf}
 }
 
