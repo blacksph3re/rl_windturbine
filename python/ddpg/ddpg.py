@@ -62,9 +62,19 @@ class DDPG:
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
             target_param.data.copy_(param.data)
         
+        if(self.hparams.clip_gradients):
+            for p in self.actor.parameters():
+                p.register_hook(lambda grad: torch.clamp(grad, -self.hparams.clip_gradients, self.hparams.clip_gradients))
+            for p in self.critic.parameters():
+                p.register_hook(lambda grad: torch.clamp(grad, -self.hparams.clip_gradients, self.hparams.clip_gradients))
+
         # optimizers
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=hparams.critic_lr)
-        self.actor_optimizer  = optim.Adam(self.actor.parameters(), lr=hparams.actor_lr)
+        if(self.hparams.optimizer == 'adam'):
+            self.optimizer = optim.Adam
+        else:
+            self.optimizer = optim.SGD
+        self.critic_optimizer = self.optimizer(self.critic.parameters(), lr=hparams.critic_lr)
+        self.actor_optimizer  = self.optimizer(self.actor.parameters(), lr=hparams.actor_lr)
 
         # If in twin critic mode, add another critic
         if(self.hparams.twin_critics):
@@ -72,12 +82,25 @@ class DDPG:
             self.critic2_target = Critic(self.obs_dim, self.act_dim, hparams.critic_sizes[0], hparams.critic_sizes[1], hparams.critic_sizes[2], hparams.init_weight_limit, hparams.critic_simple).to(self.device)
             for target_param, param in zip(self.critic2_target.parameters(), self.critic2.parameters()):
                 target_param.data.copy_(param.data)
-            self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=hparams.critic_lr)
+
+            if(self.hparams.clip_gradients):
+                for p in self.critic2.parameters():
+                    p.register_hook(lambda grad: torch.clamp(grad, -self.hparams.clip_gradients, self.hparams.clip_gradients))
+
+            self.critic2_optimizer = self.optimizer(self.critic2.parameters(), lr=hparams.critic_lr)
 
         if(self.hparams.critic_loss == 'huber'):
-            self.critic_loss_function = F.smooth_l1_loss
+            loss = torch.nn.SmoothL1Loss(reduction="none")
         else:
-            self.critic_loss_function = F.mse_loss
+            loss = torch.nn.MSELoss(reduction="none")
+
+        def generic_loss_function(target, pred, weights):
+            td_error = loss(target, pred)
+            if(self.hparams.clip_td_error):
+                torch.clamp(td_error, -self.hparams.clip_td_error, self.hparams.clip_td_error)
+            return (td_error * weights).mean(), td_error
+
+        self.critic_loss_function = lambda target, pred, weights: generic_loss_function(target, pred, weights)
 
         # Buffor for experience replay
         self.replay_buffer = BasicBuffer(hparams.buffer_maxlen)
@@ -147,7 +170,7 @@ class DDPG:
         self.reward_normalizer_params_gpu = (torch.FloatTensor(np.ones(1)).to(self.device), 
                                              torch.FloatTensor(np.zeros(1)).to(self.device))
 
-        self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps)
+        self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps, self.hparams.run_name)
         for key, value in self.hparams.values().items():
             self.logger.writer.add_text(key, str(value), 0)
 
@@ -223,6 +246,7 @@ class DDPG:
         action = action.squeeze(0).cpu().detach().numpy()
 
         assert(not np.any(np.isnan(action)))
+        self.logger.logAction(self.time, action, 'act-unclipped')
 
         action = self.clip_action(action)
 
@@ -328,7 +352,7 @@ class DDPG:
         return state
 
     def pretrain_policy(self):
-        optimizer = optim.Adam(self.actor.parameters(), lr=self.hparams.pretrain_policy_lr)
+        optimizer = self.optimizer(self.actor.parameters(), lr=self.hparams.pretrain_policy_lr)
         validation_size = int(len(self.replay_buffer) / 0.03)
         validation_indices = np.random.choice(len(self.replay_buffer), validation_size)
         self.replay_buffer.update_priorities(validation_indices, np.ones(validation_size)*1e-10)
@@ -371,10 +395,15 @@ class DDPG:
         for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
             target_param.data.copy_(param.data)
 
-    def update(self, batch_size, time = None):
-        time = time or self.time
+    def sample(self, batch_size, uniform=False):
 
-        state_batch, action_batch, reward_batch, next_state_batch, masks, indices = self.replay_buffer.sample(batch_size)
+        state_batch, action_batch, reward_batch, next_state_batch, masks, indices = self.replay_buffer.sample(batch_size, uniform)
+
+        assert(not np.any(np.isnan(state_batch)))
+        assert(not np.any(np.isnan(action_batch)))
+        assert(not np.any(np.isnan(reward_batch)))
+        assert(not np.any(np.isnan(next_state_batch)))
+        assert(not np.any(np.isnan(indices)))
 
         state_batch = torch.FloatTensor(state_batch).to(self.device)
         action_batch = torch.FloatTensor(action_batch).to(self.device)
@@ -409,14 +438,24 @@ class DDPG:
         if(self.hparams.normalize_actions):
             action_batch = self.normalize_action(action_batch, True)
 
+        return (state_batch, action_batch, reward_batch, next_state_batch, masks, indices)
+
+    def update(self, batch_size, time = None):
+        time = time or self.time
+
+        (state_batch, action_batch, reward_batch, next_state_batch, masks, indices) = self.sample(batch_size, False)
+
         # When using PER, calculate IS-weights
+        weights = np.ones(batch_size)
         if(self.hparams.prioritized_experience_replay):
-            probabilities = self.replay_buffer.get_probabilities(indices)
-            probabilities = probabilities ** (-self.hparams.prioritized_experience_replay_beta)
-            probabilities = probabilities / np.max(probabilities)
-            weights = torch.FloatTensor(probabilities).to(self.device)
+            weights = self.replay_buffer.get_probabilities(indices)
+            weights = (weights*batch_size) ** (-self.hparams.prioritized_experience_replay_beta)
+            weights = weights / np.max(weights)
+            assert(not np.any(np.isnan(weights)))
+            assert(not np.any(weights > 1))
+            weights = torch.FloatTensor(weights).to(self.device)
 
-
+        # Run the critic
         self.critic_optimizer.zero_grad()
         curr_Q = self.critic.forward(state_batch, action_batch)
         next_actions = self.actor_target.forward(next_state_batch)
@@ -430,7 +469,7 @@ class DDPG:
             next_Q2 = self.critic2_target.forward(next_state_batch, next_actions.detach())
             expected_Q = reward_batch + self.gamma * torch.min(next_Q, next_Q2)
 
-            q2_loss = self.critic_loss_function(curr_Q2, expected_Q.detach())
+            q2_loss, td_error2 = self.critic_loss_function(curr_Q2, expected_Q.detach(), weights)
             q2_loss.backward()
             self.critic2_optimizer.step()
             self.logger.add_scalar('Loss/q2', q2_loss, time)
@@ -438,8 +477,7 @@ class DDPG:
 
 
         # update critic
-        q_loss = self.critic_loss_function(curr_Q, expected_Q.detach())
-
+        q_loss, td_error = self.critic_loss_function(curr_Q, expected_Q.detach(), weights)
         q_loss.backward() 
         self.critic_optimizer.step()
         self.logger.add_scalar('Loss/q', q_loss, time)
@@ -448,20 +486,45 @@ class DDPG:
 
 
         # Update priorities if using prioritized experience replay
-        # TODO Should we correct importance sampling now?
+        # Also, for correction of oversampling in later policy replays, redraw samples
         if(self.hparams.prioritized_experience_replay):
             # In twin critic mode, take the max value of the two, 
-            # Thus, if any of the two nets is performing badly on thet sample,
+            # Thus, if any of the two nets is performing badly on that sample,
             # we'll sample it more often.
             if(self.hparams.twin_critics):
-                td_error = (expected_Q.detach() - torch.min(curr_Q.detach(), curr_Q2.detach())).abs().cpu().data.numpy()
-            else:
-                td_error = (expected_Q.detach() - curr_Q.detach()).abs().cpu().data.numpy()
-            self.replay_buffer.update_priorities(indices, td_error)
+                td_error = torch.min(td_error, td_error2)
+           
+            self.replay_buffer.update_priorities(indices, td_error.abs().cpu().data.numpy())
 
-        if(self.hparams.log_net_insights and time % self.hparams.log_net_insights == 0):
+            # Redraw for policy training
+            (state_batch, action_batch, reward_batch, next_state_batch, masks, indices) = self.sample(batch_size, True)
+            
+
+        # update actor
+        if(time%self.hparams.actor_delay == 0):
+            self.actor_optimizer.zero_grad()
+            policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
+
+            policy_loss.backward()
+
+            self.actor_optimizer.step()
+            self.logger.add_scalar('Loss/policy', policy_loss, time)
+
+        # update target networks 
+        for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
+            target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
+       
+        for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
+            target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
+
+        # Add actor parameter noise
+        if(self.hparams.parameter_noise != 0):
+            for param in self.actor.parameters():
+                param.data.copy_(param.data + self.hparams.parameter_noise * np.random.uniform(-1, 1))
+
+        # Log everything if needed
+        if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
             critic_state = dict(self.critic.cpu().named_parameters())
-
 
             self.logger.add_histogram_nofilter('critic-weights/linear1', critic_state['linear1.weight'], time)
             self.logger.add_scalar_nofilter('critic/l1-dead', np.sum(critic_state['linear1.weight'].data.numpy() == 0), time)
@@ -493,21 +556,7 @@ class DDPG:
 
             self.logger.add_histogram_nofilter('priorities', np.log10(self.replay_buffer.get_priorities()+1e-20), time)
 
-
-        # update actor
-        if(time%self.hparams.actor_delay == 0):
-            self.actor_optimizer.zero_grad()
-            policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
-
-            policy_loss.backward()
-
-            self.actor_optimizer.step()
-            self.logger.add_scalar('Loss/policy', policy_loss, time)
-
-
-        if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
             actor_state = dict(self.actor.cpu().named_parameters())
-
 
             self.logger.add_scalar_nofilter('actor/l1-dead', np.sum(actor_state['linear1.weight'].data.numpy() == 0), time)
             self.logger.add_scalar_nofilter('actor/l1-grad-exp', np.sum(actor_state['linear1.weight'].grad.numpy() > 1e10), time)
@@ -529,18 +578,6 @@ class DDPG:
                 self.logger.add_histogram_nofilter('actor-grads/linear3', np.log10(np.abs(actor_state['linear3.weight'].grad)+1e-20), time)
             self.actor.to(self.device)
 
-
-        # update target networks 
-        for target_param, param in zip(self.actor_target.parameters(), self.actor.parameters()):
-            target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
-       
-        for target_param, param in zip(self.critic_target.parameters(), self.critic.parameters()):
-            target_param.data.copy_(param.data * self.tau + target_param.data * (1.0 - self.tau))
-
-        # Add actor parameter noise
-        if(self.hparams.parameter_noise != 0):
-            for param in self.actor.parameters():
-                param.data.copy_(param.data + self.hparams.parameter_noise * np.random.uniform(-1, 1))
 
     def reset_past_obs(self, cur_state):
         if(self.hparams.feed_past):
@@ -602,7 +639,8 @@ class DDPG:
             self.epoch_killcount = 0
 
         if (self.time > self.hparams.random_exploration_steps and len(self.replay_buffer) > self.batch_size):
-            self.update(self.batch_size)
+            for i in range(0, self.hparams.training_steps_per_env_iteration):
+                self.update(self.batch_size, self.time + i/self.hparams.training_steps_per_env_iteration)
 
         if(self.time < self.hparams.random_exploration_steps):
             action = [2e7*state[0]-12e6,0]
@@ -687,6 +725,9 @@ class DDPG:
 
     def get_default_hparams():
         return tf.contrib.training.HParams(
+            # The name of the run to make identification easier
+            run_name = '',
+
             # Number of steps of interaction (state-action pairs) 
             # for the agent and the environment in each epoch.
             steps_per_epoch = 500,
@@ -762,7 +803,11 @@ class DDPG:
             # Loss function for the critic
             # default is mean square error
             # Other values: "mse", "huber"
-            critic_loss = 'huber',
+            critic_loss = 'mse',
+
+            # Whether to clip critic losses
+            # If yes, to which values
+            clip_td_error = 0,
 
             # Whether to use duelling critics
             # In this variant, two critics try to estimate q
@@ -771,7 +816,7 @@ class DDPG:
             twin_critics = False,
 
             # Learning rate of the policy
-            actor_lr = 1e-5,
+            actor_lr = 1e-4,
 
             # Network sizes of the policy
             actor_sizes = [32, 8],
@@ -783,8 +828,19 @@ class DDPG:
             # 1 for updating every critic update
             actor_delay = 2,
 
+            # Which optimizer to use for everything
+            # adam or sgd
+            optimizer = 'adam',
+
+            # How many training steps to do per environment iteration
+            training_steps_per_env_iteration = 1,
+
+            # Whether to clip gradients
+            # If yes, to which values to clip them to
+            clip_gradients = 1.0,
+
             # Whether to use batch normalization in both the actor and critic
-            batch_normalization = False,
+            batch_normalization = True,
 
             # Network parameters of both the actor and critic will be initialized to
             # a uniform random value between [-init_weight_limit, init_weight_limit]
@@ -807,7 +863,7 @@ class DDPG:
 
             # Log net insight histograms every n steps
             # -1 for disabling completely
-            log_net_insights = 1,
+            log_net_insights = 128,
 
             # Action noise
             # The type of action noise can be either
@@ -892,12 +948,12 @@ class DDPG:
             # How strongly to apply prioritized experience replay
             # 1 means sampling happens only according to the priority,
             # 0 means uniform sampling
-            prioritized_experience_replay_alpha = 1,
+            prioritized_experience_replay_alpha = 0.5,
 
             # How strongly to use importance sampling to account for
             # overestimation bias
             # 1 means full compensation, 0 means no compensation
-            prioritized_experience_replay_beta = 1,
+            prioritized_experience_replay_beta = 0.5,
 
             # Whether to clip action gradients at the maximum level returned from the environment
             clip_action_gradients = True,

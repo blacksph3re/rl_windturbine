@@ -199,41 +199,44 @@ HUGE MESS OVER
 
 Some terms which we use
 \begin{itemize}
-  \item \textbf{Return} A return with respect of a policy and a starting state s gives the accumulative reward of following that policy from state s until the future. As we have a stochastic environment, we have to add an expectation term, so it is the expected accumulative reward of following that policy. Furthermore a return can be discounted or undiscounted. Discounting means we multiply a discounting factor $\gamma \in [0,1]$ to rewards in the fashion of $r_0 \gamma^0 + r_1 \gamma^1 + r_2 \gamma^2 ...$, which results in distant future rewards being weighted less than closer ones.
+  \item \textbf{Policy} A function that maps from states to actions. There are deterministic policies $\mu: S -> A$ and stochastic policies $\pi: S -> P(A)$.
+  \item \textbf{Return} A return with respect of a policy and a starting state s gives the accumulative reward of following that policy from state s until the future. $R_{\pi}(s_t) = \mathbb{E}_{s_i \sim \varepsilon, a_i \sim \pi, i>t} r(s_i, a_i) $. As we have a stochastic environment and policy, we have to add an expectation term over actions taken and states resulting from those actions. It is the expected accumulative reward of following that policy. Furthermore a return can be discounted or undiscounted. Discounting means we multiply a discounting factor $\gamma \in [0,1]$ to rewards in the fashion of $r_0 \gamma^0 + r_1 \gamma^1 + r_2 \gamma^2 ...$, which results in distant future rewards being weighted less than closer ones.
   \item \textbf{Optimal policy} The theoretical construct of a policy that always takes the best action with respect to accumulative reward. Though we rarely know this policy, there must always be at least one policy which gives the highest returns of all possible policies
-  \item \textbf{Value} The value of a state s is the return of that state following the optimal policy.
+  \item \textbf{Q-Value} The return of taking action a in state s plus the return following a policy after that $Q_{\pi}(s,a) = r(s, a) + \mathbb{E}_{s' \sim \varepsilon} R_{\pi}(s')$
   \item \textbf{Trajectory} A trajectory is a sequence of states and actions $(s_0, a_0, s_1, ..., a_{i-1}, s_i)$
 \end{itemize}
 
 \subsection{Q-Learning}
 
-At first we will present a very basic algorithm for a machine learning agent, which is based on the basic Bellman-Equation \cite{bellmanTheoryDynamicProgramming1954}
+At first we will present a very basic algorithm for a machine learning agent, which is based on the basic Bellman-Equation \cite{bellmanTheoryDynamicProgramming1954}. It is proven, that
 
 \begin{equation}
-Q(s, a) = r + \max_{a'}Q(s', a')
+Q*(s, a) = \mathbb{E}_{s' \sim \varepsilon | s,a}[r(s,a) + \gamma\max_{a'}Q*(s', a')]
 \end{equation}
 
-This equation uses the notion of a state-value function, also called Q function. In the Bellman Equation, it describes the total accumulated return until infinity taking an action $a$ in state $s$, receiving reward $r$, ending up in state $s'$ and then following the optimal policy afterwards. With the help of this function, we can compare different actions in our current state. And also, this small definition gives us a hint on how to create this function. We could initialize an array for all states and actions and then repeatedly loop through the array and fill it according to the above equation. However, this table is only computationally feasible when we have small finite state and action spaces. If any of the two spaces is big or even continuous, we have to replace the table by an estimator for Q.
+converges to the optimal solution when using iterative value updates. I will quickly explain this Bellman Equation. This equation uses the notion of a state-value function, also called Q function. In the Bellman Equation, it describes the total accumulated return until infinity taking an action $a$ in state $s$, receiving reward $r$, ending up in state $s'$ and then following the optimal policy afterwards. $\gamma$ acts as a discounting factor just as in our return function. It is even possible to implement an algorithm from this. We could create a lookup table for all s and a, initialize it all zero and whenever observing a state transition, we could update the table at that state and action after the above notation.
 
-The idea behind Q-Learning is that we want to learn the Q function from observations which we have. Assuming we already know the Q value for the next state \(Q(s_{t+1}, a_{t+1})\), we can then calculate the current Q value \( Q(s_t, a_t) = r_t + \gamma Q(s_{t+1}, a_{t+1}) \). Unfortunately, we don't have a definite Q for the next state, so we need to use our estimation which we have already. This estimation is most likely noisy or even plain wrong, so we want to only gradually update our Q. For this, we define our learning target for learning step i as
+With the help of this function, we can compare different actions in our current state. However, this table is only computationally feasible when we have small finite state and action spaces. If any of the two spaces is big or even continuous, we have to replace the table by an estimator for Q.
+
+Even with an estimated Q, though no longer guaranteed, we can still converge towards the optimal solution. For training an estimator, we need a loss which we can derive. For this, we define our learning target for learning step i as
 \begin{equation}
-y_i = \mathbb{E}_{s' \sim \varepsilon}[r + \gamma Q(s', \pi(s');\theta_{i-1})]
+y_i = \mathbb{E}_{s' \sim \varepsilon}[r + \gamma \max_{a'}Q(s', a';\theta_{i})]
 \end{equation}
-For the moment, let's assume the optimal policy $\pi$ which always chooses the action with the highest Q value. Our $y$ is then the current reward added to the highest possible reward in the future. If we had another policy, we would get the future accumulated reward under that policy. We use the parameters $\theta_{i-1}$ from the previous timestep here so that we don't have to derive y when we derive for $\theta_i$, which simplifies the learning term.
+For the moment, let's assume we can still calculate $\max_{a'}$. In fact, in a small finite action space we could just try all possible values of a. Our $y$ is then the current reward added to the highest possible rewards in the future, with other words exactly what we want to have as Q. We use the parameters $\theta_{i}$ in the target, so in theory, when deriving a later loss, we would also have to derive over our targets. However, in Q learning, this is commonly ignored.
 
 Now, on our learning target y, we can define a loss as
 \begin{equation}
-L(\theta_i) = \mathbb{E}_{s, a}[(y_i - Q(s, a))^2]
+L(\theta_i) = \mathbb{E}_{s \sim \varepsilon}[(y_i - Q(s, a;\theta_i))^2]
 \end{equation}
-This already looks close to some squared error term. To calculate the expectation value over the environment $\varepsilon$, we will randomly draw samples from the replay buffer and average across them, doing something similar to a Monte-Carlo experiment. The result is equivalent to a normal mean square error calculation.
+This already looks close to some squared error term. To calculate the expectation value over the environment $\varepsilon$, we need to do some form of Monte-Carlo experiment, in which we approximate that expectation value by repeatedly drawing samples from the underlying distribution. Luckily, we can easily draw samples from our environment, and we can even reuse old samples. Thus we store all samples in a replay buffer and uniformly draw from it to resemble a Monte-Carlo experiment. 
 
 Deriving for $\theta_i$ and applying the chain rule, we get the loss derivative
 \begin{equation}
-\Delta_{\theta_i} L(\theta_i) = \mathbb{E}[2(y_i - Q(s, a))\Delta_{\theta_i}Q(s, a)]
+\Delta_{\theta_i} L(\theta_i) = \mathbb{E}[(y_i - Q(s, a;\theta_i))\Delta_{\theta_i}Q(s, a;\theta_i)]
 \end{equation}
-Using our Monte-Carlo like batch from the replay buffer instead of calculating the full expectation term, we end up with stochastic gradient descent. 
+Using our Monte-Carlo like batch from the replay buffer, we end up with stochastic gradient descent.
 
-Thus we just derived a method to train a Q function under the assumption of a policy. In \cite{mnihPlayingAtariDeep2013}, the team had a finite state space and could use the greedy policy $argmax_a Q(s', a)$ by searching the entire action space. We are presented with an infinite action space though, which is why we can't implement a greedy policy without high computational expense. So, for our work, we have to also learn a policy and not just a Q estimator. Luckily, our Q learning rule also works for other policies than the optimal policy, so let's try to derive a way to learn a policy.
+Thus we just derived a method to train a Q function under the assumption of a policy. In \cite{mnihPlayingAtariDeep2013}, the authors assumed a finite state space and could use the greedy policy $argmax_a Q(s', a)$ by searching the entire action space. We are presented with an infinite action space though, which is why we can't implement a greedy policy without high computational expense. So, for our work, we have to also learn a policy and not just a Q estimator. Luckily, our Q learning rule also works for other policies than the optimal policy, so let's try to derive a way to learn a policy.
 
 
 \subsection{Policy Gradients}
@@ -244,11 +247,17 @@ Let's assume we have a probablistic policy $\pi: S \rightarrow P(A)$ which is pa
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha \Delta \pi_{\theta_i}(a^*|s)
 \end{equation}
-We could do this for all states we see and would end up with an iterative way of improving our policy. However, we might not know the best action for any state. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. \cite{suttonPolicyGradientMethods} include Q-learning into the REINFORCE algorithm and call the resulting algorithm \ac{PG}. So, with our newly gained Q, for all actions and states, do
+We could do this for all states we see and would end up with an iterative way of improving our policy. However, we might not know the best action for any state. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. So, with our newly gained Q, for all actions and states, do
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha Q(s, a)\Delta \pi_{\theta_i}(a|s)
 \end{equation}
-This way, actions with higher Q values will receive a higher gradient step, and as Q is constant with respect to $\theta$ we don't have to derive along Q here. However there is still a problem to this. We assume that we use the same $\pi$ for exploration while doing training, so this policy is responsible for taking actions in the environment. This style is also called on-policy learning. So let's assume the policy is poorly initialized at the beginning of our training and gives action 1 a probability 4 times as high as action 2, though taking action 2 would yield a 10\% better return in our Q function. Now, as we are taking action 1 4 times as often as action 2, we will also perform gradient updates on action 1 4 times as often. Though each of the gradient steps is smaller due to the Q factor, the higher frequency of updating action 1 will lead to action 1 getting an advantage over action 2 in this update strategy. To correct for this phenomenon, we could divide the probability of each of the actions from the update term:
+This way, actions with higher Q values will receive a higher gradient step, and as Q is constant with respect to $\theta$ we don't have to derive along Q here. Problematic is though, that the Q term we defined before, always took the best possible actions, which could be vastly different from the actions under our policy. Thus, we need to reformulate Q to account for any policy and not just the one which always takes the best action.
+
+\begin{equation}
+Q(s, a) = \mathbb{E}_{s' \sim \varepsilon, a' \sim \pi | s,a}[r + \gamma Q(s', a')]
+\end{equation}
+
+However there is still a problem if we integrate this new Q into our policy updates. We assume that we use the same $\pi$ for exploration while doing training, so this policy is responsible for taking actions in the environment. So let's assume the policy is poorly initialized at the beginning of our training and gives action 1 a probability 4 times as high as action 2, though taking action 2 would yield a 10\% better return in our Q function. Now, as we are taking action 1 4 times as often as action 2, we will also perform gradient updates on action 1 4 times as often in our Monte-Carlo expectation draw. Though each of the gradient steps is smaller due to the Q factor, the higher frequency of updating action 1 will lead to action 1 getting an advantage over action 2 in this update strategy. To correct for this oversampling bias, we could divide the probability of each of the actions from the update term:
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha Q(s, a) \frac{ \Delta \pi_{\theta_i}(a|s)}{\pi_{\theta_i}(a|s)}
 \end{equation}
@@ -257,11 +266,23 @@ We might remember from calculus that $\frac{\Delta x}{x} = \Delta \log x$ so we 
 \theta_{i+1} = \theta_i + \alpha Q(s, a) \Delta \log \pi_{\theta_i}(a|s)
 \end{equation}
 
-This update equation is our basic policy gradient equation.
+This update equation is our basic policy gradient equation. In reinforcement-learning, it has proven helpful to do off-policy learning, in which another policy than the one being trained can generate experiences. Thus, we can store past experiences in a replay buffer. And in fact, we were already able to use a replay buffer in the Q learning part. However we lost that again when we introduced our policy to Q learning. If we remember our expectation term, in which actions were sampled from the policy $\mathbb{E}_{a \sim \pi}$. We needed this expectation term, because we were dealing with stochastic policies. If instead learning deterministic policies, we can exclude the term from the equation. 
+
+\begin{equation}
+Q^{\mu}(s,a) = \mathbb{E}_{s' \sim \varepsilon | s,a}[r + \gamma Q^{\mu}(s', \mu(s'))]
+\end{equation}
+
+Now, our Q is only dependent on the environment distribution, so when we do our Monte-Carlo experiments to update it, we can take our generated samples from the environment and assume they are modelling the underlying environment. However, by introducing our deterministic policy, we ruined our trick of dividing the probability value of an action from its gradient.
+
+TODO: deterministic policy gradients
+
+
+\subsection{Deterministic Policy Gradients}
 
 
 \subsection{DDPG}
 
+\ac{DDPG} is a combination of \ac{DPG} and \ac{DQN}. \cite{lillicrapCONTINUOUSCONTROLDEEP2015} tackle several problems in the two algorithms to combine them. At first, \ac{DQN} updates the Q network parameters based on a target calculated on the Q network parameters. To tackle this, \cite{mnihPlayingAtariDeep2013} introduced a second Q network which they call target network for which the parameters are held constant over a period of updates. After a number of steps, the parameters from the actual Q network are then copied over to the target. In \ac{DDPG}, they instead use soft target updates, where every step, the parameters of the actual network fade over to the target: $\theta_{target} = \tau \theta + (1 - \tau) \theta_{target}$. The fade-over parameter $\tau$ was recommended to be set to a small number like 0.01. Additionally to the target Q-network, they also found that a target policy 
 
 
 \section{RL on windturbines}
@@ -371,7 +392,9 @@ We at first hid this clipping from the replay buffer, but then decided to store 
 
 We added a small period of direct pretraining of the policy on the actions taken by the expert policy during random exploration. We hoped for a more sensible default policy at the beginning and indeed observed reaching sensible behavior a little earlier.
 
-\section{Improvements without sense}
+\section{Other improvements}
+
+Because still generally not performing well, we added some techniques which we thought would aid general performance.
 
 \subsection{Prioritized experience replay}
 
@@ -381,7 +404,7 @@ As knowing how much a sample benefits training is difficult, they propose to app
 
 When replaying, the sampling probability of a sample is set to $P(j) = \frac{p_j^{\alpha}}{\sum_i{p_i^{\alpha}}}$, $\alpha$ being a hyperparameter allowing to fade between uniform sampling ($\alpha=0$) and only priority sampling ($\alpha=1$). New samples are always stored with maximum priority, and to correct for oversampling bias, a correction term is applied to the temporal difference error: $w_j = \frac{(N*P(j))^{-\beta}}{\max_i{w_i}}$. It is simply multiplied to the real TD-error. $\beta$ is a parameter describing how strongly to correct oversampling, where $\beta=1$ is full correction and $\beta=0$ no correction at all.
 
-We decided to split policy and critic updates, as the oversampling effects could also happen to policy updates, and still sample uniformly for policy updates.
+We decided to split policy and critic updates, as the oversampling effects could also happen to policy updates, and still sample uniformly for policy updates. 
 
 \subsection{Data augmentation}
 
@@ -406,9 +429,13 @@ To test all the above things, we tried simulations with different hyperparameter
 
 \chapter{Evaluation}
 
-It must be stated that we did not achieve a single run which stayed within sensible operational range for longer than 30K steps. Even our handcrafted PID controller for which we took the first set of parameters that somehow works widely outperforms our learnt policies, an industry controller is even better. This result in itself is notable, because it needed a whole set of additions to plain \ac{DDPG} to get first sensible results on our windturbine environment. So apparently, our windturbine simulation is more complex to learn than the OpenAI gym examples, which are usually used as benchmarks for \ac{RL} performance. As the final product we developped is close to \cite{fujimotoAddressingFunctionApproximation2018} and has improvements from a wide variety of papers, we conclude that tackling wind turbine control with \ac{RL} will need more research. Though we were not able to outperform industry controllers, the speed in which the area of \ac{RL} is advancing makes us hopeful to achieve good results in the near future. With our work on integrating qblade, we provided an open-source, accessible framework to develop future reinforcement learning controllers for wind turbines. 
+It must be stated that we did not achieve a single run which stayed within sensible operational range for longer than 30K steps. Even our handcrafted PID controller for which we took the first set of parameters that somehow works widely outperforms our learnt policies, an industry controller is even better. This result in itself is notable, because it needed a whole set of additions to plain \ac{DDPG} to get first sensible results on our windturbine environment. So apparently, our windturbine simulation is more complex to learn than the OpenAI gym examples, which are usually used as benchmarks for \ac{RL} performance, or we are having errors in our programme. As the final product we developped is close to \cite{fujimotoAddressingFunctionApproximation2018} and has improvements from a wide variety of papers, we conclude that tackling wind turbine control with \ac{RL} will need more research. Though we were not able to outperform industry controllers, the speed in which the area of \ac{RL} is advancing makes us hopeful to achieve good results in the near future. With our work on integrating qblade, we provided an open-source, accessible framework to develop future reinforcement learning controllers for wind turbines. 
 
 \section{First working version}
+
+Our model consists of the DDPG algorithm with following additions:
+We integrated prioritized experience replay to
+
 How we achieved first successes, hparams, etc
 
 \section{HParam tuning}

@@ -290,13 +290,16 @@ class BasicBuffer:
         else:
             return self.buffer[0:self.iterator]
 
-    def sample(self, batch_size):
+    def sample(self, batch_size, uniform=False):
         if(len(self.buffer) == 0):
             return [], [], [], [], [], []
 
 
-        # Sample according to priorities
-        indices = [self.priorities.sample() for _ in range(0, batch_size)]
+        # Sample according to priorities or uniformly
+        if(not uniform):
+            indices = [self.priorities.sample() for _ in range(0, batch_size)]
+        else:
+            indices = np.random.choice(len(self), batch_size)
 
         # Convert indices to lists of individual batches
         batch = self.buffer[indices]
@@ -304,7 +307,6 @@ class BasicBuffer:
         state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*batch)
 
         return (state_batch, action_batch, reward_batch, next_state_batch, done_batch, indices)
-
 
     def sample_sequence(self, batch_size):
         state_batch = []
@@ -379,10 +381,11 @@ class BasicBuffer:
 
 class QBladeLogger:
 
-    def __init__(self, logdir, log_steps):
+    def __init__(self, logdir, log_steps, run_name):
         self.logdir = logdir
         self.log_steps = log_steps
-        self.writer = SummaryWriter(logdir + '/' + str(datetime.now()))
+        run_name = run_name if run_name else str(datetime.now())
+        self.writer = SummaryWriter('%s/%s' % (logdir, run_name))
 
     def logObservation(self, step, observation, prefix='obs'):
         labels = {

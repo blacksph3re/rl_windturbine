@@ -12,18 +12,18 @@ import os
   {"id": 5, "batch_size": 256},
 ]'''
 
-'''experiments = [
-  {"id": 6, "critic_lr": 1e-2},
-  {"id": 7, "critic_lr": 1e-3},
-  {"id": 8, "critic_lr": 1e-5},
-  {"id": 9, "critic_lr": 1e-6},
-  {"id": 10, "actor_lr": 1e-2},
-  {"id": 10, "actor_lr": 1e-3},
-  {"id": 10, "actor_lr": 1e-5},
-  {"id": 10, "actor_lr": 1e-6},
-]'''
-
 experiments = [
+  {"id": 30, "critic_lr": 1e-2},
+  {"id": 31, "critic_lr": 1e-3},
+  {"id": 32, "critic_lr": 1e-5},
+  {"id": 33, "critic_lr": 1e-6},
+  {"id": 34, "actor_lr": 1e-2},
+  {"id": 35, "actor_lr": 1e-3},
+  {"id": 36, "actor_lr": 1e-5},
+  {"id": 37, "actor_lr": 1e-6},
+]
+
+'''experiments = [
   {"id": 11, "twin_critics": True},
   {"id": 12, "twin_critics": True, "critic_loss": 'mse'},
   {"id": 13, "critic_simple": False},
@@ -41,7 +41,9 @@ experiments = [
   {"id": 25, "gamma": 0.999},
   {"id": 26, "gamma": 0.9999},
   {"id": 27, "gamma": 0.8},
-]
+]'''
+
+
 
 
 def run_one(experiment):
@@ -53,6 +55,7 @@ def run_one(experiment):
 
   experiment['test_output'] = test_output
   experiment['checkpoint_dir'] = checkpoint_dir
+  experiment['run_name'] = 'id%d' % id
 
   os.makedirs(checkpoint_dir, exist_ok=True)
 
@@ -72,7 +75,7 @@ def run_one(experiment):
     return (id, -1, -1)
 
 # Set the number of parallel runs here
-pool = Pool(1)
+pool = Pool(2)
 results = pool.map(run_one, experiments)
 
 for (id, reward, deaths) in results:

@@ -235,3 +235,6 @@ nicht so sehr Tagebuch-style, die aktuelle Experimentations-Sektion komplett ein
 
 Mehr Bilder
 
+### **11/29**
+
+I found that PER actually does a lot to finding good solutions. Furthermore I found out, that my implementation disregarded importance sampling, and I am correcting that now.
