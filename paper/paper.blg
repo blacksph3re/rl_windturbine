@@ -8,7 +8,6 @@ Warning--entry type for "DeepDeterministicPolicy" isn't style-file defined
 --line 2 of file literatur.bib
 Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
 --line 150 of file literatur.bib
-Warning--I didn't find a database entry for "degrisOffPolicyActorCritic2013"
 Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
 Warning--to sort, need author or key in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
@@ -20,6 +19,7 @@ Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
 Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
 Warning--Es gibt einen Jahrgang, aber kein Jahr in cobbeQuantifyingGeneralizationReinforcement2019
 Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
+Warning--Es gibt einen Jahrgang, aber kein Jahr in degrisOffPolicyActorCritic2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
 Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
@@ -35,45 +35,45 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
 Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
 Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
-You've used 22 entries,
+You've used 23 entries,
             3183 wiz_defined-function locations,
-            758 strings with 9088 characters,
-and the built_in function-call counts, 17323 in all, are:
-= -- 1844
-> -- 594
-< -- 646
-+ -- 760
-- -- 235
-* -- 1287
-:= -- 3120
-add.period$ -- 21
-call.type$ -- 22
-change.case$ -- 148
-chr.to.int$ -- 22
-cite$ -- 48
-duplicate$ -- 364
-empty$ -- 881
-format.name$ -- 316
-if$ -- 3132
+            760 strings with 9174 characters,
+and the built_in function-call counts, 17955 in all, are:
+= -- 1911
+> -- 619
+< -- 674
++ -- 794
+- -- 245
+* -- 1325
+:= -- 3240
+add.period$ -- 22
+call.type$ -- 23
+change.case$ -- 154
+chr.to.int$ -- 23
+cite$ -- 50
+duplicate$ -- 379
+empty$ -- 907
+format.name$ -- 329
+if$ -- 3239
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 22
-newline$ -- 127
-num.names$ -- 63
-pop$ -- 233
+missing$ -- 23
+newline$ -- 132
+num.names$ -- 66
+pop$ -- 244
 preamble$ -- 1
-purify$ -- 192
+purify$ -- 200
 quote$ -- 0
-skip$ -- 783
+skip$ -- 821
 stack$ -- 0
-substring$ -- 1600
-swap$ -- 103
-text.length$ -- 103
+substring$ -- 1639
+swap$ -- 106
+text.length$ -- 106
 text.prefix$ -- 4
 top$ -- 0
-type$ -- 168
-warning$ -- 25
-while$ -- 158
-width$ -- 27
-write$ -- 273
+type$ -- 176
+warning$ -- 26
+while$ -- 164
+width$ -- 28
+write$ -- 284
 (There were 28 warnings)

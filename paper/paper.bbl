@@ -44,6 +44,12 @@
 
 \newblock \emph{Deep {{Deterministic Policy Gradients Explained}}}
 
+\bibitem[DWS]{degrisOffPolicyActorCritic2013}
+\textsc{Degris}, Thomas ; \textsc{White}, Martha  ; \textsc{Sutton},
+  Richard~S.:
+\newblock Off-{{Policy Actor}}-{{Critic}}.
+\newblock
+
 \bibitem[FHM]{fujimotoAddressingFunctionApproximation2018}
 \textsc{Fujimoto}, Scott ; \textsc{van Hoof}, Herke  ; \textsc{Meger}, David:
 \newblock Addressing {{Function Approximation Error}} in {{Actor}}-{{Critic

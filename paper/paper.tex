@@ -202,7 +202,7 @@ Some terms which we use
   \item \textbf{Policy} A function that maps from states to actions. There are deterministic policies $\mu: S -> A$ and stochastic policies $\pi: S -> P(A)$.
   \item \textbf{Return} A return with respect of a policy and a starting state s gives the accumulative reward of following that policy from state s until the future. $R_{\pi}(s_t) = \mathbb{E}_{s_i \sim \varepsilon, a_i \sim \pi, i>t} r(s_i, a_i) $. As we have a stochastic environment and policy, we have to add an expectation term over actions taken and states resulting from those actions. It is the expected accumulative reward of following that policy. Furthermore a return can be discounted or undiscounted. Discounting means we multiply a discounting factor $\gamma \in [0,1]$ to rewards in the fashion of $r_0 \gamma^0 + r_1 \gamma^1 + r_2 \gamma^2 ...$, which results in distant future rewards being weighted less than closer ones.
   \item \textbf{Optimal policy} The theoretical construct of a policy that always takes the best action with respect to accumulative reward. Though we rarely know this policy, there must always be at least one policy which gives the highest returns of all possible policies
-  \item \textbf{Q-Value} The return of taking action a in state s plus the return following a policy after that $Q_{\pi}(s,a) = r(s, a) + \mathbb{E}_{s' \sim \varepsilon} R_{\pi}(s')$
+  \item \textbf{Q-Value} The return of taking action a in state s plus the return following a policy after that $Q_{\pi}(s,a) = r(s, a) + \mathbb{E}_{s' \sim \varepsilon} R_{\pi}(s')$. When following the optimal policy, we simply write $Q(s,a)$.
   \item \textbf{Trajectory} A trajectory is a sequence of states and actions $(s_0, a_0, s_1, ..., a_{i-1}, s_i)$
 \end{itemize}
 
@@ -211,7 +211,7 @@ Some terms which we use
 At first we will present a very basic algorithm for a machine learning agent, which is based on the basic Bellman-Equation \cite{bellmanTheoryDynamicProgramming1954}. It is proven, that
 
 \begin{equation}
-Q*(s, a) = \mathbb{E}_{s' \sim \varepsilon | s,a}[r(s,a) + \gamma\max_{a'}Q*(s', a')]
+Q(s, a) = \mathbb{E}_{s' \sim \varepsilon | s,a}[r(s,a) + \gamma\max_{a'}Q(s', a')]
 \end{equation}
 
 converges to the optimal solution when using iterative value updates. I will quickly explain this Bellman Equation. This equation uses the notion of a state-value function, also called Q function. In the Bellman Equation, it describes the total accumulated return until infinity taking an action $a$ in state $s$, receiving reward $r$, ending up in state $s'$ and then following the optimal policy afterwards. $\gamma$ acts as a discounting factor just as in our return function. It is even possible to implement an algorithm from this. We could create a lookup table for all s and a, initialize it all zero and whenever observing a state transition, we could update the table at that state and action after the above notation.
@@ -241,52 +241,77 @@ Thus we just derived a method to train a Q function under the assumption of a po
 
 \subsection{Policy Gradients}
 
-We will at first give an intuitive explanation of a basic algorithm which forms the basis for many modern reinforcement learning algorithms, including the one we chose. The algorithm is called REINFORCE and was originally presented by \cite{williamsSimpleStatisticalGradientfollowing}. Then we will add a Q term to it according to \cite{suttonPolicyGradientMethods} and is called \ac{PG}. \cite{degrisOffPolicyActorCritic2013} generalized that term and made an off-policy version of policy gradients. That version was then used by \cite{silverDeterministicPolicyGradient2013} and the stochastic policy was replaced by a deterministic one, the algorithm was called \ac{DPG}. This algorithm finally lays the basis for \ac{DDPG} by \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, which is what we used until finally optimizing it towards \ac{TD3} \cite{fujimotoAddressingFunctionApproximation2018}.
+We will at first give an intuitive explanation of a basic algorithm which forms the basis for many modern reinforcement learning algorithms, including the one we chose. The algorithm is called \ac{REINFORCE} (no joke) and was originally presented by \cite{williamsSimpleStatisticalGradientfollowing}. Then we will add a Q term to it according to \cite{suttonPolicyGradientMethods} and is called \ac{PG}. \cite{degrisOffPolicyActorCritic2013} generalized that term and made an off-policy version of policy gradients. That version was then used by \cite{silverDeterministicPolicyGradient2013} and the stochastic policy was replaced by a deterministic one, the algorithm was called \ac{DPG}. This algorithm finally lays the basis for \ac{DDPG} by \cite{lillicrapCONTINUOUSCONTROLDEEP2015}, which is what we used until finally optimizing it towards \ac{TD3} \cite{fujimotoAddressingFunctionApproximation2018}.
 
-Let's assume we have a probablistic policy $\pi: S \rightarrow P(A)$ which is parametrized by $\theta$. An intuitive way of improving this policy could be to increase the gradient of the best possible action $a^*$ for a state $s$:
+Let's assume we have a probablistic policy $\pi: S \rightarrow P(A)$ which is parametrized by $\theta$. An intuitive way of improving this policy could be to increase the gradient proportional to the reward an action yielded:
 \begin{equation}
-\theta_{i+1} = \theta_i + \alpha \Delta \pi_{\theta_i}(a^*|s)
+\theta_{i+1} = \theta_i + \alpha r(s,a) \Delta \pi_{\theta_i}(a|s)
 \end{equation}
-We could do this for all states we see and would end up with an iterative way of improving our policy. However, we might not know the best action for any state. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. So, with our newly gained Q, for all actions and states, do
+We could do this for all states we see and would end up with an iterative way of improving our policy. In fact, this is similar to the \ac{REINFORCE} algorithm (if we add our importance sampling trick from below). However, we might not know rewards for any action, state or have noisy rewards. Luckily, we derived Q-Learning in the section before and thus have an estimation which action will give which return in this step. So, with our newly gained Q, for all actions and states, do
 \begin{equation}
 \theta_{i+1} = \theta_i + \alpha Q(s, a)\Delta \pi_{\theta_i}(a|s)
 \end{equation}
-This way, actions with higher Q values will receive a higher gradient step, and as Q is constant with respect to $\theta$ we don't have to derive along Q here. Problematic is though, that the Q term we defined before, always took the best possible actions, which could be vastly different from the actions under our policy. Thus, we need to reformulate Q to account for any policy and not just the one which always takes the best action.
+This way, actions with higher Q values will receive a higher gradient step. As Q is constant with respect to $\theta$ we don't have to derive along Q here. Problematic is though, that the Q term we used, always took the best possible actions, which could be vastly different from the actions under our policy. Thus, we need to reformulate Q to account for our policy instead of the optimal policy
 
 \begin{equation}
-Q(s, a) = \mathbb{E}_{s' \sim \varepsilon, a' \sim \pi | s,a}[r + \gamma Q(s', a')]
+Q^{\pi}(s, a) = \mathbb{E}_{s' \sim \varepsilon, a' \sim \pi | s,a}[r + \gamma Q^{\pi}(s', a')]
 \end{equation}
 
-However there is still a problem if we integrate this new Q into our policy updates. We assume that we use the same $\pi$ for exploration while doing training, so this policy is responsible for taking actions in the environment. So let's assume the policy is poorly initialized at the beginning of our training and gives action 1 a probability 4 times as high as action 2, though taking action 2 would yield a 10\% better return in our Q function. Now, as we are taking action 1 4 times as often as action 2, we will also perform gradient updates on action 1 4 times as often in our Monte-Carlo expectation draw. Though each of the gradient steps is smaller due to the Q factor, the higher frequency of updating action 1 will lead to action 1 getting an advantage over action 2 in this update strategy. To correct for this oversampling bias, we could divide the probability of each of the actions from the update term:
+Now, in theory, we can not regard Q as constant with respect to $\theta$ anymore, because it is dependent on the policy. \cite{suttonPolicyGradientMethods} claim though that it can be ommitted and still regarded as constant. However there is still a problem if we integrate this new Q into our policy updates. We assume that we use the same $\pi$ for exploration while doing training, so this policy is responsible for taking actions in the environment and also responsible for which experiences we see during our training. So let's assume the policy is poorly initialized at the beginning of our training and gives action 1 a probability 4 times as high as action 2, though taking action 2 would yield a 10\% better return in our Q function. Now, as we are taking action 1 4 times as often as action 2, we will also perform gradient updates on action 1 4 times as often in our Monte-Carlo expectation draw. Though each of the gradient update steps is smaller due to the lower Q factor, the higher frequency of updating action 1 will lead to action 1 getting an advantage over action 2 in this update strategy. To correct for this oversampling bias, we could employ a trick which is called importance sampling. Because we know the bias from the probability distribution of our policy, we divide that probability from the update term:
 \begin{equation}
-\theta_{i+1} = \theta_i + \alpha Q(s, a) \frac{ \Delta \pi_{\theta_i}(a|s)}{\pi_{\theta_i}(a|s)}
+\theta_{i+1} = \theta_i + \alpha Q^{\pi}(s, a) \frac{ \Delta \pi_{\theta_i}(a|s)}{\pi_{\theta_i}(a|s)}
 \end{equation}
 We might remember from calculus that $\frac{\Delta x}{x} = \Delta \log x$ so we simplify to
 \begin{equation}
-\theta_{i+1} = \theta_i + \alpha Q(s, a) \Delta \log \pi_{\theta_i}(a|s)
+\theta_{i+1} = \theta_i + \alpha Q^{\pi}(s, a) \Delta \log \pi_{\theta_i}(a|s)
 \end{equation}
 
-This update equation is our basic policy gradient equation. In reinforcement-learning, it has proven helpful to do off-policy learning, in which another policy than the one being trained can generate experiences. Thus, we can store past experiences in a replay buffer. And in fact, we were already able to use a replay buffer in the Q learning part. However we lost that again when we introduced our policy to Q learning. If we remember our expectation term, in which actions were sampled from the policy $\mathbb{E}_{a \sim \pi}$. We needed this expectation term, because we were dealing with stochastic policies. If instead learning deterministic policies, we can exclude the term from the equation. 
+This update equation is our basic policy gradient equation.
+
+Before, we ignored for brevity that we are dealing with expectation calculations and that we are doing these updates under a stochastic environment, so to write it down formally correct, we need to introduce the density function of a state under a policy. According to \cite{suttonPolicyGradientMethods}, $d^{\pi}(s) = \lim_{t -> \infty} p(s_t = s | s_0, \pi)$ describes how likely it is to be in state s when following a policy $\pi$ forever, and also according to them this distribution is independent of the starting state $s_0$ and only dependent on the policy and environment. \cite{silverDeterministicPolicyGradient2013} used a discounted version of this, $\rho^{\pi}(s)$, which weights future probabilities less and thus can be described as the probability of being in state s \textit{soon} when following policy $\pi$. Using the discounted version approximates the Monte-Carlo experiments we are doing better than the undiscounted version, as effectively we do not train forever on one constant policy, but change it frequently.
+
+Having this $\rho$, let's write our objective function $J$ which we want to maximize.
+\begin{equation}
+J(\pi) = \int_S \rho^{\pi}(s) \int_A \pi(s, a)Q^{\pi}(s, a) dads = \mathbb{E}_{s \sim \rho^{\pi}, a \sim \pi}[Q^{\pi}(s,a)]
+\end{equation}
+
+We explained intuitively above, and \cite{suttonPolicyGradientMethods} proves that deriving this yields
+\begin{equation}
+\Delta J(\pi) = \mathbb{E}_{s \sim \rho^{\pi}, a \sim \pi}[\Delta \log \pi(a|s)Q^{\pi}(s, a)]
+\end{equation}
+
+
+In reinforcement-learning, it has proven helpful to do off-policy learning, in which another policy than the one being trained can generate experiences. Thus, we can store past experiences in a replay buffer and learn from that. In fact, we were already able to use a replay buffer in the Q learning part. If we wanted to do that on our policy, we would need to correct for the bias of the other policy aswell with importance sampling. However we will not derive stochastic off-policy updates, because using the \ac{DPG} algorithm, this problem is solved.
+
+Additionally to this problem, another problem will be solved by \ac{DPG} as well: If we remember our Q expectation term, in which actions were sampled from the policy $\mathbb{E}_{a \sim \pi}$. We needed this expectation term, because we were dealing with stochastic policies. If instead learning deterministic policies, we can exclude policy expectation from the equation. But before going through all the advantages of deterministic policies, let's first explain it.
+
+\subsection{Deterministic Policy Gradients}
+
+Before \cite{silverDeterministicPolicyGradient2013}, stochastic policies were preferred because the stochastic nature aided exploration and because there was simply no theory on how to derive deterministic policy gradients. The idea behind deterministic policy gradients is to replace the stochastic policy $\pi: S -> P(A)$ with a deterministic one $\mu: S -> A$. Also, we are switching from small finite action spaces to continous action spaces. Now, updating this policy according to the equations above does not work anymore due to two problems. At first and most significantly, above we needed all $a$ or at least some form of maximization to calculate the full gradient of $\pi(a|s)$. This is difficult with a continous action space now. Furthermore our importance sampling trick, our correction for overestimation bias based on the bias of the policy, does not work anymore. We don't now the bias of that policy, because it is deterministic and will yield only a single action for any state. 
+
+So, following the policy gradient has become difficult. However, let's have a look at our Q function. We can replace our stochastic policy with a deterministic one and get
 
 \begin{equation}
 Q^{\mu}(s,a) = \mathbb{E}_{s' \sim \varepsilon | s,a}[r + \gamma Q^{\mu}(s', \mu(s'))]
 \end{equation}
 
-Now, our Q is only dependent on the environment distribution, so when we do our Monte-Carlo experiments to update it, we can take our generated samples from the environment and assume they are modelling the underlying environment. However, by introducing our deterministic policy, we ruined our trick of dividing the probability value of an action from its gradient.
+Now, our Q is only dependent on the environment distribution, not anymore both on $s' \sim \varepsilon, a' \sim \pi$. This is an advantage, because computing only one expectation requires less samples and we do not have to worry for any bias from the policy in Q-updates. When we do our Monte-Carlo experiments to update it, we can take our generated samples from the environment and assume they are modelling the underlying environment.
 
-TODO: deterministic policy gradients
+If we are visualizing our Q as a function of state and action, we get a fully differentiable surface. If we derive this surface along the action dimension, we get a gradient which points in the direction of a better action for this state. We could direcly follow this gradient and calculate our policy update from it:
 
+\begin{equation}
+\theta_{i+1} = \theta_i + \alpha \mathbb{E}_{s \sim \rho^{\mu_{\theta_i}}}[\Delta Q^{\mu_{\theta_i}}(s, \mu_{\theta_i}(s))]
+\end{equation}
 
-\subsection{Deterministic Policy Gradients}
-
+\cite[Theorem 1]{silverDeterministicPolicyGradient2013} proves that this gradient always exists. We now managed to remove any expectation that is related to our action space from our gradient updates. This is beautiful because at first, we do not have to sample over many actions to learn this expectation. But more importantly, this term also works off policy \cite[Section 4.2]{silverDeterministicPolicyGradient2013} and with a Q function that approximates based on any other policy $Q^{\omega}$. So now we can use a replay buffer again and learn from past experiences, though we did not generate them with our policy.
 
 \subsection{DDPG}
 
-\ac{DDPG} is a combination of \ac{DPG} and \ac{DQN}. \cite{lillicrapCONTINUOUSCONTROLDEEP2015} tackle several problems in the two algorithms to combine them. At first, \ac{DQN} updates the Q network parameters based on a target calculated on the Q network parameters. To tackle this, \cite{mnihPlayingAtariDeep2013} introduced a second Q network which they call target network for which the parameters are held constant over a period of updates. After a number of steps, the parameters from the actual Q network are then copied over to the target. In \ac{DDPG}, they instead use soft target updates, where every step, the parameters of the actual network fade over to the target: $\theta_{target} = \tau \theta + (1 - \tau) \theta_{target}$. The fade-over parameter $\tau$ was recommended to be set to a small number like 0.01. Additionally to the target Q-network, they also found that a target policy 
+\ac{DDPG} is a combination of \ac{DPG} and \ac{DQN} with several improvements. \cite{lillicrapCONTINUOUSCONTROLDEEP2015} tackle several problems in the two algorithms to combine them. At first, \ac{DQN} updates the Q network parameters based on a target calculated on the Q network parameters. To tackle this, \cite{mnihPlayingAtariDeep2013} introduced a second Q network which they call target network for which the parameters are held constant over a period of updates. After a number of steps, the parameters from the actual Q network are then copied over to the target. In \ac{DDPG}, they instead use soft target updates, where every step, the parameters of the actual network fade over to the target: $\theta_{target} = \tau \theta + (1 - \tau) \theta_{target}$. The fade-over parameter $\tau$ was recommended to be set to a small number like 0.01. Additionally to the target Q-network, they also found that a target policy improves stability, and they update it the same way as the main policy.
 
 
 \section{RL on windturbines}
-We are aware of one paper \cite{kolterDesignAnalysisLearning2012} which tried RL on windturbines already, we want to dedicate a section to it. The team behind that paper built a miniature model of a windturbine and used a variation of the policy gradient algorithm to control it.
+We are aware of one paper \cite{kolterDesignAnalysisLearning2012} which tried RL on windturbines already, we want to dedicate a section to it. The team behind that paper built a miniature model of a windturbine and used a variation of the \ac{REINFORCE} algorithm to control it.
 
 \chapter{Experimentation}
 
