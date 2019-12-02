@@ -28,6 +28,15 @@
 \newblock {John Wiley \& Sons, Ltd}. --
 \newblock ISBN 978--1--119--99271--4 978--0--470--69975--1
 
+\bibitem[BPS{\etalchar{+}}]{bhatnagarConvergentTemporalDifferenceLearning2009}
+\textsc{Bhatnagar}, Shalabh ; \textsc{Precup}, Doina ; \textsc{Silver}, David ;
+  \textsc{Sutton}, Richard~S. ; \textsc{Maei}, Hamid~R.  ;
+  \textsc{SzepesvÃ¡ri}, Csaba:
+\newblock Convergent {{Temporal}}-{{Difference Learning}} with {{Arbitrary
+  Smooth Function Approximation}}.
+\newblock
+\newblock , S.~9
+
 \bibitem[BW]{berglindFatigueEstimationMethods2014}
 \textsc{Berglind}, J. J.~B. ; \textsc{Wisniewski}, Rafael:
 \newblock Fatigue {{Estimation Methods Comparison}} for {{Wind Turbine
@@ -75,6 +84,11 @@
   \textsc{Scott}, G.
 \newblock \emph{Definition of a 5-{{MW Reference Wind Turbine}} for {{Offshore
   System Development}}}
+
+\bibitem[KB]{kingmaAdamMethodStochastic2017}
+\textsc{Kingma}, Diederik~P. ; \textsc{Ba}, Jimmy:
+\newblock Adam: {{A Method}} for {{Stochastic Optimization}}.
+\newblock
 
 \bibitem[KJT]{kolterDesignAnalysisLearning2012}
 \textsc{Kolter}, J.~Z. ; \textsc{Jackowski}, Z.  ; \textsc{Tedrake}, R.:

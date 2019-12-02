@@ -7,45 +7,45 @@
 \contentsline {section}{\numberline {3.2}QBlade}{6}{section.3.2}% 
 \contentsline {section}{\numberline {3.3}Reinforcement learning}{8}{section.3.3}% 
 \contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{8}{subsection.3.3.1}% 
-\contentsline {subsection}{\numberline {3.3.2}Definitions}{9}{subsection.3.3.2}% 
-\contentsline {subsection}{\numberline {3.3.3}Q-Learning}{11}{subsection.3.3.3}% 
+\contentsline {subsection}{\numberline {3.3.2}Definitions}{10}{subsection.3.3.2}% 
+\contentsline {subsection}{\numberline {3.3.3}Q-Learning}{10}{subsection.3.3.3}% 
 \contentsline {subsection}{\numberline {3.3.4}Policy Gradients}{12}{subsection.3.3.4}% 
 \contentsline {subsection}{\numberline {3.3.5}Deterministic Policy Gradients}{14}{subsection.3.3.5}% 
 \contentsline {subsection}{\numberline {3.3.6}DDPG}{15}{subsection.3.3.6}% 
-\contentsline {section}{\numberline {3.4}RL on windturbines}{16}{section.3.4}% 
-\contentsline {chapter}{\numberline {4}Experimentation}{17}{chapter.4}% 
-\contentsline {section}{\numberline {4.1}Gym Experiments}{17}{section.4.1}% 
-\contentsline {section}{\numberline {4.2}Starting with qblade}{17}{section.4.2}% 
-\contentsline {section}{\numberline {4.3}Designing reward functions}{18}{section.4.3}% 
-\contentsline {section}{\numberline {4.4}Aiding exploration}{20}{section.4.4}% 
-\contentsline {subsection}{\numberline {4.4.1}Action Noise}{20}{subsection.4.4.1}% 
-\contentsline {subsection}{\numberline {4.4.2}Random exploration}{20}{subsection.4.4.2}% 
-\contentsline {subsection}{\numberline {4.4.3}Parameter noise}{21}{subsection.4.4.3}% 
-\contentsline {section}{\numberline {4.5}Zero Gradients}{21}{section.4.5}% 
-\contentsline {subsection}{\numberline {4.5.1}Simplifying the architecture}{21}{subsection.4.5.1}% 
-\contentsline {subsection}{\numberline {4.5.2}Normalization}{21}{subsection.4.5.2}% 
-\contentsline {section}{\numberline {4.6}High action gradients}{22}{section.4.6}% 
-\contentsline {subsection}{\numberline {4.6.1}Gradient actionspace}{22}{subsection.4.6.1}% 
-\contentsline {subsection}{\numberline {4.6.2}Feeding past timesteps}{22}{subsection.4.6.2}% 
-\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{23}{subsection.4.6.3}% 
-\contentsline {subsection}{\numberline {4.6.4}Pretraining the policy}{23}{subsection.4.6.4}% 
-\contentsline {section}{\numberline {4.7}Other improvements}{23}{section.4.7}% 
-\contentsline {subsection}{\numberline {4.7.1}Prioritized experience replay}{23}{subsection.4.7.1}% 
-\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{24}{subsection.4.7.2}% 
-\contentsline {section}{\numberline {4.8}Exploding Q-Loss}{24}{section.4.8}% 
-\contentsline {subsection}{\numberline {4.8.1}Huber loss}{24}{subsection.4.8.1}% 
-\contentsline {subsection}{\numberline {4.8.2}Double critic}{25}{subsection.4.8.2}% 
-\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{25}{subsection.4.8.3}% 
-\contentsline {section}{\numberline {4.9}Automatized hyperparameter search}{25}{section.4.9}% 
-\contentsline {chapter}{\numberline {5}Evaluation}{26}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}First working version}{26}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}HParam tuning}{26}{section.5.2}% 
-\contentsline {section}{\numberline {5.3}Comparison to industry controllers}{27}{section.5.3}% 
-\contentsline {chapter}{\numberline {6}Future work}{28}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Reward functions}{28}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}Switch reward functions during training}{28}{section.6.2}% 
-\contentsline {section}{\numberline {6.3}Expert policy training}{28}{section.6.3}% 
-\contentsline {section}{\numberline {6.4}Expert policy in instable conditions}{29}{section.6.4}% 
-\contentsline {section}{\numberline {6.5}Active control elements}{29}{section.6.5}% 
-\contentsline {chapter}{\numberline {7}Conclusion}{30}{chapter.7}% 
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{31}{chapter*.7}% 
+\contentsline {section}{\numberline {3.4}RL on windturbines}{17}{section.3.4}% 
+\contentsline {chapter}{\numberline {4}Experimentation}{18}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}Gym Experiments}{18}{section.4.1}% 
+\contentsline {section}{\numberline {4.2}Starting with qblade}{18}{section.4.2}% 
+\contentsline {section}{\numberline {4.3}Designing reward functions}{19}{section.4.3}% 
+\contentsline {section}{\numberline {4.4}Aiding exploration}{21}{section.4.4}% 
+\contentsline {subsection}{\numberline {4.4.1}Action Noise}{21}{subsection.4.4.1}% 
+\contentsline {subsection}{\numberline {4.4.2}Random exploration}{21}{subsection.4.4.2}% 
+\contentsline {subsection}{\numberline {4.4.3}Parameter noise}{22}{subsection.4.4.3}% 
+\contentsline {section}{\numberline {4.5}Zero Gradients}{22}{section.4.5}% 
+\contentsline {subsection}{\numberline {4.5.1}Simplifying the architecture}{22}{subsection.4.5.1}% 
+\contentsline {subsection}{\numberline {4.5.2}Normalization}{22}{subsection.4.5.2}% 
+\contentsline {section}{\numberline {4.6}High action gradients}{23}{section.4.6}% 
+\contentsline {subsection}{\numberline {4.6.1}Gradient actionspace}{23}{subsection.4.6.1}% 
+\contentsline {subsection}{\numberline {4.6.2}Feeding past timesteps}{23}{subsection.4.6.2}% 
+\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{24}{subsection.4.6.3}% 
+\contentsline {subsection}{\numberline {4.6.4}Pretraining the policy}{24}{subsection.4.6.4}% 
+\contentsline {section}{\numberline {4.7}Other improvements}{24}{section.4.7}% 
+\contentsline {subsection}{\numberline {4.7.1}Prioritized experience replay}{24}{subsection.4.7.1}% 
+\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{25}{subsection.4.7.2}% 
+\contentsline {section}{\numberline {4.8}Exploding Q-Loss}{25}{section.4.8}% 
+\contentsline {subsection}{\numberline {4.8.1}Huber loss}{25}{subsection.4.8.1}% 
+\contentsline {subsection}{\numberline {4.8.2}Double critic}{26}{subsection.4.8.2}% 
+\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{26}{subsection.4.8.3}% 
+\contentsline {section}{\numberline {4.9}Automatized hyperparameter search}{26}{section.4.9}% 
+\contentsline {chapter}{\numberline {5}Evaluation}{27}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}First working version}{27}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}HParam tuning}{27}{section.5.2}% 
+\contentsline {section}{\numberline {5.3}Comparison to industry controllers}{28}{section.5.3}% 
+\contentsline {chapter}{\numberline {6}Future work}{29}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Reward functions}{29}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Switch reward functions during training}{29}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Expert policy training}{29}{section.6.3}% 
+\contentsline {section}{\numberline {6.4}Expert policy in instable conditions}{30}{section.6.4}% 
+\contentsline {section}{\numberline {6.5}Active control elements}{30}{section.6.5}% 
+\contentsline {chapter}{\numberline {7}Conclusion}{31}{chapter.7}% 
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{32}{chapter*.7}% 

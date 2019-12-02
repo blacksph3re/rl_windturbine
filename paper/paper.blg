@@ -16,6 +16,7 @@ Warning--empty edition in bishopNeuralNetworksPattern1995
 Warning--Es gibt nur eine Verlagsangabe in bishopNeuralNetworksPattern1995
 Warning--empty edition in burtonWindEnergyHandbook2011
 Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
+Warning--Es gibt einen Jahrgang, aber kein Jahr in bhatnagarConvergentTemporalDifferenceLearning2009
 Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
 Warning--Es gibt einen Jahrgang, aber kein Jahr in cobbeQuantifyingGeneralizationReinforcement2019
 Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
@@ -23,6 +24,7 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in degrisOffPolicyActorCritic201
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
 Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
+Warning--Es gibt einen Jahrgang, aber kein Jahr in kingmaAdamMethodStochastic2017
 Warning--empty booktitle in kolterDesignAnalysisLearning2012
 Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
 Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
@@ -35,45 +37,45 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
 Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
 Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
-You've used 23 entries,
+You've used 25 entries,
             3183 wiz_defined-function locations,
-            760 strings with 9174 characters,
-and the built_in function-call counts, 17955 in all, are:
-= -- 1911
-> -- 619
-< -- 674
-+ -- 794
-- -- 245
-* -- 1325
-:= -- 3240
-add.period$ -- 22
-call.type$ -- 23
-change.case$ -- 154
-chr.to.int$ -- 23
-cite$ -- 50
-duplicate$ -- 379
-empty$ -- 907
-format.name$ -- 329
-if$ -- 3239
+            768 strings with 9630 characters,
+and the built_in function-call counts, 19441 in all, are:
+= -- 2068
+> -- 678
+< -- 745
++ -- 877
+- -- 269
+* -- 1423
+:= -- 3522
+add.period$ -- 24
+call.type$ -- 25
+change.case$ -- 168
+chr.to.int$ -- 25
+cite$ -- 54
+duplicate$ -- 412
+empty$ -- 964
+format.name$ -- 359
+if$ -- 3488
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 23
-newline$ -- 132
-num.names$ -- 66
-pop$ -- 244
+missing$ -- 25
+newline$ -- 143
+num.names$ -- 72
+pop$ -- 267
 preamble$ -- 1
-purify$ -- 200
+purify$ -- 218
 quote$ -- 0
-skip$ -- 821
+skip$ -- 908
 stack$ -- 0
-substring$ -- 1639
-swap$ -- 106
-text.length$ -- 106
+substring$ -- 1734
+swap$ -- 115
+text.length$ -- 115
 text.prefix$ -- 4
 top$ -- 0
-type$ -- 176
-warning$ -- 26
-while$ -- 164
-width$ -- 28
-write$ -- 284
-(There were 28 warnings)
+type$ -- 192
+warning$ -- 28
+while$ -- 179
+width$ -- 30
+write$ -- 308
+(There were 30 warnings)
