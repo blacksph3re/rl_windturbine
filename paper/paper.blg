@@ -4,12 +4,10 @@ The top-level auxiliary file: paper.aux
 The style file: alphadin.bst
 Reallocated singl_function (elt_size=8) to 100 items from 50.
 Database file #1: literatur.bib
-Warning--entry type for "DeepDeterministicPolicy" isn't style-file defined
---line 2 of file literatur.bib
 Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
 --line 150 of file literatur.bib
 Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
-Warning--to sort, need author or key in DeepDeterministicPolicy
+Warning--Es gibt einen Jahrgang, aber kein Jahr in agarapDeepLearningUsing2019
 Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in bellmanTheoryDynamicProgramming1954
 Warning--empty edition in bishopNeuralNetworksPattern1995
@@ -19,17 +17,19 @@ Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
 Warning--Es gibt einen Jahrgang, aber kein Jahr in bhatnagarConvergentTemporalDifferenceLearning2009
 Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
 Warning--Es gibt einen Jahrgang, aber kein Jahr in cobbeQuantifyingGeneralizationReinforcement2019
-Warning--Weder Verfasser noch Hrsg. in DeepDeterministicPolicy
 Warning--Es gibt einen Jahrgang, aber kein Jahr in degrisOffPolicyActorCritic2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
+Warning--Es gibt einen Jahrgang, aber kein Jahr in vanhasseltLearningValuesMany2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
 Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
+Warning--Es gibt einen Jahrgang, aber kein Jahr in houImprovingDDPGPrioritized
 Warning--Es gibt einen Jahrgang, aber kein Jahr in kingmaAdamMethodStochastic2017
 Warning--empty booktitle in kolterDesignAnalysisLearning2012
 Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
 Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReactive1990
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihPlayingAtariDeep2013
+Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihHumanlevelControlDeep2015
 Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
 Warning--Es gibt einen Jahrgang, aber kein Jahr in silverDeterministicPolicyGradient2013
@@ -37,45 +37,46 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
 Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
 Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
-You've used 25 entries,
+Warning--Es gibt einen Jahrgang, aber kein Jahr in zhaExperienceReplayOptimization2019
+You've used 29 entries,
             3183 wiz_defined-function locations,
-            768 strings with 9630 characters,
-and the built_in function-call counts, 19441 in all, are:
-= -- 2068
-> -- 678
-< -- 745
-+ -- 877
-- -- 269
-* -- 1423
-:= -- 3522
-add.period$ -- 24
-call.type$ -- 25
-change.case$ -- 168
-chr.to.int$ -- 25
-cite$ -- 54
-duplicate$ -- 412
-empty$ -- 964
-format.name$ -- 359
-if$ -- 3488
-int.to.chr$ -- 1
+            790 strings with 10697 characters,
+and the built_in function-call counts, 24243 in all, are:
+= -- 2569
+> -- 875
+< -- 1001
++ -- 1172
+- -- 347
+* -- 1770
+:= -- 4434
+add.period$ -- 28
+call.type$ -- 29
+change.case$ -- 211
+chr.to.int$ -- 28
+cite$ -- 60
+duplicate$ -- 499
+empty$ -- 1128
+format.name$ -- 468
+if$ -- 4275
+int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 25
-newline$ -- 143
-num.names$ -- 72
-pop$ -- 267
+missing$ -- 30
+newline$ -- 168
+num.names$ -- 87
+pop$ -- 329
 preamble$ -- 1
-purify$ -- 218
+purify$ -- 269
 quote$ -- 0
-skip$ -- 908
+skip$ -- 1179
 stack$ -- 0
-substring$ -- 1734
-swap$ -- 115
-text.length$ -- 115
-text.prefix$ -- 4
+substring$ -- 2099
+swap$ -- 149
+text.length$ -- 151
+text.prefix$ -- 5
 top$ -- 0
-type$ -- 192
-warning$ -- 28
-while$ -- 179
-width$ -- 30
-write$ -- 308
-(There were 30 warnings)
+type$ -- 224
+warning$ -- 31
+while$ -- 228
+width$ -- 35
+write$ -- 362
+(There were 32 warnings)

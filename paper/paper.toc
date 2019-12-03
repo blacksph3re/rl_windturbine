@@ -17,7 +17,7 @@
 \contentsline {section}{\numberline {4.1}Gym Experiments}{18}{section.4.1}% 
 \contentsline {section}{\numberline {4.2}Starting with qblade}{18}{section.4.2}% 
 \contentsline {section}{\numberline {4.3}Designing reward functions}{19}{section.4.3}% 
-\contentsline {section}{\numberline {4.4}Aiding exploration}{21}{section.4.4}% 
+\contentsline {section}{\numberline {4.4}Aiding exploration}{20}{section.4.4}% 
 \contentsline {subsection}{\numberline {4.4.1}Action Noise}{21}{subsection.4.4.1}% 
 \contentsline {subsection}{\numberline {4.4.2}Random exploration}{21}{subsection.4.4.2}% 
 \contentsline {subsection}{\numberline {4.4.3}Parameter noise}{22}{subsection.4.4.3}% 
@@ -27,25 +27,27 @@
 \contentsline {section}{\numberline {4.6}High action gradients}{23}{section.4.6}% 
 \contentsline {subsection}{\numberline {4.6.1}Gradient actionspace}{23}{subsection.4.6.1}% 
 \contentsline {subsection}{\numberline {4.6.2}Feeding past timesteps}{23}{subsection.4.6.2}% 
-\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{24}{subsection.4.6.3}% 
+\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{23}{subsection.4.6.3}% 
 \contentsline {subsection}{\numberline {4.6.4}Pretraining the policy}{24}{subsection.4.6.4}% 
 \contentsline {section}{\numberline {4.7}Other improvements}{24}{section.4.7}% 
 \contentsline {subsection}{\numberline {4.7.1}Prioritized experience replay}{24}{subsection.4.7.1}% 
-\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{25}{subsection.4.7.2}% 
-\contentsline {section}{\numberline {4.8}Exploding Q-Loss}{25}{section.4.8}% 
-\contentsline {subsection}{\numberline {4.8.1}Huber loss}{25}{subsection.4.8.1}% 
-\contentsline {subsection}{\numberline {4.8.2}Double critic}{26}{subsection.4.8.2}% 
-\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{26}{subsection.4.8.3}% 
-\contentsline {section}{\numberline {4.9}Automatized hyperparameter search}{26}{section.4.9}% 
-\contentsline {chapter}{\numberline {5}Evaluation}{27}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}First working version}{27}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}HParam tuning}{27}{section.5.2}% 
-\contentsline {section}{\numberline {5.3}Comparison to industry controllers}{28}{section.5.3}% 
-\contentsline {chapter}{\numberline {6}Future work}{29}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Reward functions}{29}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}Switch reward functions during training}{29}{section.6.2}% 
-\contentsline {section}{\numberline {6.3}Expert policy training}{29}{section.6.3}% 
-\contentsline {section}{\numberline {6.4}Expert policy in instable conditions}{30}{section.6.4}% 
-\contentsline {section}{\numberline {6.5}Active control elements}{30}{section.6.5}% 
-\contentsline {chapter}{\numberline {7}Conclusion}{31}{chapter.7}% 
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{32}{chapter*.7}% 
+\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{26}{subsection.4.7.2}% 
+\contentsline {section}{\numberline {4.8}Exploding Q-Loss}{26}{section.4.8}% 
+\contentsline {subsection}{\numberline {4.8.1}Huber loss}{27}{subsection.4.8.1}% 
+\contentsline {subsection}{\numberline {4.8.2}Double critic}{27}{subsection.4.8.2}% 
+\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{27}{subsection.4.8.3}% 
+\contentsline {chapter}{\numberline {5}Algorithm}{28}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}QBlade}{28}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Core algorithm}{29}{section.5.2}% 
+\contentsline {chapter}{\numberline {6}Evaluation}{30}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}First working version}{30}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}HParam tuning}{30}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Comparison to industry controllers}{31}{section.6.3}% 
+\contentsline {chapter}{\numberline {7}Future work}{32}{chapter.7}% 
+\contentsline {section}{\numberline {7.1}Reward functions}{32}{section.7.1}% 
+\contentsline {section}{\numberline {7.2}Switch reward functions during training}{32}{section.7.2}% 
+\contentsline {section}{\numberline {7.3}Expert policy training}{32}{section.7.3}% 
+\contentsline {section}{\numberline {7.4}Expert policy in instable conditions}{33}{section.7.4}% 
+\contentsline {section}{\numberline {7.5}Active control elements}{33}{section.7.5}% 
+\contentsline {chapter}{\numberline {8}Conclusion}{34}{chapter.8}% 
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{35}{chapter*.7}% 

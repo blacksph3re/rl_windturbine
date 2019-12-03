@@ -27,15 +27,11 @@ class QBladeAdapter:
 
     print("loading qblade library")
     qbladeLib = ctypes.CDLL('../qblade_build/libQBlade.so')
-
-
     self._qbladeLib = qbladeLib
-
     self.map_functions(qbladeLib)
 
     print("creating qblade instance")
     self._qbladeLib._Z14createInstancev()
-
     self.load_default_project()
 
     print("qblade init done")
@@ -66,17 +62,21 @@ class QBladeAdapter:
     x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
     print("loading qblade project")
     self._loadProject(x)
+    self.steps_since_reload = 0
 
   def reset(self):
     print('Resetting simulation')
+    if(self.steps_since_reload>100000):
+      self.load_default_project()
     self._initializeSimulation(ctypes.c_int(0))
     self.lastAction = np.zeros(5)
     self.storeAction(np.zeros(self.get_act_dim()))
 
     # Do some steps with zero action
-    #action = np.zeros(self.get_act_dim())
-    #for i in range(0, 5):
-    #  self.step(action)
+    action = np.zeros(self.get_act_dim())
+    self.storeAction(action)
+    for i in range(0, 100):
+      self._advanceSingleTimestep()
 
     print('reset done')
 
@@ -101,7 +101,7 @@ class QBladeAdapter:
     return [0, 0]
 
   def get_act_max_grad(self):
-    return [3e5, 0.5]
+    return [3e4, 0.5]
 
 
   def calc_reward(self, observation, action, death):
@@ -121,7 +121,9 @@ class QBladeAdapter:
     return 1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty
 
   def calc_death(self, observation):
-    # If there are nan values, accumulate, after a few, die
+    # If there are nan values, accumulate, after a few, reload
+    self.steps_since_reload += np.sum(np.isnan(observation)) * 100
+
     if(np.any(np.isnan(observation))):
       return True
 
@@ -164,6 +166,7 @@ class QBladeAdapter:
     return np.array(obs[0:2])
 
   def step(self, action):
+    self.steps_since_reload += 1
 
     self.storeAction(action)
     self._advanceSingleTimestep()

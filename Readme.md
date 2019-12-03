@@ -237,4 +237,37 @@ Mehr Bilder
 
 ### **11/29**
 
-I found that PER actually does a lot to finding good solutions. Furthermore I found out, that my implementation disregarded importance sampling, and I am correcting that now.
+I found that PER actually does a lot to finding good solutions. Furthermore I found out, that my implementation disregarded importance sampling, and I am correcting that now. Also, I read that against exploding q losses, the DDPG authors clipped the td-error. I implemented that as well.
+
+### **12/01**
+
+I noticed how the policy has a lot of problems spinning up the turbine, and in fact you need to set the action to exactly zero at that state and wait a while for it to spin up. I had the idea to use the expert policy now in extreme situations like 0 rotation or very high rotation and only give control to the RL controller in legit areas.
+
+It would be interesting to plot the Q function. For this I could calculate an embedding of both the action and state space down to a 1-dimensional value and plot the Q values for these datapoints on a plane
+
+### **12/02**
+
+I had an idea today where I could split the qblade part from network training. As the network trains on the replay buffer anyways and doesn't need to do that online, I could have several instances of qblade with either a random, an expert or a learnt policy running, generating experiences, a message broker in the middle and several trainings running on the accumulated replay buffers from the message broker. The trainings could also hand their policies to the message broker and let them run for a while. Doing all this communication via a tcp interface will allow running the things on different computers. That'd be fucking cool. 
+
+sim -> broker:
+
+sim ready - broker sends policy and linkedness parameter a
+
+sim step (data) -> broker
+  broker -> sim either new policy or just "keep going"
+only do this every a steps and assume "keep going" until then.
+
+
+train -> broker:
+
+train ready - training subscribes to broker either as
+  - follow a specific policy and send updates to that policy (linked training)
+  - follow all policies (unlinked training)
+  - evaluate a policy (eval mode)
+
+linked training can have a linkedness factor - every a steps link sim with broker and every b steps link training with broker.
+
+train step
+  train -> broker train sends his new policy (in linked mode) and training metrics to the broker 
+  broker -> train sends new replay buffer updates
+This is also done only every b steps

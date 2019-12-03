@@ -81,6 +81,7 @@ def main():
 
     if(reset):
       o = env.reset()
+      print('Reset at step %d' % t)
       a = agent.reset_finalize(o)
 
   # Run a test run after training if wanted

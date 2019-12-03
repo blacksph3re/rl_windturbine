@@ -12,17 +12,6 @@ import os
   {"id": 5, "batch_size": 256},
 ]'''
 
-experiments = [
-  {"id": 30, "critic_lr": 1e-2},
-  {"id": 31, "critic_lr": 1e-3},
-  {"id": 32, "critic_lr": 1e-5},
-  {"id": 33, "critic_lr": 1e-6},
-  {"id": 34, "actor_lr": 1e-2},
-  {"id": 35, "actor_lr": 1e-3},
-  {"id": 36, "actor_lr": 1e-5},
-  {"id": 37, "actor_lr": 1e-6},
-]
-
 '''experiments = [
   {"id": 11, "twin_critics": True},
   {"id": 12, "twin_critics": True, "critic_loss": 'mse'},
@@ -43,7 +32,28 @@ experiments = [
   {"id": 27, "gamma": 0.8},
 ]'''
 
+'''experiments = [
+  {"id": 30, "critic_lr": 1e-2},
+  {"id": 31, "critic_lr": 1e-3},
+  {"id": 32, "critic_lr": 1e-5},
+  {"id": 33, "critic_lr": 1e-6},
+  {"id": 34, "actor_lr": 1e-2},
+  {"id": 35, "actor_lr": 1e-3},
+  {"id": 36, "actor_lr": 1e-5},
+  {"id": 37, "actor_lr": 1e-6},
+]'''
 
+
+experiments = [
+  {"id": 38},
+  {"id": 39},
+  {"id": 40},
+  {"id": 41},
+  {"id": 42},
+  {"id": 43},
+  {"id": 44},
+  {"id": 45},
+]
 
 
 def run_one(experiment):

@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class Critic(nn.Module):
-    def __init__(self, obs_dim, action_dim, hidden_size_1 = 1024, hidden_size_2 = 512, hidden_size_3 = 300, init_w = 0.1, simple = False, batch_normalization = False):
+    def __init__(self, obs_dim, action_dim, hidden_size_1 = 1024, hidden_size_2 = 512, init_w = 0.1, simple = False, batch_normalization = False):
         super(Critic, self).__init__()
 
         self.obs_dim = obs_dim
@@ -15,7 +15,6 @@ class Critic(nn.Module):
         if(batch_normalization):
             self.bn1 = nn.BatchNorm1d(hidden_size_1)
             self.bn2 = nn.BatchNorm1d(hidden_size_2)
-            self.bn3 = nn.BatchNorm1d(hidden_size_3)
         else:
             self.bn1 = lambda x: x
             self.bn2 = lambda x: x
@@ -28,12 +27,10 @@ class Critic(nn.Module):
         else:
             self.linear1 = nn.Linear(self.obs_dim, hidden_size_1)
             self.linear2 = nn.Linear(hidden_size_1 + self.action_dim, hidden_size_2)
-            self.linear3 = nn.Linear(hidden_size_2, hidden_size_3)
-            self.linear4 = nn.Linear(hidden_size_3, 1)
-            print('Initialized Critic with %d, %d, %d, %d, %d' % (self.obs_dim + self.action_dim,
-                                                              hidden_size_1,
+            self.linear3 = nn.Linear(hidden_size_2, 1)
+            print('Initialized Critic with %d, %d, %d, %d' % (self.obs_dim,
+                                                              hidden_size_1 + self.action_dim,
                                                               hidden_size_2,
-                                                              hidden_size_3,
                                                               1))
 
         self.init_weights(init_w)
@@ -44,7 +41,6 @@ class Critic(nn.Module):
 
         if(not self.simple):
             self.linear3.weight.data.uniform_(-init_w, init_w)
-            self.linear4.weight.data.uniform_(-init_w, init_w)
 
     def first_layer(self, x, a):
         if(self.simple):
@@ -56,8 +52,7 @@ class Critic(nn.Module):
         xa = F.relu(self.bn1(self.linear1(x)))
         xa = torch.cat([xa,a], 1)
         xa = F.relu(self.bn2(self.linear2(xa)))
-        xa = F.relu(self.bn3(self.linear3(xa)))
-        qval = self.linear4(xa)
+        qval = self.linear3(xa)
 
         return qval
 

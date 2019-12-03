@@ -393,3 +393,69 @@
   file = {/home/sph3re/Zotero/storage/K8KPX9LC/Kingma and Ba - 2017 - Adam A Method for Stochastic Optimization.pdf;/home/sph3re/Zotero/storage/JQ7BB7T6/1412.html}
 }
 
+@article{agarapDeepLearningUsing2019,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1803.08375},
+  primaryClass = {cs, stat},
+  title = {Deep {{Learning}} Using {{Rectified Linear Units}} ({{ReLU}})},
+  url = {http://arxiv.org/abs/1803.08375},
+  abstract = {We introduce the use of rectified linear units (ReLU) as the classification function in a deep neural network (DNN). Conventionally, ReLU is used as an activation function in DNNs, with Softmax function as their classification function. However, there have been several studies on using a classification function other than Softmax, and this study is an addition to those. We accomplish this by taking the activation of the penultimate layer \$h\_\{n - 1\}\$ in a neural network, then multiply it by weight parameters \$\textbackslash{}theta\$ to get the raw scores \$o\_\{i\}\$. Afterwards, we threshold the raw scores \$o\_\{i\}\$ by \$0\$, i.e. \$f(o) = \textbackslash{}max(0, o\_\{i\})\$, where \$f(o)\$ is the ReLU function. We provide class predictions \$\textbackslash{}hat\{y\}\$ through argmax function, i.e. argmax \$f(x)\$.},
+  urldate = {2019-12-02},
+  date = {2019-02-07},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning,Computer Science - Neural and Evolutionary Computing,Computer Science - Computer Vision and Pattern Recognition},
+  author = {Agarap, Abien Fred},
+  file = {/home/sph3re/Zotero/storage/Q3GEUQBM/Agarap - 2019 - Deep Learning using Rectified Linear Units (ReLU).pdf;/home/sph3re/Zotero/storage/AQSEKQDV/1803.html}
+}
+
+@article{houImprovingDDPGPrioritized,
+  langid = {english},
+  title = {Improving {{DDPG}} via {{Prioritized Experience Replay}}},
+  abstract = {Experience replay plays an important role in reinforcement learning. It reuses previous experiences to prevent the input data from being highly correlated. Recently, a deep reinforcement learning algorithm with experience replay, called deep deterministic policy gradient (DDPG), has achieved good performance in many continuous control tasks. However, it assumes the experiences are of equal importance and samples them uniformly, which obviously neglects the difference in the value of each individual experience. To improve the efficiency of experience replay in DDPG method, we propose to replace the original uniform experience replay with prioritized experience replay. We test the algorithms in five tasks in the OpenAI Gym, a testbed for reinforcement learning algorithms. In the experiment, we find that DDPG with prioritized experience replay mechanism significantly outperforms that with uniform sampling in terms of training time, training stability and final performance. We also find that our algorithm can achieve better performance in three tasks compared with some state-of-the-art algorithms like Q-prop, which directly proves the effectiveness of our proposed scheme. Our weekly report and codes are available at https://github.com/cardwing/Codes-for-RL-Project.},
+  pages = {10},
+  author = {Hou, Yuenan and Zhang, Yi},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/RL_course_report.pdf}
+}
+
+@article{zhaExperienceReplayOptimization2019,
+  langid = {english},
+  title = {Experience {{Replay Optimization}}},
+  abstract = {Experience replay enables reinforcement learning agents to memorize and reuse past experiences, just as humans replay memories for the situation at hand. Contemporary off-policy algorithms either replay past experiences uniformly or utilize a rulebased replay strategy, which may be sub-optimal. In this work, we consider learning a replay policy to optimize the cumulative reward. Replay learning is challenging because the replay memory is noisy and large, and the cumulative reward is unstable. To address these issues, we propose a novel experience replay optimization (ERO) framework which alternately updates two policies: the agent policy, and the replay policy. The agent is updated to maximize the cumulative reward based on the replayed data, while the replay policy is updated to provide the agent with the most useful experiences. The conducted experiments on various continuous control tasks demonstrate the effectiveness of ERO, empirically showing promise in experience replay learning to improve the performance of off-policy reinforcement learning algorithms.},
+  date = {2019-08},
+  pages = {7},
+  author = {Zha, Daochen and Lai, Kwei-Herng and Zhou, Kaixiong and Hu, Xia},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/0589.pdf}
+}
+
+
+@article{vanhasseltLearningValuesMany2016,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1602.07714},
+  primaryClass = {cs, stat},
+  title = {Learning Values across Many Orders of Magnitude},
+  url = {http://arxiv.org/abs/1602.07714},
+  abstract = {Most learning algorithms are not invariant to the scale of the function that is being approximated. We propose to adaptively normalize the targets used in learning. This is useful in value-based reinforcement learning, where the magnitude of appropriate value approximations can change over time when we update the policy of behavior. Our main motivation is prior work on learning to play Atari games, where the rewards were all clipped to a predetermined range. This clipping facilitates learning across many different games with a single learning algorithm, but a clipped reward function can result in qualitatively different behavior. Using the adaptive normalization we can remove this domain-specific heuristic without diminishing overall performance.},
+  urldate = {2019-12-03},
+  date = {2016-08-16},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning,Computer Science - Artificial Intelligence,Computer Science - Neural and Evolutionary Computing},
+  author = {van Hasselt, Hado and Guez, Arthur and Hessel, Matteo and Mnih, Volodymyr and Silver, David},
+  options = {useprefix=true},
+  file = {/home/sph3re/Zotero/storage/9J6QURSP/van Hasselt et al. - 2016 - Learning values across many orders of magnitude.pdf;/home/sph3re/Zotero/storage/E8EFBV7W/1602.html}
+}
+
+@article{mnihHumanlevelControlDeep2015,
+  langid = {english},
+  title = {Human-Level Control through Deep Reinforcement Learning},
+  volume = {518},
+  issn = {0028-0836, 1476-4687},
+  url = {http://www.nature.com/articles/nature14236},
+  doi = {10.1038/nature14236},
+  number = {7540},
+  journaltitle = {Nature},
+  urldate = {2019-12-03},
+  date = {2015-02},
+  pages = {529-533},
+  author = {Mnih, Volodymyr and Kavukcuoglu, Koray and Silver, David and Rusu, Andrei A. and Veness, Joel and Bellemare, Marc G. and Graves, Alex and Riedmiller, Martin and Fidjeland, Andreas K. and Ostrovski, Georg and Petersen, Stig and Beattie, Charles and Sadik, Amir and Antonoglou, Ioannis and King, Helen and Kumaran, Dharshan and Wierstra, Daan and Legg, Shane and Hassabis, Demis},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/nature14236.pdf}
+}

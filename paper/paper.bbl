@@ -1,5 +1,10 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
-\begin{thebibliography}{MWP{\etalchar{+}}}
+\begin{thebibliography}{MKS{\etalchar{+}}b}
+
+\bibitem[Aga]{agarapDeepLearningUsing2019}
+\textsc{Agarap}, Abien~F.:
+\newblock Deep {{Learning}} Using {{Rectified Linear Units}} ({{ReLU}}).
+\newblock
 
 \bibitem[BCP{\etalchar{+}}]{brockmanOpenAIGym2016}
 \textsc{Brockman}, Greg ; \textsc{Cheung}, Vicki ; \textsc{Pettersson}, Ludwig
@@ -49,10 +54,6 @@
 \newblock Quantifying {{Generalization}} in {{Reinforcement Learning}}.
 \newblock
 
-\bibitem[Dee]{DeepDeterministicPolicy}
-
-\newblock \emph{Deep {{Deterministic Policy Gradients Explained}}}
-
 \bibitem[DWS]{degrisOffPolicyActorCritic2013}
 \textsc{Degris}, Thomas ; \textsc{White}, Martha  ; \textsc{Sutton},
   Richard~S.:
@@ -63,6 +64,12 @@
 \textsc{Fujimoto}, Scott ; \textsc{van Hoof}, Herke  ; \textsc{Meger}, David:
 \newblock Addressing {{Function Approximation Error}} in {{Actor}}-{{Critic
   Methods}}.
+\newblock
+
+\bibitem[HGH{\etalchar{+}}]{vanhasseltLearningValuesMany2016}
+\textsc{van Hasselt}, Hado ; \textsc{Guez}, Arthur ; \textsc{Hessel}, Matteo ;
+  \textsc{Mnih}, Volodymyr  ; \textsc{Silver}, David:
+\newblock Learning Values across Many Orders of Magnitude.
 \newblock
 
 \bibitem[HLD]{howlandWindFarmPower2019}
@@ -78,6 +85,12 @@
 \newblock Robust Estimation of a Location Parameter.
 \newblock
 \newblock 35, Nr. 1, S. 73--101
+
+\bibitem[HZ]{houImprovingDDPGPrioritized}
+\textsc{Hou}, Yuenan ; \textsc{Zhang}, Yi:
+\newblock Improving {{DDPG}} via {{Prioritized Experience Replay}}.
+\newblock
+\newblock , S.~10
 
 \bibitem[JBMS]{jonkmanDefinition5MWReference2009}
 \textsc{Jonkman}, J. ; \textsc{Butterfield}, S. ; \textsc{Musial}, W.  ;
@@ -112,12 +125,26 @@
 \newblock 2, Nr. 4, S. 447--457. --
 \newblock ISSN 0899--7667, 1530--888X
 
-\bibitem[MKS{\etalchar{+}}]{mnihPlayingAtariDeep2013}
+\bibitem[MKS{\etalchar{+}}a]{mnihPlayingAtariDeep2013}
 \textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
   ; \textsc{Graves}, Alex ; \textsc{Antonoglou}, Ioannis ; \textsc{Wierstra},
   Daan  ; \textsc{Riedmiller}, Martin:
 \newblock Playing {{Atari}} with {{Deep Reinforcement Learning}}.
 \newblock
+
+\bibitem[MKS{\etalchar{+}}b]{mnihHumanlevelControlDeep2015}
+\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
+  ; \textsc{Rusu}, Andrei~A. ; \textsc{Veness}, Joel ; \textsc{Bellemare},
+  Marc~G. ; \textsc{Graves}, Alex ; \textsc{Riedmiller}, Martin ;
+  \textsc{Fidjeland}, Andreas~K. ; \textsc{Ostrovski}, Georg ;
+  \textsc{Petersen}, Stig ; \textsc{Beattie}, Charles ; \textsc{Sadik}, Amir ;
+  \textsc{Antonoglou}, Ioannis ; \textsc{King}, Helen ; \textsc{Kumaran},
+  Dharshan ; \textsc{Wierstra}, Daan ; \textsc{Legg}, Shane  ;
+  \textsc{Hassabis}, Demis:
+\newblock Human-Level Control through Deep Reinforcement Learning.
+\newblock
+\newblock 518, Nr. 7540, S. 529--533. --
+\newblock ISSN 0028--0836, 1476--4687
 
 \bibitem[MWP{\etalchar{+}}]{martenQBLADEOPENSOURCE2013}
 \textsc{Marten}, D ; \textsc{Wendler}, J ; \textsc{Pechlivanoglou}, G ;
@@ -170,5 +197,12 @@
   Reinforcement Learning.
 \newblock
 \newblock , S.~28
+
+\bibitem[ZLZH]{zhaExperienceReplayOptimization2019}
+\textsc{Zha}, Daochen ; \textsc{Lai}, Kwei-Herng ; \textsc{Zhou}, Kaixiong  ;
+  \textsc{Hu}, Xia:
+\newblock Experience {{Replay Optimization}}.
+\newblock
+\newblock , S.~7
 
 \end{thebibliography}
