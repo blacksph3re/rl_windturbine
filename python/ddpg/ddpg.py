@@ -9,8 +9,7 @@ from datetime import datetime
 from collections import deque
 
 # For hparams
-import tensorflow as tf
-
+from .hparams import HParams
 from .models import Critic, Actor
 from .utils import *
 
@@ -704,7 +703,7 @@ class DDPG:
             "prefix": prefix,
             "time": str(datetime.now()),
             "killcount": self.killcount,
-            "hparams": self.hparams.values(),
+            "hparams": self.hparams.get_dict(),
             "real_last_action": self.real_last_action.tolist() if self.hparams.action_gradients else None,
         }
         with open('%s/%s_metadata' % (directory, prefix), 'w') as f:
@@ -736,7 +735,7 @@ class DDPG:
 
 
     def get_default_hparams():
-        return tf.contrib.training.HParams(
+        return HParams(
             # The name of the run to make identification easier
             run_name = '',
 

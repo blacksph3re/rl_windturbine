@@ -11,6 +11,7 @@ import tensorflow as tf
 import argparse
 import os
 import json
+import time
 
 def main():
 
@@ -68,6 +69,8 @@ def main():
   o = env.reset()
   a = agent.prepare(o)
 
+  execution_time_env = 0
+  execution_time_agent = 0
 
   for t in range(start_time, hparams.steps_per_epoch * hparams.epochs):
     # do a checkpoint if required
@@ -75,9 +78,18 @@ def main():
       file = agent.save_checkpoint(checkpoint_dir)
       print("Checkpoint written to %s" % file)
 
+    start = time.time()
     o, r, d = env.step(a)
-
+    step = time.time()
     a, reset = agent.step(o, r, d)
+    end = time.time()
+    execution_time_env += step - start
+    execution_time_agent += end - step
+
+    if(t%100 == 0):
+      print("Step %d, Execution times env: %f, agent: %f" % (t, execution_time_env, execution_time_agent))
+      execution_time_agent = 0
+      execution_time_env = 0
 
     if(reset):
       o = env.reset()

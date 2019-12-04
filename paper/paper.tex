@@ -165,12 +165,7 @@ Because it has no semantic meaning, we mask away current time from our reinforce
 * pitch blade 3 [deg]
 \end{verbatim}
 
-After a while of experimenting with the unrestricted simulation, we added some bounds to our control parameters. In our final version, we had the following restrictions:
-As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial and in our simulations, wind will always come from the front. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to \num{4e6} Nm.
-Because changing torque from zero to maximum in one timestep is not realistic for a real turbine, we restrict it to move a maximum of \num{3e5} Nm per one timestep of 0.1 seconds. If our agent chooses a value outside of that area, we set it to the closest value inside of that area.
-Blades can be pitched between 0 and 90 degrees, 0 being not pitched out at all and operating at maximum efficiency and 90 resulting in no aerodynamic torque from the rotor whatsoever. A sensible pitch motor can only turn the blades at a limited speed, we assume a limit of 5 degrees per second and again set controller inputs to a sensible value inside that. The simulation theoretically accepts a full pitch change in one timestep, however as inertia on the blade is so high for such a change, the blades break instantly and the rest of the simulation needs to be reset.
-
-QBlade simulates blade damage, also high rotational speeds cause blades to fall off. QBlade is not validated to realistically simulate these extreme conditions and thus posed a problem to our controllers. In the course of our experiments, we decided to reset the simulation at an rotational speed of 4 rad/s, as our turbine operates at ca 0.8 rad/s. Also, high generator torque inputs cause the simulation to rotate the rotor backwards with a negative energy yield, effectively creating a multimillion-dollar leafblower. As this is neither a realistic scenario, we also reset the simulation at -0.5 rad/s. 
+After a while of experimenting with the unrestricted simulation, we added some bounds to our control parameters. Restrictions to our final version are described in section \ref{sec:alg_qblade}.
 
 \section{Reinforcement learning}
 
@@ -215,7 +210,7 @@ J^{\pi} = \mathbb{E}_{s \sim \rho^{\pi}, a \sim \pi}r(s, a) = \int_S \rho^{\pi}(
 \label{equ:maximize_rewards}
 \end{equation}
 
-In other words, we want a very high probability of being in a state ($\rho^{\pi}$) which might give good rewards, and in that state we want a high probability of taking an action ($\pi$) which might give a good reward. In our wind turbine, rewards could for example be the all the costs and incomes summed together, so at every point in time we could count income by energy yield or costs because of maintenance (with our controller more likely costs for rebuilding the entire turbine). But before we choose $\pi$, there is a bit of a problem ahead. We can observe some rewards, but only very few of them. We might know that using 0.3MN of torque at rotational speed 11rpm is a good idea, but how about rotational speed 11.1rpm? We might have never seen that. Also, rotating the turbine at 15rpm might be a good strategy to immediately achieve high power outputs, but we might need to fix our turbine after running this policy for just a few days and incur a heavy penalty. Luckily we have defined Q-Values above. We could use them somehow, so let's discuss how to learn them.
+In other words, we want a very high probability of being in a state ($\rho^{\pi}$) which might give good rewards, and in that state we want a high probability of taking an action ($\pi$) which might give a good reward. In our wind turbine, rewards could for example be the all the costs and incomes summed together, so at every point in time we could count income by energy yield or costs because of maintenance (with our controller more likely costs for rebuilding the entire turbine). This work would be easy if we could directly calculate this equation but clearly, there is a bit of a problem ahead. Firstly, we don't know $\rho$ as we don't exactly know the environment we are modelling. We can observe some rewards, states and actions, but only very few of them. We might then see that using 0.3MN of torque at rotational speed 11rpm yields good energy yield, but how about rotational speed 11.1rpm? We might have never seen that. Also, rotating the turbine at 15rpm might be a good strategy to immediately achieve high power outputs, but we might need to fix our turbine after running this policy for just a few days and incur a heavy penalty. So we don't know how rewards will spread out in the future. Luckily we have defined Q-Values above. We could use them somehow, so let's discuss how to learn them.
 
 \subsection{Q-Learning}
 
@@ -606,6 +601,8 @@ After our experimentation phase, we will present our algorithm, on which we perf
 
 \section{QBlade}
 
+\label{sec:alg_qblade}
+
 As mentioned before, we set the yaw angle to always 0 degrees, as in reality controlling the orientation of the nacelle is trivial and in our simulations, wind will always come from the front. The generator torque on our NREL 5MW turbine has a sensible range of \num{0} to ca \num{4e6} Nm, we used a range of \num{0} to \num{8e6} as action space, as higher torque can be simulated by qblade and this way made it easier for the controller, as it can apply high torques to slow down quickly rotating blades.
 Because changing torque from zero to maximum in one timestep is not realistic for a real turbine, we restrict it to move a maximum of \num{3e5} Nm per one timestep of 0.1 seconds. If our agent chooses a value outside of that area, we set it to the closest value inside of that area.
 Blades can be pitched between 0 and 90 degrees, 0 being not pitched out at all and operating at maximum efficiency and 90 resulting in no aerodynamic torque from the rotor whatsoever. A sensible pitch motor can only turn the blades at a limited speed, we assume a limit of 5 degrees per second and again set controller inputs to a sensible value inside that. The simulation theoretically accepts a full pitch change in one timestep, however as inertia on the blade is so high for such a change, the blades break instantly and the rest of the simulation needs to be reset.
@@ -709,9 +706,13 @@ We tried
 % Switch reward functions during training?
 % Interest from TU Berlin from control elements guy
 
+\section{More computational power}
+
+As we weren't able to solve the problem by our reasoning, we could just implement a huge hyperparameter search. Limiting factor in this is currently the simulation, which currently uses 95\% of the computation time, while we only use 5\% to train our networks.
+
 \section{Train PID inputs}
 
-As PID controllers have proven well in controlling a turbine and neural nets directly performed poorly, we could imagine to predict PID controller parameters instead of directly building the controller. \cite{kolterDesignAnalysisLearning2012} had successes with this approach, and maybe using a more advanced algorithm such as DDPG would result in even better performance.
+As PID controllers have proven well in controlling a turbine and neural nets directly performed poorly, we could imagine to predict PID controller parameters and error targets instead of directly building the controller. 
 
 \section{Reward functions}
 

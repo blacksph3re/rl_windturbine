@@ -7,12 +7,12 @@
 \contentsline {subsection}{\numberline {3.1.1}Why we do what we do}{8}{subsection.3.1.1}% 
 \contentsline {section}{\numberline {3.2}QBlade}{9}{section.3.2}% 
 \contentsline {section}{\numberline {3.3}Reinforcement learning}{11}{section.3.3}% 
-\contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{12}{subsection.3.3.1}% 
-\contentsline {subsection}{\numberline {3.3.2}Definitions}{13}{subsection.3.3.2}% 
+\contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{11}{subsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.3.2}Definitions}{12}{subsection.3.3.2}% 
 \contentsline {subsection}{\numberline {3.3.3}Q-Learning}{14}{subsection.3.3.3}% 
-\contentsline {subsection}{\numberline {3.3.4}Policy Gradients}{16}{subsection.3.3.4}% 
+\contentsline {subsection}{\numberline {3.3.4}Policy Gradients}{15}{subsection.3.3.4}% 
 \contentsline {subsection}{\numberline {3.3.5}Deterministic Policy Gradients}{18}{subsection.3.3.5}% 
-\contentsline {subsection}{\numberline {3.3.6}DDPG}{20}{subsection.3.3.6}% 
+\contentsline {subsection}{\numberline {3.3.6}DDPG}{19}{subsection.3.3.6}% 
 \contentsline {section}{\numberline {3.4}RL on windturbines}{21}{section.3.4}% 
 \contentsline {chapter}{\numberline {4}Experimentation}{24}{chapter.4}% 
 \contentsline {section}{\numberline {4.1}Gym Experiments}{24}{section.4.1}% 
@@ -46,11 +46,12 @@
 \contentsline {section}{\numberline {6.2}HParam tuning}{39}{section.6.2}% 
 \contentsline {section}{\numberline {6.3}Comparison to industry controllers}{40}{section.6.3}% 
 \contentsline {chapter}{\numberline {7}Future work}{41}{chapter.7}% 
-\contentsline {section}{\numberline {7.1}Train PID inputs}{41}{section.7.1}% 
-\contentsline {section}{\numberline {7.2}Reward functions}{41}{section.7.2}% 
-\contentsline {section}{\numberline {7.3}Switch reward functions during training}{41}{section.7.3}% 
-\contentsline {section}{\numberline {7.4}Expert policy training}{41}{section.7.4}% 
-\contentsline {section}{\numberline {7.5}Expert policy in instable conditions}{42}{section.7.5}% 
-\contentsline {section}{\numberline {7.6}Active control elements}{42}{section.7.6}% 
+\contentsline {section}{\numberline {7.1}More computational power}{41}{section.7.1}% 
+\contentsline {section}{\numberline {7.2}Train PID inputs}{41}{section.7.2}% 
+\contentsline {section}{\numberline {7.3}Reward functions}{41}{section.7.3}% 
+\contentsline {section}{\numberline {7.4}Switch reward functions during training}{41}{section.7.4}% 
+\contentsline {section}{\numberline {7.5}Expert policy training}{42}{section.7.5}% 
+\contentsline {section}{\numberline {7.6}Expert policy in instable conditions}{42}{section.7.6}% 
+\contentsline {section}{\numberline {7.7}Active control elements}{42}{section.7.7}% 
 \contentsline {chapter}{\numberline {8}Conclusion}{43}{chapter.8}% 
 \contentsline {chapter}{\nonumberline Literaturverzeichnis}{44}{chapter*.7}% 
