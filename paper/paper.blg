@@ -10,6 +10,7 @@ Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
 Warning--Es gibt einen Jahrgang, aber kein Jahr in agarapDeepLearningUsing2019
 Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in bellmanTheoryDynamicProgramming1954
+Warning--Es gibt einen Jahrgang, aber kein Jahr in bjorckUnderstandingBatchNormalization
 Warning--empty edition in bishopNeuralNetworksPattern1995
 Warning--Es gibt nur eine Verlagsangabe in bishopNeuralNetworksPattern1995
 Warning--empty edition in burtonWindEnergyHandbook2011
@@ -21,62 +22,66 @@ Warning--Es gibt einen Jahrgang, aber kein Jahr in degrisOffPolicyActorCritic201
 Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
 Warning--Es gibt einen Jahrgang, aber kein Jahr in vanhasseltLearningValuesMany2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
+Warning--Es gibt einen Jahrgang, aber kein Jahr in hesselRainbowCombiningImprovements2017
 Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
 Warning--Es gibt einen Jahrgang, aber kein Jahr in houImprovingDDPGPrioritized
 Warning--Es gibt einen Jahrgang, aber kein Jahr in kingmaAdamMethodStochastic2017
 Warning--empty booktitle in kolterDesignAnalysisLearning2012
 Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
+Warning--Es gibt einen Jahrgang, aber kein Jahr in vankuikLongtermResearchChallenges2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReactive1990
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihPlayingAtariDeep2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihHumanlevelControlDeep2015
 Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
+Warning--Es gibt nur eine Verlagsangabe in suttonReinforcementLearningIntroduction2018
+Warning--Es gibt einen Jahrgang, aber kein Jahr in silverMasteringGameGo2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in silverDeterministicPolicyGradient2013
 Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
 Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
 Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
 Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
 Warning--Es gibt einen Jahrgang, aber kein Jahr in zhaExperienceReplayOptimization2019
-You've used 29 entries,
+You've used 34 entries,
             3183 wiz_defined-function locations,
-            790 strings with 10697 characters,
-and the built_in function-call counts, 24243 in all, are:
-= -- 2569
-> -- 875
-< -- 1001
-+ -- 1172
-- -- 347
-* -- 1770
-:= -- 4434
-add.period$ -- 28
-call.type$ -- 29
-change.case$ -- 211
-chr.to.int$ -- 28
-cite$ -- 60
-duplicate$ -- 499
-empty$ -- 1128
-format.name$ -- 468
-if$ -- 4275
+            820 strings with 12700 characters,
+and the built_in function-call counts, 32341 in all, are:
+= -- 3385
+> -- 1240
+< -- 1425
++ -- 1668
+- -- 503
+* -- 2454
+:= -- 5985
+add.period$ -- 34
+call.type$ -- 34
+change.case$ -- 289
+chr.to.int$ -- 33
+cite$ -- 70
+duplicate$ -- 629
+empty$ -- 1384
+format.name$ -- 674
+if$ -- 5577
 int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 30
-newline$ -- 168
-num.names$ -- 87
-pop$ -- 329
+missing$ -- 36
+newline$ -- 201
+num.names$ -- 102
+pop$ -- 422
 preamble$ -- 1
-purify$ -- 269
+purify$ -- 357
 quote$ -- 0
-skip$ -- 1179
+skip$ -- 1590
 stack$ -- 0
-substring$ -- 2099
-swap$ -- 149
-text.length$ -- 151
+substring$ -- 2721
+swap$ -- 219
+text.length$ -- 220
 text.prefix$ -- 5
 top$ -- 0
-type$ -- 224
-warning$ -- 31
-while$ -- 228
-width$ -- 35
-write$ -- 362
-(There were 32 warnings)
+type$ -- 260
+warning$ -- 36
+while$ -- 312
+width$ -- 40
+write$ -- 433
+(There were 37 warnings)

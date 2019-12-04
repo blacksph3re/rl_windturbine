@@ -20,6 +20,13 @@
 \newblock 60, Nr. 6, S. 503--516. --
 \newblock ISSN 0002--9904
 
+\bibitem[BGSW]{bjorckUnderstandingBatchNormalization}
+\textsc{Bjorck}, Nils ; \textsc{Gomes}, Carla~P. ; \textsc{Selman}, Bart  ;
+  \textsc{Weinberger}, Kilian~Q.:
+\newblock Understanding {{Batch Normalization}}.
+\newblock
+\newblock , S.~12
+
 \bibitem[Bis]{bishopNeuralNetworksPattern1995}
 \textsc{Bishop}, Christopher~M.:
 \newblock \emph{Neural Networks for Pattern Recognition}.
@@ -80,6 +87,15 @@
 \newblock 116, Nr. 29, S. 14495--14500. --
 \newblock ISSN 0027--8424, 1091--6490
 
+\bibitem[HMH{\etalchar{+}}]{hesselRainbowCombiningImprovements2017}
+\textsc{Hessel}, Matteo ; \textsc{Modayil}, Joseph ; \textsc{van Hasselt}, Hado
+  ; \textsc{Schaul}, Tom ; \textsc{Ostrovski}, Georg ; \textsc{Dabney}, Will ;
+  \textsc{Horgan}, Dan ; \textsc{Piot}, Bilal ; \textsc{Azar}, Mohammad  ;
+  \textsc{Silver}, David:
+\newblock Rainbow: {{Combining Improvements}} in {{Deep Reinforcement
+  Learning}}.
+\newblock
+
 \bibitem[Hub]{huber1964}
 \textsc{Huber}, Peter~J.:
 \newblock Robust Estimation of a Location Parameter.
@@ -109,6 +125,23 @@
   Turbine, {IEEE}. --
 \newblock ISBN 978--1--4577--1096--4 978--1--4577--1095--7
   978--1--4577--1094--0 978--1--4673--2102--0, S. 2256--2263
+
+\bibitem[KPN{\etalchar{+}}]{vankuikLongtermResearchChallenges2016}
+\textsc{van Kuik}, G. A.~M. ; \textsc{Peinke}, J. ; \textsc{Nijssen}, R. ;
+  \textsc{Lekou}, D. ; \textsc{Mann}, J. ; \textsc{SA¸rensen}, J.~N. ;
+  \textsc{Ferreira}, C. ; \textsc{van Wingerden}, J.~W. ; \textsc{Schlipf}, D.
+  ; \textsc{Gebraad}, P. ; \textsc{Polinder}, H. ; \textsc{Abrahamsen}, A. ;
+  \textsc{van Bussel}, G. J.~W. ; \textsc{SA¸rensen}, J.~D. ; \textsc{Tavner},
+  P. ; \textsc{Bottasso}, C.~L. ; \textsc{Muskulus}, M. ; \textsc{Matha}, D. ;
+  \textsc{Lindeboom}, H.~J. ; \textsc{Degraer}, S. ; \textsc{Kramer}, O. ;
+  \textsc{Lehnhoff}, S. ; \textsc{Sonnenschein}, M. ; \textsc{SA¸rensen},
+  P.~E. ; \textsc{Konneke}, R.~W. ; \textsc{Morthorst}, P.~E.  ;
+  \textsc{Skytte}, K.:
+\newblock Long-Term Research Challenges in Wind Energy“ a Research Agenda by
+  the {{European Academy}} of {{Wind Energy}}.
+\newblock
+\newblock 1, Nr. 1, S. 1--39. --
+\newblock ISSN 2366--7451
 
 \bibitem[LHP{\etalchar{+}}]{lillicrapCONTINUOUSCONTROLDEEP2015}
 \textsc{Lillicrap}, Timothy~P. ; \textsc{Hunt}, Jonathan~J. ; \textsc{Pritzel},
@@ -161,6 +194,29 @@
   \textsc{Andrychowicz}, Marcin:
 \newblock Parameter {{Space Noise}} for {{Exploration}}.
 \newblock
+
+\bibitem[SB]{suttonReinforcementLearningIntroduction2018}
+\textsc{Sutton}, Richard~S. ; \textsc{Barto}, Andrew~G.:
+\newblock \emph{Reinforcement Learning: An Introduction}.
+\newblock Second edition.
+\newblock {The MIT Press}
+\newblock (Adaptive Computation and Machine Learning Series). --
+\newblock ISBN 978--0--262--03924--6
+
+\bibitem[SHM{\etalchar{+}}]{silverMasteringGameGo2016}
+\textsc{Silver}, David ; \textsc{Huang}, Aja ; \textsc{Maddison}, Chris~J. ;
+  \textsc{Guez}, Arthur ; \textsc{Sifre}, Laurent ; \textsc{van~den Driessche},
+  George ; \textsc{Schrittwieser}, Julian ; \textsc{Antonoglou}, Ioannis ;
+  \textsc{Panneershelvam}, Veda ; \textsc{Lanctot}, Marc ; \textsc{Dieleman},
+  Sander ; \textsc{Grewe}, Dominik ; \textsc{Nham}, John ;
+  \textsc{Kalchbrenner}, Nal ; \textsc{Sutskever}, Ilya ; \textsc{Lillicrap},
+  Timothy ; \textsc{Leach}, Madeleine ; \textsc{Kavukcuoglu}, Koray ;
+  \textsc{Graepel}, Thore  ; \textsc{Hassabis}, Demis:
+\newblock Mastering the Game of {{Go}} with Deep Neural Networks and Tree
+  Search.
+\newblock
+\newblock 529, Nr. 7587, S. 484--489. --
+\newblock ISSN 0028--0836, 1476--4687
 
 \bibitem[SLH{\etalchar{+}}]{silverDeterministicPolicyGradient2013}
 \textsc{Silver}, David ; \textsc{Lever}, Guy ; \textsc{Heess}, Nicolas ;

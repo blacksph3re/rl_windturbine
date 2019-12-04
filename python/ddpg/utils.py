@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pickle
+import torch
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 from collections import deque
@@ -195,7 +196,7 @@ class SumTree:
     # Update a leaf and propagate the sums back through the net
     def update_entry(self, leaf_idx, weight):
         self.leaf_weights[leaf_idx] = float(weight)
-        weight = float(weight)**self.alpha
+        weight = np.clip(float(weight)**self.alpha, 0, 1.5)
 
         trajectory = self.leaf_trajectory(leaf_idx)
         # Get the previous weight at this position
@@ -237,13 +238,34 @@ class SumTree:
 # A "Basic" Buffer which stores entries and can sample them by priority
 class BasicBuffer:
 
-    def __init__(self, max_size, alpha=1):
+    def __init__(self, max_size, device, state_dim, action_dim, alpha=1):
+        self.device = device
         self.max_size = max_size
         self.iterator = 0 # Next position to write to
         self.full = False # Whether we are full
+
+        # CPU buffer
         self.buffer = np.array([(None, None, None, None, None) for _ in range(max_size)])
+
+        self.dtype = torch.float
+
+        # GPU buffers
+        self.buffer_s = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device)
+        self.buffer_a = torch.zeros(max_size, action_dim, dtype=self.dtype, device=device)
+        self.buffer_snext = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device)
+        self.buffer_r = torch.zeros(max_size, 1, dtype=self.dtype, device=device)
+        self.buffer_d = torch.zeros(max_size, 1, dtype=self.dtype, device=device)
+
         self.priorities = SumTree(max_size, alpha)
         self.max_priority = 1
+
+    def copy_buffer_to_device(self):
+        for i in range(0, len(self)):
+            self.buffer_s[i] = torch.tensor(self.buffer[i][0])
+            self.buffer_a[i] = torch.tensor(self.buffer[i][1])
+            self.buffer_r[i] = torch.tensor(self.buffer[i][2])
+            self.buffer_snext[i] = torch.tensor(self.buffer[i][3])
+            self.buffer_d[i] = torch.tensor(self.buffer[i][4])
 
     def push(self, state, action, reward, next_state, done, priority=None):
         # If not given a priority, make sure it's getting sampled
@@ -254,14 +276,19 @@ class BasicBuffer:
         if(priority == 0):
             priority = 1e-15
 
-        done = 1 if done else 0
-
-        experience = (state, action, np.array([reward]), next_state, np.array([done]))
+        done = 1.0 if done else 0.0
 
         self.max_priority = max(self.max_priority, priority)
 
         # Store experience
-        self.buffer[self.iterator] = experience
+        self.buffer[self.iterator] = (state, action, np.array([reward]), next_state, np.array([done]))
+
+        self.buffer_s[self.iterator] = torch.tensor(state)
+        self.buffer_a[self.iterator] = torch.tensor(action)
+        self.buffer_snext[self.iterator] = torch.tensor(next_state)
+        self.buffer_r[self.iterator] = torch.tensor([reward])
+        self.buffer_d[self.iterator] = torch.tensor([done])
+
         self.priorities.update_entry(self.iterator, priority)
         self.iterator += 1
 
@@ -301,33 +328,7 @@ class BasicBuffer:
         else:
             indices = np.random.choice(len(self), batch_size)
 
-        # Convert indices to lists of individual batches
-        batch = self.buffer[indices]
-
-        state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*batch)
-
-        return (state_batch, action_batch, reward_batch, next_state_batch, done_batch, indices)
-
-    def sample_sequence(self, batch_size):
-        state_batch = []
-        action_batch = []
-        reward_batch = []
-        next_state_batch = []
-        done_batch = []
-
-        min_start = len(self) - batch_size
-        start = np.random.randint(0, min_start)
-
-        for sample in range(start, start + batch_size):
-            state, action, reward, next_state, done = self.buffer[start]
-            state, action, reward, next_state, done = experience
-            state_batch.append(state)
-            action_batch.append(action)
-            reward_batch.append(reward)
-            next_state_batch.append(next_state)
-            done_batch.append(done)
-
-        return (state_batch, action_batch, reward_batch, next_state_batch, done_batch)
+        return self.buffer_s[indices], self.buffer_a[indices], self.buffer_r[indices], self.buffer_snext[indices], self.buffer_d[indices], indices
 
     def __len__(self):
         if(not self.full):
@@ -374,6 +375,10 @@ class BasicBuffer:
                     self.priorities.update_entry(i, max_prio)
                 else:
                     self.priorities.update_entry(i, data["priorities"][i])
+
+            # Copy to GPU
+            self.copy_buffer_to_device()
+
 
         except Exception as e:
             print("Could not load memory: %s" % str(e))

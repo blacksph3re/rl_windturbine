@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Arch Linux) (preloaded format=pdflatex 2019.11.30)  3 DEC 2019 15:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Arch Linux) (preloaded format=pdflatex 2019.11.30)  4 DEC 2019 16:09
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -643,26 +643,33 @@ File: lstlang1.sty 2019/09/10 1.8c listings language file
 (/usr/share/texmf-dist/tex/latex/listings/lstmisc.sty
 File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
 ))
+(/usr/share/texmf-dist/tex/latex/fancyref/fancyref.sty
+Package: fancyref 1999/02/03 v0.9c Fancy cross-referencing
+
+(/usr/share/texmf-dist/tex/latex/tools/varioref.sty
+Package: varioref 2019/09/08 v1.6b package for extended references (FMi)
+\c@vrcnt=\count129
+))
 (/usr/share/texmf-dist/tex/latex/acro/acro.sty
 (/usr/share/texmf-dist/tex/latex/l3kernel/expl3.sty
 Package: expl3 2019-10-28 L3 programming layer (loader) 
 
 (/usr/share/texmf-dist/tex/latex/l3kernel/expl3-code.tex
 Package: expl3 2019-10-28 L3 programming layer (code)
-\c_max_int=\count129
-\l_tmpa_int=\count130
-\l_tmpb_int=\count131
-\g_tmpa_int=\count132
-\g_tmpb_int=\count133
-\l__seq_internal_a_int=\count134
-\l__seq_internal_b_int=\count135
-\g__kernel_prg_map_int=\count136
-\c__ior_term_noprompt_ior=\count137
-\c_log_iow=\count138
-\l_iow_line_count_int=\count139
-\l__iow_line_target_int=\count140
-\l__iow_one_indent_int=\count141
-\l__iow_indent_int=\count142
+\c_max_int=\count130
+\l_tmpa_int=\count131
+\l_tmpb_int=\count132
+\g_tmpa_int=\count133
+\g_tmpb_int=\count134
+\l__seq_internal_a_int=\count135
+\l__seq_internal_b_int=\count136
+\g__kernel_prg_map_int=\count137
+\c__ior_term_noprompt_ior=\count138
+\c_log_iow=\count139
+\l_iow_line_count_int=\count140
+\l__iow_line_target_int=\count141
+\l__iow_one_indent_int=\count142
+\l__iow_indent_int=\count143
 \c_zero_dim=\dimen131
 \c_max_dim=\dimen132
 \l_tmpa_dim=\dimen133
@@ -681,80 +688,80 @@ Package: expl3 2019-10-28 L3 programming layer (code)
 \l_tmpb_muskip=\muskip15
 \g_tmpa_muskip=\muskip16
 \g_tmpb_muskip=\muskip17
-\l_keys_choice_int=\count143
-\l__intarray_loop_int=\count144
+\l_keys_choice_int=\count144
+\l__intarray_loop_int=\count145
 \c__intarray_sp_dim=\dimen137
-\g__intarray_font_int=\count145
-\c__fp_leading_shift_int=\count146
-\c__fp_middle_shift_int=\count147
-\c__fp_trailing_shift_int=\count148
-\c__fp_big_leading_shift_int=\count149
-\c__fp_big_middle_shift_int=\count150
-\c__fp_big_trailing_shift_int=\count151
-\c__fp_Bigg_leading_shift_int=\count152
-\c__fp_Bigg_middle_shift_int=\count153
-\c__fp_Bigg_trailing_shift_int=\count154
-\c__kernel_randint_max_int=\count155
-\g__fp_array_int=\count156
-\l__fp_array_loop_int=\count157
-\l__sort_length_int=\count158
-\l__sort_min_int=\count159
-\l__sort_top_int=\count160
-\l__sort_max_int=\count161
-\l__sort_true_max_int=\count162
-\l__sort_block_int=\count163
-\l__sort_begin_int=\count164
-\l__sort_end_int=\count165
-\l__sort_A_int=\count166
-\l__sort_B_int=\count167
-\l__sort_C_int=\count168
-\l__str_internal_int=\count169
-\c__str_replacement_char_int=\count170
-\l__tl_analysis_normal_int=\count171
-\l__tl_analysis_index_int=\count172
-\l__tl_analysis_nesting_int=\count173
-\l__tl_analysis_type_int=\count174
-\l__regex_internal_a_int=\count175
-\l__regex_internal_b_int=\count176
-\l__regex_internal_c_int=\count177
-\l__regex_balance_int=\count178
-\l__regex_group_level_int=\count179
-\l__regex_mode_int=\count180
-\c__regex_cs_in_class_mode_int=\count181
-\c__regex_cs_mode_int=\count182
-\l__regex_catcodes_int=\count183
-\l__regex_default_catcodes_int=\count184
-\c__regex_catcode_D_int=\count185
-\c__regex_catcode_S_int=\count186
-\c__regex_catcode_L_int=\count187
-\c__regex_catcode_O_int=\count188
-\c__regex_catcode_A_int=\count189
-\c__regex_all_catcodes_int=\count190
-\l__regex_show_lines_int=\count191
-\l__regex_min_state_int=\count192
-\l__regex_max_state_int=\count193
-\l__regex_left_state_int=\count194
-\l__regex_right_state_int=\count195
-\l__regex_capturing_group_int=\count196
-\l__regex_min_pos_int=\count197
-\l__regex_max_pos_int=\count198
-\l__regex_curr_pos_int=\count199
-\l__regex_start_pos_int=\count266
-\l__regex_success_pos_int=\count267
-\l__regex_curr_char_int=\count268
-\l__regex_curr_catcode_int=\count269
-\l__regex_last_char_int=\count270
-\l__regex_case_changed_char_int=\count271
-\l__regex_curr_state_int=\count272
-\l__regex_step_int=\count273
-\l__regex_min_active_int=\count274
-\l__regex_max_active_int=\count275
-\l__regex_replacement_csnames_int=\count276
-\l__regex_match_count_int=\count277
-\l__regex_min_submatch_int=\count278
-\l__regex_submatch_int=\count279
-\l__regex_zeroth_submatch_int=\count280
-\g__regex_trace_regex_int=\count281
+\g__intarray_font_int=\count146
+\c__fp_leading_shift_int=\count147
+\c__fp_middle_shift_int=\count148
+\c__fp_trailing_shift_int=\count149
+\c__fp_big_leading_shift_int=\count150
+\c__fp_big_middle_shift_int=\count151
+\c__fp_big_trailing_shift_int=\count152
+\c__fp_Bigg_leading_shift_int=\count153
+\c__fp_Bigg_middle_shift_int=\count154
+\c__fp_Bigg_trailing_shift_int=\count155
+\c__kernel_randint_max_int=\count156
+\g__fp_array_int=\count157
+\l__fp_array_loop_int=\count158
+\l__sort_length_int=\count159
+\l__sort_min_int=\count160
+\l__sort_top_int=\count161
+\l__sort_max_int=\count162
+\l__sort_true_max_int=\count163
+\l__sort_block_int=\count164
+\l__sort_begin_int=\count165
+\l__sort_end_int=\count166
+\l__sort_A_int=\count167
+\l__sort_B_int=\count168
+\l__sort_C_int=\count169
+\l__str_internal_int=\count170
+\c__str_replacement_char_int=\count171
+\l__tl_analysis_normal_int=\count172
+\l__tl_analysis_index_int=\count173
+\l__tl_analysis_nesting_int=\count174
+\l__tl_analysis_type_int=\count175
+\l__regex_internal_a_int=\count176
+\l__regex_internal_b_int=\count177
+\l__regex_internal_c_int=\count178
+\l__regex_balance_int=\count179
+\l__regex_group_level_int=\count180
+\l__regex_mode_int=\count181
+\c__regex_cs_in_class_mode_int=\count182
+\c__regex_cs_mode_int=\count183
+\l__regex_catcodes_int=\count184
+\l__regex_default_catcodes_int=\count185
+\c__regex_catcode_D_int=\count186
+\c__regex_catcode_S_int=\count187
+\c__regex_catcode_L_int=\count188
+\c__regex_catcode_O_int=\count189
+\c__regex_catcode_A_int=\count190
+\c__regex_all_catcodes_int=\count191
+\l__regex_show_lines_int=\count192
+\l__regex_min_state_int=\count193
+\l__regex_max_state_int=\count194
+\l__regex_left_state_int=\count195
+\l__regex_right_state_int=\count196
+\l__regex_capturing_group_int=\count197
+\l__regex_min_pos_int=\count198
+\l__regex_max_pos_int=\count199
+\l__regex_curr_pos_int=\count266
+\l__regex_start_pos_int=\count267
+\l__regex_success_pos_int=\count268
+\l__regex_curr_char_int=\count269
+\l__regex_curr_catcode_int=\count270
+\l__regex_last_char_int=\count271
+\l__regex_case_changed_char_int=\count272
+\l__regex_curr_state_int=\count273
+\l__regex_step_int=\count274
+\l__regex_min_active_int=\count275
+\l__regex_max_active_int=\count276
+\l__regex_replacement_csnames_int=\count277
+\l__regex_match_count_int=\count278
+\l__regex_min_submatch_int=\count279
+\l__regex_submatch_int=\count280
+\l__regex_zeroth_submatch_int=\count281
+\g__regex_trace_regex_int=\count282
 \c_empty_box=\box40
 \l_tmpa_box=\box41
 \l_tmpb_box=\box42
@@ -805,15 +812,15 @@ File: l3deprecation.def 2019-04-06 v L3 Deprecated functions
 ))
 (/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
 File: l3backend-pdfmode.def 2019-04-06 L3 backend support: PDF mode
-\l__kernel_color_stack_int=\count282
+\l__kernel_color_stack_int=\count283
 \l__pdf_internal_box=\box58
 ))
 (/usr/share/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
 Package: xparse 2019-10-11 L3 Experimental document command parser
-\l__xparse_current_arg_int=\count283
-\g__xparse_grabber_int=\count284
-\l__xparse_m_args_int=\count285
-\l__xparse_v_nesting_int=\count286
+\l__xparse_current_arg_int=\count284
+\g__xparse_grabber_int=\count285
+\l__xparse_m_args_int=\count286
+\l__xparse_v_nesting_int=\count287
 )
 (/usr/share/texmf-dist/tex/latex/l3packages/l3keys2e/l3keys2e.sty
 Package: l3keys2e 2019-10-11 LaTeX2e option processing using LaTeX3 keys
@@ -821,19 +828,19 @@ Package: l3keys2e 2019-10-11 LaTeX2e option processing using LaTeX3 keys
 (/usr/share/texmf-dist/tex/latex/l3packages/xtemplate/xtemplate.sty
 Package: xtemplate 2019-10-11 L3 Experimental prototype document functions
 \l__xtemplate_tmp_dim=\dimen163
-\l__xtemplate_tmp_int=\count287
+\l__xtemplate_tmp_int=\count288
 \l__xtemplate_tmp_muskip=\muskip18
 \l__xtemplate_tmp_skip=\skip83
 )
 (/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
 Package: etoolbox 2019/09/21 v2.5h e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count288
+\etb@tempcnta=\count289
 )
 Package: acro 2019/10/12 v2.10c Typeset Acronyms
-\l__acro_tmpa_int=\count289
-\l__acro_tmpb_int=\count290
-\l__acro_tmpc_int=\count291
-\l__acro_tmpd_int=\count292
+\l__acro_tmpa_int=\count290
+\l__acro_tmpb_int=\count291
+\l__acro_tmpc_int=\count292
+\l__acro_tmpd_int=\count293
 \l__acro_page_space_skip=\skip84
 \l__acro_short_width_dim=\dimen164
 
@@ -854,7 +861,7 @@ Package zref Info: New property list: main on input line 759.
 Package zref Info: New property: default on input line 760.
 Package zref Info: New property: page on input line 761.
 )
-\c@abspage=\count293
+\c@abspage=\count294
 Package zref Info: New property: abspage on input line 62.
 )
 
@@ -869,7 +876,7 @@ Package xtemplate Info: Declaring object type 'acro-title' taking 1
 Package xtemplate Info: Declaring object type 'acro-list' taking 2 argument(s)
 (xtemplate)             on line 1364.
 
-\g__acro_barrier_int=\count294
+\g__acro_barrier_int=\count295
 
 (/usr/share/texmf-dist/tex/latex/translations/translations.sty
 Package: translations 2017/08/31 v1.7a internationalization of LaTeX2e packages
@@ -879,27 +886,27 @@ Package: translations 2017/08/31 v1.7a internationalization of LaTeX2e packages
 Package: siunitx 2019/10/10 v2.7t A comprehensive (SI) units package
 \l__siunitx_tmp_box=\box59
 \l__siunitx_tmp_dim=\dimen165
-\l__siunitx_tmp_int=\count295
-\l__siunitx_number_mantissa_length_int=\count296
-\l__siunitx_number_uncert_length_int=\count297
-\l__siunitx_round_int=\count298
-\l__siunitx_process_decimal_int=\count299
-\l__siunitx_process_uncertainty_int=\count300
-\l__siunitx_process_fixed_int=\count301
-\l__siunitx_process_integer_min_int=\count302
-\l__siunitx_process_precision_int=\count303
-\l__siunitx_group_min_int=\count304
+\l__siunitx_tmp_int=\count296
+\l__siunitx_number_mantissa_length_int=\count297
+\l__siunitx_number_uncert_length_int=\count298
+\l__siunitx_round_int=\count299
+\l__siunitx_process_decimal_int=\count300
+\l__siunitx_process_uncertainty_int=\count301
+\l__siunitx_process_fixed_int=\count302
+\l__siunitx_process_integer_min_int=\count303
+\l__siunitx_process_precision_int=\count304
+\l__siunitx_group_min_int=\count305
 \l__siunitx_angle_marker_box=\box60
 \l__siunitx_angle_unit_box=\box61
 \l__siunitx_angle_marker_dim=\dimen166
 \l__siunitx_angle_unit_dim=\dimen167
-\l__siunitx_unit_int=\count305
-\l__siunitx_unit_denominator_int=\count306
-\l__siunitx_unit_numerator_int=\count307
-\l__siunitx_unit_prefix_int=\count308
-\l__siunitx_unit_prefix_base_int=\count309
-\l__siunitx_unit_prefix_gram_int=\count310
-\l__siunitx_number_product_int=\count311
+\l__siunitx_unit_int=\count306
+\l__siunitx_unit_denominator_int=\count307
+\l__siunitx_unit_numerator_int=\count308
+\l__siunitx_unit_prefix_int=\count309
+\l__siunitx_unit_prefix_base_int=\count310
+\l__siunitx_unit_prefix_gram_int=\count311
+\l__siunitx_number_product_int=\count312
 \c__siunitx_one_fill_skip=\skip85
 \l__siunitx_table_unit_align_skip=\skip86
 \l__siunitx_table_exponent_dim=\dimen168
@@ -926,15 +933,15 @@ Package: mathtools 2019/07/31 v1.22 mathematical typesetting tools
 
 (/usr/share/texmf-dist/tex/latex/tools/calc.sty
 Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count312
-\calc@Bcount=\count313
+\calc@Acount=\count313
+\calc@Bcount=\count314
 \calc@Adimen=\dimen177
 \calc@Bdimen=\dimen178
 \calc@Askip=\skip89
 \calc@Bskip=\skip90
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count314
+\calc@Ccount=\count315
 \calc@Cskip=\skip91
 )
 (/usr/share/texmf-dist/tex/latex/mathtools/mhsetup.sty
@@ -944,7 +951,7 @@ LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 129.
 LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
-\g_MT_multlinerow_int=\count315
+\g_MT_multlinerow_int=\count316
 \l_MT_multwidth_dim=\dimen179
 \origjot=\skip92
 \l_MT_shortvdotswithinadjustabove_dim=\dimen180
@@ -957,39 +964,90 @@ LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 129.
 (/usr/share/texmf-dist/tex/latex/commath/commath.sty
 (/usr/share/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
-)) (./abbreviations.tex)
+))
+(/usr/share/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+Package: algorithm2e 2017/07/18 v5.2 algorithms environments
+\c@AlgoLine=\count317
+\algocf@hangindent=\skip93
+
+(/usr/share/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
+Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
+\c@checkoddpage=\count318
+)
+(/usr/share/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+(/usr/share/texmf-dist/tex/latex/relsize/relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+\skiptotal=\skip94
+\skiplinenumber=\skip95
+\skiprule=\skip96
+\skiphlne=\skip97
+\skiptext=\skip98
+\skiplength=\skip99
+\algomargin=\skip100
+\skipalgocfslide=\skip101
+\algowidth=\dimen186
+\inoutsize=\dimen187
+\inoutindent=\dimen188
+\interspacetitleruled=\dimen189
+\interspacealgoruled=\dimen190
+\interspacetitleboxruled=\dimen191
+\algocf@ruledwidth=\skip102
+\algocf@inoutbox=\box66
+\algocf@inputbox=\box67
+\AlCapSkip=\skip103
+\AlCapHSkip=\skip104
+\algoskipindent=\skip105
+\algocf@nlbox=\box68
+\algocf@hangingbox=\box69
+\algocf@untilbox=\box70
+\algocf@skipuntil=\skip106
+\algocf@capbox=\box71
+\algocf@lcaptionbox=\skip107
+\algoheightruledefault=\skip108
+\algoheightrule=\skip109
+\algotitleheightruledefault=\skip110
+\algotitleheightrule=\skip111
+\c@algocfline=\count319
+\c@algocfproc=\count320
+\c@algocf=\count321
+\algocf@algoframe=\box72
+\algocf@algobox=\box73
+) (./abbreviations.tex)
 Package translations Info: No language package found. I am going to use `englis
-h' as default language. on input line 75.
+h' as default language. on input line 77.
 
 (./paper.aux)
 \openout1 = `paper.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 77.
+LaTeX Font Info:    ... okay on input line 77.
  (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count316
-\scratchdimen=\dimen186
-\scratchbox=\box66
-\nofMPsegments=\count317
-\nofMParguments=\count318
+\scratchcounter=\count322
+\scratchdimen=\dimen192
+\scratchbox=\box74
+\nofMPsegments=\count323
+\nofMParguments=\count324
 \everyMPshowfont=\toks27
-\MPscratchCnt=\count319
-\MPscratchDim=\dimen187
-\MPnumerator=\count320
-\makeMPintoPDFobject=\count321
+\MPscratchCnt=\count325
+\MPscratchDim=\dimen193
+\MPnumerator=\count326
+\makeMPintoPDFobject=\count327
 \everyMPtoPDFconversion=\toks28
 ) (/usr/share/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -1008,8 +1066,8 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-\AtBeginShipoutBox=\box67
-Package hyperref Info: Link coloring OFF on input line 75.
+\AtBeginShipoutBox=\box75
+Package hyperref Info: Link coloring OFF on input line 77.
 
 (/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
@@ -1017,16 +1075,18 @@ Package: nameref 2019/09/16 v2.46 Cross-referencing by name of section
 (/usr/share/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count322
+\c@section@level=\count328
+LaTeX Info: Redefining \Ref on input line 520.
 )
-LaTeX Info: Redefining \ref on input line 75.
-LaTeX Info: Redefining \pageref on input line 75.
-LaTeX Info: Redefining \nameref on input line 75.
+LaTeX Info: Redefining \ref on input line 77.
+LaTeX Info: Redefining \pageref on input line 77.
+LaTeX Info: Redefining \nameref on input line 77.
  (./paper.out)
 (./paper.out)
 \@outlinefile=\write4
 \openout4 = `paper.out'.
 
+LaTeX Info: Redefining \Ref on input line 77.
 Class scrreprt Info: loading recommended package `bookmark'.
 (scrreprt)           Using `bookmark' together with `hyperref' is recommended,
 (scrreprt)           because of handling of possible bookmark level gaps.
@@ -1034,7 +1094,7 @@ Class scrreprt Info: loading recommended package `bookmark'.
 (scrreprt)           `bookmarkpackage=false' before \begin{document} and
 (scrreprt)           you can avoid this message adding:
 (scrreprt)             \usepackage{bookmark}
-(scrreprt)           before \begin{document} on input line 75.
+(scrreprt)           before \begin{document} on input line 77.
  (/usr/share/texmf-dist/tex/latex/oberdiek/bookmark.sty
 Package: bookmark 2019/06/04 v1.27 PDF bookmarks (HO)
 
@@ -1043,9 +1103,9 @@ File: bkm-pdftex.def 2019/06/04 v1.27 bookmark driver for pdfTeX (HO)
 Package auxhook Info: \AddLineBeginMainAux comes a little late,
 (auxhook)             because the main .aux file is already opened on input lin
 e 164.
-\BKM@id=\count323
+\BKM@id=\count329
 ))
-\c@lstlisting=\count324
+\c@lstlisting=\count330
 
 (/usr/share/texmf-dist/tex/latex/translations/translations-basic-dictionary-ger
 man.trsl
@@ -1053,7 +1113,7 @@ File: translations-basic-dictionary-german.trsl (german translation file `trans
 lations-basic-dictionary')
 )
 Package translations Info: loading dictionary `translations-basic-dictionary' f
-or `german'. on input line 75.
+or `german'. on input line 77.
 Now handling font encoding TS1 ...
 ... processing UTF-8 mapping file for font encoding TS1
  (/usr/share/texmf-dist/tex/latex/base/ts1enc.dfu
@@ -1145,32 +1205,32 @@ File: siunitx-abbreviations.cfg 2017/11/26 v2.7k siunitx: Abbreviated units
 
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Trying to load font information for T1+phv on input line 75
+LaTeX Font Info:    Trying to load font information for T1+phv on input line 77
 .
 
 (/usr/share/texmf-dist/tex/latex/psnfss/t1phv.fd
 File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
 )
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 75.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 77.
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 75.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 77.
 LaTeX Font Info:    Trying to load font information for OMS+ptm on input line 7
-5.
+7.
 
 (/usr/share/texmf-dist/tex/latex/psnfss/omsptm.fd
 File: omsptm.fd 
 )
 LaTeX Font Info:    Font shape `OMS/ptm/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 75.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 77.
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10.95> not available
-(Font)              Font shape `T1/ptm/b/n' tried instead on input line 75.
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 77.
  [2
 
 
 ] [3]
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 75.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 77.
  [4
 
 
@@ -1188,7 +1248,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
  been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.27 ....6}High action gradients}{23}{section.4.6}
+l.27 ...4.5.2}Normalization}{29}{subsection.4.5.2}
                                                   % [1
 
 
@@ -1201,8 +1261,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.75 \begin{document}
-                      [2]
+l.77 \begin{document}
+                      [2]pdfTeX warning (ext4): destination with the same ident
+ifier (name{page.3}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.77 \begin{document}
+                      [3]
 chapter 1.
 
 Class scrreprt Warning: \float@addtolists detected!
@@ -1219,98 +1284,110 @@ Class scrreprt Warning: \float@addtolists detected!
 (scrreprt)              a package that still implements the
 (scrreprt)              deprecated \float@addtolist interface .
 
-pdfTeX warning (ext4): destination with the same identifier (name{page.3}) has 
-been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.80 \chapter
-             {Intro} [3
-
-
-]
-chapter 2.
 pdfTeX warning (ext4): destination with the same identifier (name{page.4}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.87 \chapter
-             {Background} [4
+l.82 \chapter
+             {Intro} [4
+
+
+]
+chapter 2.
+[5
 
 ]
 chapter 3.
-[5
+<NREL-5MW.png, id=161, 376.2858pt x 190.7928pt>
+File: NREL-5MW.png Graphic file (type png)
+<use NREL-5MW.png>
+Package pdftex.def Info: NREL-5MW.png  used on input line 101.
+(pdftex.def)             Requested size: 376.28487pt x 190.79231pt.
+[6
 
-] [6]
-LaTeX Font Info:    Trying to load font information for T1+pcr on input line 11
-4.
- (/usr/share/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-) [7]
+] [7 <./NREL-5MW.png>]
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 160.
- [8] [9] [10]
-[11] [12] [13] [14]
-<DDPG_Setup.png, id=254, 758.835pt x 303.1325pt>
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 117.
+ [8] [9]
+LaTeX Font Info:    Trying to load font information for T1+pcr on input line 13
+3.
+
+(/usr/share/texmf-dist/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+) [10] [11] [12] [13] [14]
+[15] [16] [17] [18]
+<DDPG_Setup.png, id=296, 758.835pt x 303.1325pt>
 File: DDPG_Setup.png Graphic file (type png)
 <use DDPG_Setup.png>
-Package pdftex.def Info: DDPG_Setup.png  used on input line 293.
+Package pdftex.def Info: DDPG_Setup.png  used on input line 334.
 (pdftex.def)             Requested size: 273.14922pt x 109.11374pt.
- [15] [16 <./DDPG_Setup.png>] [17]
+ [19 <./DDPG_Setup.png>] [20]
+<Miniturbine.png, id=324, 273.1806pt x 242.8272pt>
+File: Miniturbine.png Graphic file (type png)
+<use Miniturbine.png>
+Package pdftex.def Info: Miniturbine.png  used on input line 403.
+(pdftex.def)             Requested size: 227.62204pt x 202.33572pt.
+ [21] [22 <./Miniturbine.png>]
+[23]
 chapter 4.
-[18
+[24
 
-] [19] [20] [21] [22] [23] [24] [25] [26] [27]
+] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
 chapter 5.
-[28
+[36
 
-] [29]
+] [37] [38]
 chapter 6.
-[30
+[39
 
-] [31]
+] [40]
 chapter 7.
-[32
+[41
 
-] [33]
+] [42]
 chapter 8.
-[34
+[43
 
 ] (./paper.bbl
 chapter without number
-[35
+[44
 
 
-] [36]) [37] [38
+] [45]) [46] [47
 
 
 
 
-] [39
+] [48
 
 
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 569.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 569.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 738.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 738.
  (./paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 569.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 569.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 738.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 738.
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 569.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 738.
  )
 (\end occurred inside a group at level 1)
 
-### semi simple group (level 1) entered at line 75 (\begingroup)
+### semi simple group (level 1) entered at line 77 (\begingroup)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 29167 strings out of 492167
- 574459 string characters out of 6131557
- 749025 words of memory out of 5000000
- 33115 multiletter control sequences out of 15000+600000
+ 30638 strings out of 492167
+ 599564 string characters out of 6131557
+ 792240 words of memory out of 5000000
+ 34534 multiletter control sequences out of 15000+600000
  589792 words of font info for 86 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 50i,12n,78p,10068b,3344s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 50i,21n,78p,10068b,3478s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/share/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/share/texmf-dist/fon
 ts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/share/texmf-dist/fonts/type1/p
@@ -1325,10 +1402,10 @@ share/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/share/texmf-dist/font
 s/type1/urw/helvetic/uhvb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/ut
 mb8a.pfb></usr/share/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/te
 xmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (43 pages, 289289 bytes).
+Output written on paper.pdf (52 pages, 1856884 bytes).
 PDF statistics:
- 673 PDF objects out of 1000 (max. 8388607)
- 603 compressed objects within 7 object streams
- 152 named destinations out of 1000 (max. 500000)
- 430 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 781 PDF objects out of 1000 (max. 8388607)
+ 696 compressed objects within 7 object streams
+ 182 named destinations out of 1000 (max. 500000)
+ 464 words of extra memory for PDF output out of 10000 (max. 10000000)
 

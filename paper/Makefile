@@ -8,4 +8,4 @@ clean:
 	rm *.aux *.out *.log *.bgl *.bbl *.toc *.pdf
 
 watch:
-	pdflatex paper
+	pdflatex -interaction=nonstopmode paper

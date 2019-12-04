@@ -90,10 +90,9 @@ class QBladeAdapter:
     #return 5
     return 2
 
-  # TODO get actual values for this
   def get_act_high(self):
     #return [10, 10, 10, 10, 10]
-    return [8e6, 90]
+    return [474029.1, 90]
 
   # TODO get actual values for this
   def get_act_low(self):
@@ -101,7 +100,8 @@ class QBladeAdapter:
     return [0, 0]
 
   def get_act_max_grad(self):
-    return [3e4, 0.5]
+    timestep = 0.1
+    return [150000*timestep, 8*timestep]
 
 
   def calc_reward(self, observation, action, death):
@@ -118,11 +118,11 @@ class QBladeAdapter:
     #return np.clip(5 
     #  - np.abs((observation[1]-rated_power)/rated_power)
     #  - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -10, 10)
-    return 1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty
+    return np.clip(1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty, -4, 4)
 
   def calc_death(self, observation):
-    # If there are nan values, accumulate, after a few, reload
-    self.steps_since_reload += np.sum(np.isnan(observation)) * 100
+    # If there are nan values, reload completely
+    self.steps_since_reload += 100000
 
     if(np.any(np.isnan(observation))):
       return True

@@ -45,14 +45,14 @@ import os
 
 
 experiments = [
-  {"id": 38},
-  {"id": 39},
-  {"id": 40},
-  {"id": 41},
-  {"id": 42},
-  {"id": 43},
-  {"id": 44},
-  {"id": 45},
+  {"id": 48},
+  {"id": 49},
+  {"id": 50},
+  {"id": 51},
+  {"id": 52},
+  {"id": 53},
+  {"id": 54},
+  {"id": 55},
 ]
 
 
@@ -85,7 +85,7 @@ def run_one(experiment):
     return (id, -1, -1)
 
 # Set the number of parallel runs here
-pool = Pool(2)
+pool = Pool(1)
 results = pool.map(run_one, experiments)
 
 for (id, reward, deaths) in results:
