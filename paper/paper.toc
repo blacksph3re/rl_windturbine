@@ -35,23 +35,24 @@
 \contentsline {subsection}{\numberline {4.7.2}Data augmentation}{33}{subsection.4.7.2}% 
 \contentsline {section}{\numberline {4.8}Exploding Q-Loss}{34}{section.4.8}% 
 \contentsline {subsection}{\numberline {4.8.1}Huber loss}{34}{subsection.4.8.1}% 
-\contentsline {subsection}{\numberline {4.8.2}Double critic}{34}{subsection.4.8.2}% 
-\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{34}{subsection.4.8.3}% 
-\contentsline {subsection}{\numberline {4.8.4}Regarding death conditions}{35}{subsection.4.8.4}% 
-\contentsline {chapter}{\numberline {5}Algorithm}{36}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}QBlade}{36}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}Core algorithm}{37}{section.5.2}% 
-\contentsline {chapter}{\numberline {6}Evaluation}{39}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}First working version}{39}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}HParam tuning}{39}{section.6.2}% 
-\contentsline {section}{\numberline {6.3}Comparison to industry controllers}{40}{section.6.3}% 
-\contentsline {chapter}{\numberline {7}Future work}{41}{chapter.7}% 
-\contentsline {section}{\numberline {7.1}More computational power}{41}{section.7.1}% 
-\contentsline {section}{\numberline {7.2}Train PID inputs}{41}{section.7.2}% 
-\contentsline {section}{\numberline {7.3}Reward functions}{41}{section.7.3}% 
-\contentsline {section}{\numberline {7.4}Switch reward functions during training}{41}{section.7.4}% 
-\contentsline {section}{\numberline {7.5}Expert policy training}{42}{section.7.5}% 
-\contentsline {section}{\numberline {7.6}Expert policy in instable conditions}{42}{section.7.6}% 
-\contentsline {section}{\numberline {7.7}Active control elements}{42}{section.7.7}% 
-\contentsline {chapter}{\numberline {8}Conclusion}{43}{chapter.8}% 
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{44}{chapter*.7}% 
+\contentsline {subsection}{\numberline {4.8.2}Double critics}{34}{subsection.4.8.2}% 
+\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{35}{subsection.4.8.3}% 
+\contentsline {subsection}{\numberline {4.8.4}Regarding death conditions}{36}{subsection.4.8.4}% 
+\contentsline {subsection}{\numberline {4.8.5}Clipping observations}{36}{subsection.4.8.5}% 
+\contentsline {chapter}{\numberline {5}Algorithm}{37}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}QBlade}{37}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Core algorithm}{38}{section.5.2}% 
+\contentsline {chapter}{\numberline {6}Evaluation}{40}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}First working version}{40}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}HParam tuning}{40}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Comparison to industry controllers}{41}{section.6.3}% 
+\contentsline {chapter}{\numberline {7}Future work}{42}{chapter.7}% 
+\contentsline {section}{\numberline {7.1}More computational power}{42}{section.7.1}% 
+\contentsline {section}{\numberline {7.2}Train PID inputs}{42}{section.7.2}% 
+\contentsline {section}{\numberline {7.3}Reward functions}{42}{section.7.3}% 
+\contentsline {section}{\numberline {7.4}Switch reward functions during training}{42}{section.7.4}% 
+\contentsline {section}{\numberline {7.5}Expert policy training}{43}{section.7.5}% 
+\contentsline {section}{\numberline {7.6}Expert policy in instable conditions}{43}{section.7.6}% 
+\contentsline {section}{\numberline {7.7}Active control elements}{43}{section.7.7}% 
+\contentsline {chapter}{\numberline {8}Conclusion}{44}{chapter.8}% 
+\contentsline {chapter}{\nonumberline Literaturverzeichnis}{45}{chapter*.7}% 

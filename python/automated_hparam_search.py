@@ -85,7 +85,7 @@ def run_one(experiment):
     return (id, -1, -1)
 
 # Set the number of parallel runs here
-pool = Pool(1)
+pool = Pool(2)
 results = pool.map(run_one, experiments)
 
 for (id, reward, deaths) in results:

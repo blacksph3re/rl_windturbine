@@ -66,7 +66,7 @@ class QBladeAdapter:
 
   def reset(self):
     print('Resetting simulation')
-    if(self.steps_since_reload>100000):
+    if(self.steps_since_reload>50000):
       self.load_default_project()
     self._initializeSimulation(ctypes.c_int(0))
     self.lastAction = np.zeros(5)

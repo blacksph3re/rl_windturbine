@@ -513,7 +513,7 @@ We tackled this problem by at first reducing the number and size of layers from 
 
 More effectively, we added data normalization. As in our simulation, where our state reflects measurements from very different parts of the simulation, some values in the state-array were 8 orders of magnitude different from others as they were measured in very different units. As most of the high-magnitude values are vibrations, the net could not create a link between these and the state-action, while low-magnitude but insightful observations like rotational speed were not considered due to their small absolute values. 
 
-We normalized the data so states, actions and reward usually stayed between 1 and -1. This is a normal technique in machine learning, and we are irritated by the fact that the reinforcement learning community largely made no mention of normalization. At times, rewards were clipped \cite{mnihPlayingAtariDeep2013} and observations were sometimes, especially when working on pixel inputs, cropped to be of square dimensions. Only in 2016, \cite{vanhasseltLearningValuesMany2016} brought up the topic. They propose an adaptive normalization mechanism which integrates into a generic \ac{RL} algorithm and which can normalize all inputs adaptively. We decided to implement a more straight-forward variant. At first, we used observed states and rewards from the random exploration phase to calculate the 5\%, 95\% quartile values. We calculated normalization constants from it to normalize those quartiles to $[-1, 1]$. As sometimes during random exploration, no extreme values were observed and later extreme values lay far outside of $[-1, 1]$, we instead normalized on replay data of a previous run. Also, we clipped inputs which lay outside of $[-3, 3]$, as sometimes in boundary conditions, qblade would produce observations far outside normal operational ranges. We could also imagine manually setting normalization bounds on low-dimensional problems, as human knowledge about the possible state space is usually present. In case when human knowledge about input magnitudes is not present, we recommend the mechanism from \cite{vanhasseltLearningValuesMany2016}.
+We normalized the data so states, actions and reward usually stayed between 1 and -1. This is a normal technique in machine learning, and we are irritated by the fact that the reinforcement learning community largely made no mention of normalization. At times, rewards were clipped \cite{mnihPlayingAtariDeep2013} and observations were sometimes, especially when working on pixel inputs, cropped to be of square dimensions. Only in 2016, \cite{vanhasseltLearningValuesMany2016} brought up the topic. They propose an adaptive normalization mechanism which integrates into a generic \ac{RL} algorithm and which can normalize all inputs adaptively. We decided to implement a more straight-forward variant. At first, we used observed states and rewards from the random exploration phase to calculate the 5\%, 95\% quartile values. We calculated normalization constants from it to normalize those quartiles to $[-1, 1]$. As sometimes during random exploration, no extreme values were observed and later extreme values lay far outside of $[-1, 1]$, we instead normalized on replay data of a previous run. We could also imagine manually setting normalization bounds on low-dimensional problems, as human knowledge about the possible state space is usually present. In case when human knowledge about input magnitudes is not present, we recommend the mechanism from \cite{vanhasseltLearningValuesMany2016}.
 
 This finally fixed our problem of zero gradients and we could observe normal learning. We recommend this technique as a default technique for every reinforcement learning algorithm. 
 
@@ -585,8 +585,36 @@ We could already greatly improve our results by using huber-loss \cite{huber1964
 
 Although loss explosions gotten less frequent and smaller in magnitude with this update, we still saw some.
 
-\subsection{Double critic}
-Adding twin critic networks such as in \cite{fujimotoAddressingFunctionApproximation2018} eventually solved our problem with loss explosions completely, however the thing didn't reach sensible states anymore. To use it in conjunction with \ac{PER}, we needed to decide for a priority formula and decided to take the minimum of the two q values, after the maximum showed biasing towards one of the networks. 
+\subsection{Double critics}
+
+
+
+We also had a look at \cite{fujimotoAddressingFunctionApproximation2018}. They propose a set of three mechanisms that address function approximation error in \ac{DDPG}. At first, they show in section 4.1 that Q learning with a deterministic policy tends to overestimate true Q values. This has been observed in normal Q learning as well, but hasn't been generalized to \ac{DDPG} before. They show, that the interaction of the policy and the Q network leads to a residual error accumulating over the recursive nature of Q updates. To mitigate this, they at first proposed to use two Q networks and choose the minimum of the two to compute the target $y$. They combine this with the target network idea, so effectively we end up with 6 networks now. They called this technique Clipped Double Q learning. We illustrate this in figure \ref{fig:clippedq}. The Q target is computed as 
+
+\begin{equation}
+y = r(s, a) + \gamma \min_{i \in {1,2}} Q_i'(s', \mu'(s';\theta^{\mu'});\theta^{Q_i'})
+\end{equation}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\linewidth]{TD3-Setup.png}
+  \caption{Clipped double Q learning}
+  \label{fig:clippedq}
+\end{figure}
+
+As they observed that a quickly changing policy introduces instability into the Q learning process, they proposed to update the policy less often than the actor. They do this simply by updating the policy only when $t\mod d = 0$ where $t$ is the timestep and $d$ describes how many timesteps to wait before an actor update. They call this \textit{delaying} policy updates. Lastly they proposed adding noise in the target policy calculations to achieve smoothing around policy results. So they changed the target updates again to:
+\begin{equation}
+\tilde{a} = \mu'(s';\theta^{\mu'}) + \text{clip}(\mathcal{N}(0, \tilde{\sigma}), -\tilde{c}, \tilde{c})\\
+\end{equation}
+\begin{equation}
+y = r(s, a) + \gamma \min_{i \in {1,2}} Q_i'(s', \tilde{a});\theta^{Q_i'})
+\end{equation}
+
+Where $\tilde{a}$ is the target action with added noise on it. In their appendix they describe that they furthermore clip this target action to sensible action range.
+
+When implementing this, we found that we now have two \ac{TD-Error}s which left us with a choice how to implement \ac{PER} in conjunction with this. We could either use one of the two errors. When implementing this, we found that the critic whose error we chose for \ac{PER} performed way better than the other, effectively rendering it useless to have two critics. We also tried to use the maximum and minimum of the two, which yielded more stable results, where minimum seemed better than maximum. Finally, we ended up with adding the two errors for prioritisation.
+
+Using the techniques from \cite{fujimotoAddressingFunctionApproximation2018} still didn't solve
 
 \subsection{Batch normalization}
 As in deep learning, batch normalization is found helpful for increasing lr and thus to skip over local maxima \cite{bjorckUnderstandingBatchNormalization}. It works by normalizing the outputs between the layers to be of zero mean and unit standart deviation, and for not losing generalization adding an extra learnt parameter per output dimension. We did get a performance boost when using this, however we ended up with NaN values after a while of running it, especially when experiencing q loss explosions. We can explain this because our prioritized experience replay most likely sampled only one item at a timee. To circumvent this, we clipped individual priorities. As these unexpected nan-values made training more complicated, we decided to not use batch normalization.
@@ -594,6 +622,10 @@ As in deep learning, batch normalization is found helpful for increasing lr and 
 \subsection{Regarding death conditions}
 
 In \ac{DQN}, death conditions are accounted for by changing the Q target in the terminal step to be $y = r$ instead of $y = r + \gamma \max_a' Q(s', a')$. This way, behavior after a death will not be accounted for by the Q function. As we are seeing many death conditions, we thought it could be useful to include this into our DDPG algorithm. So now, instead of $y = r + \gamma Q'(s', \mu'(s'))$ we change it to be $y = r + \gamma Q'(s', \mu'(s')) * (1-d)$ where $d \in {0, 1}$ symbolize the death conditions.
+
+\subsection{Clipping observations}
+
+Finally, we found that the solution to our problem lay in qblade. In certain conditions, qblade returned observations 20 orders of magnitude away from normal operation. As we based our reward calculation on the observations, the reward was also far off from normal reward. This condition happened only every 200k steps or so, and as we did not log every timestep, these spikes didn't end up in our logs. It was up to chance, that one of these spikes finally did, and we then decided to clip all normalized values to $[-3, 3]$.
 
 \chapter{Algorithm}
 
@@ -631,7 +663,7 @@ Initialize target networks $Q'$ and $\mu'$ with weights $\theta^{Q'} \leftarrow 
 Initialize replay buffer $\mathcal{R}$\\
 
 Execute algorithm \ref{alg:expertexplo} for expert exploration \\
-
+Calculate normalization factors based on exploraton buffer and data from a previous run \\
 Execute algorithm \ref{alg:pretrain} for policy pretraining \\
 
 \For{episode = 1, M}{
@@ -639,7 +671,7 @@ Execute algorithm \ref{alg:pretrain} for policy pretraining \\
   Receive initial observation state $s_1$\\
   \For{t = 1, T}{
     Select action $a_t = \mathrm{clip}(\mu(s_t;\theta^{\mu}) + \mathcal{N}_t)$ according to the current policy and exploration noise\\
-    Execute action $a_t$ and observe reward $r_t$, death condition $d_t$ and new state $s_{t+1}$\\
+    Execute action $a_t$ in $\varepsilon$ and observe $r_t$, $d_t$ and $s_{t+1}$ and normalize these\\
     Store transition with highest priority $(s_t, a_t, r_t, s_{t+1}, d_t, \max_i(p_i))$ in $\mathcal{R}$\\
     Calculate sampling probabilities $P(i) = \frac{p_i}{\sum_j p_j}$\\
     Sample a random minibatch of $N$ transitions $(s_i, a_i, r_i, s_{i+1}, d_i)$ from $\mathcal{R}$ according to $P$\\
@@ -708,7 +740,7 @@ We tried
 
 \section{More computational power}
 
-As we weren't able to solve the problem by our reasoning, we could just implement a huge hyperparameter search. Limiting factor in this is currently the simulation, which currently uses 95\% of the computation time, while we only use 5\% to train our networks.
+As we weren't able to solve the problem by our reasoning, we could just implement a huge hyperparameter search. Limiting factor in this is currently the simulation, which currently uses 70\% of the computation time, while we only use 30\% to train our networks. As on windows, gpu support in qblade is available, it might be interesting to run qblade on another machine than the training.
 
 \section{Train PID inputs}
 
