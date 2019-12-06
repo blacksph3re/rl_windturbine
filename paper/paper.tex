@@ -6,6 +6,7 @@
 \usepackage{mathtools}
 \usepackage{commath}
 \usepackage[ruled]{algorithm2e}
+\usepackage{multicol}
 \input{abbreviations}
 
 %weitere Optionen zum Ergänzen (in eckigen Klammern):
@@ -98,7 +99,7 @@ In the nacelle there is, most importantly, an electrical generator, which can be
 
 \begin{figure}
   \centering
-  \includegraphics{NREL-5MW.png}
+  \includegraphics{images/NREL-5MW.png}
   \caption{Control curve of the NREL 5MW turbine, from \cite{jonkmanDefinition5MWReference2009}}
   \label{fig:nrel5mw}
 \end{figure}
@@ -129,43 +130,9 @@ Our data source in this work is the open-source simulation tool QBlade \cite{mar
 
 QBlade allows different simulation scenarios, for our testing we decided to only use the NREL 5MW \cite{jonkmanDefinition5MWReference2009} turbine with the default structural model and using all implemented correction mechanisms to achieve the most realistic data possible. As reference data to this turbine is easily available and publicly published by NREL, this allows us for good cross-validation.
 
-The interface is made of 7 functions, which allow for loading a project, resetting the simulation, setting controller inputs and getting environment measurements and advancing the simulation a timestep. The observations returned in getControlVars match those that are visible to standart industry controllers, which in turn are modelled after what can be measured on a real windturbine. Concretely, we measure:
-\begin{verbatim}
-* rotational speed [rad/s]
-* power [kW]
-* wind velocity [m/s]
-* yaw angle [deg]
-* pitch blade 1 [deg]
-* pitch blade 2 [deg]
-* pitch blade 3 [deg]
-* tower top bending local x [Nm]
-* tower top bending local y [Nm]
-* tower top bending local z [Nm]
-* out-of-plane bending blade 1 [Nm]
-* out-of-plane bending blade 2 [Nm]
-* out-of-plane bending blade 3 [Nm]
-* in-plane bending blade 1 [Nm]
-* in-plane bending blade 2 [Nm]
-* in-plane bending blade 3 [Nm]
-* out-of-plane tip deflection blade 1 [m]
-* out-of-plane tip deflection blade 2 [m]
-* out-of-plane tip deflection blade 3 [m]
-* in-plane tip deflection blade 1 [m]
-* in-plane tip deflection blade 2 [m]
-* in-plane tip deflection blade 3 [m]
-* current time [s]
-\end{verbatim}
+The interface is made of 7 functions, which allow for loading a project, resetting the simulation, setting controller inputs and getting environment measurements and advancing the simulation a timestep. The observations returned in getControlVars match those that are visible to standart industry controllers, which in turn are modelled after what can be measured on a real windturbine. We have 23 observations and 5 actions.
 
-Because it has no semantic meaning, we mask away current time from our reinforcement learning agent. The inputs we can give to the turbine are:
-\begin{verbatim}
-* generator torque [Nm]
-* yaw angle [deg]
-* pitch blade 1 [deg]
-* pitch blade 2 [deg]
-* pitch blade 3 [deg]
-\end{verbatim}
-
-After a while of experimenting with the unrestricted simulation, we added some bounds to our control parameters. Restrictions to our final version are described in section \ref{sec:alg_qblade}.
+After a while of experimenting with the unrestricted simulation, we added some bounds to our control parameters and hid some observations and actions. Restrictions to our final version are described in section \ref{sec:alg_qblade}.
 
 \section{Reinforcement learning}
 
@@ -326,7 +293,7 @@ J(\mu_{\theta}) = \int_S \rho^{\beta}(s) Q^{\omega}(s,\mu_{\theta}(s)) ds = \mat
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.6\linewidth]{DDPG_Setup.png}
+  \includegraphics[width=0.6\linewidth]{images/DDPG_Setup.png}
   \caption{DDPG Network}
   \label{fig:ddpgsetup}
 \end{figure}
@@ -395,7 +362,7 @@ We are aware of one paper \cite{kolterDesignAnalysisLearning2012} which tried RL
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\linewidth]{Miniturbine.png}
+  \includegraphics[width=0.5\linewidth]{images/Miniturbine.png}
   \caption{The mini wind-turbine from \cite{kolterDesignAnalysisLearning2012}}
   \label{fig:miniturbine}
 \end{figure}
@@ -513,7 +480,7 @@ We tackled this problem by at first reducing the number and size of layers from 
 
 More effectively, we added data normalization. As in our simulation, where our state reflects measurements from very different parts of the simulation, some values in the state-array were 8 orders of magnitude different from others as they were measured in very different units. As most of the high-magnitude values are vibrations, the net could not create a link between these and the state-action, while low-magnitude but insightful observations like rotational speed were not considered due to their small absolute values. 
 
-We normalized the data so states, actions and reward usually stayed between 1 and -1. This is a normal technique in machine learning, and we are irritated by the fact that the reinforcement learning community largely made no mention of normalization. At times, rewards were clipped \cite{mnihPlayingAtariDeep2013} and observations were sometimes, especially when working on pixel inputs, cropped to be of square dimensions. Only in 2016, \cite{vanhasseltLearningValuesMany2016} brought up the topic. They propose an adaptive normalization mechanism which integrates into a generic \ac{RL} algorithm and which can normalize all inputs adaptively. We decided to implement a more straight-forward variant. At first, we used observed states and rewards from the random exploration phase to calculate the 5\%, 95\% quartile values. We calculated normalization constants from it to normalize those quartiles to $[-1, 1]$. As sometimes during random exploration, no extreme values were observed and later extreme values lay far outside of $[-1, 1]$, we instead normalized on replay data of a previous run. We could also imagine manually setting normalization bounds on low-dimensional problems, as human knowledge about the possible state space is usually present. In case when human knowledge about input magnitudes is not present, we recommend the mechanism from \cite{vanhasseltLearningValuesMany2016}.
+We normalized the data so states, actions and reward usually stayed between 1 and -1. This is a normal technique in machine learning, and we are irritated by the fact that the reinforcement learning community largely made no mention of normalization. At times, rewards were clipped \cite{mnihPlayingAtariDeep2013} and observations were sometimes, especially when working on pixel inputs, cropped to be of square dimensions. Only in 2016, \cite{vanhasseltLearningValuesMany2016} brought up the topic. They propose an adaptive normalization mechanism which integrates into a generic \ac{RL} algorithm and which can normalize all inputs adaptively. We decided to implement a more straight-forward variant. At first, we used observed states and rewards from the random exploration phase to calculate the 5\%, 95\% quartile values. We calculated normalization constants from it to linearly normalize those quartiles to $[-1, 1]$. Plain min/max normalization worked less well. As sometimes during random exploration, no extreme values were observed and later extreme values lay far outside of $[-1, 1]$, we instead normalized on replay data of a previous run. We could also imagine manually setting normalization bounds on low-dimensional problems, as human knowledge about the possible state space is usually present. In case when human knowledge about input magnitudes is not present, we recommend the mechanism from \cite{vanhasseltLearningValuesMany2016}, or if you are willing to accept the extra computational effort of running once without normalization, our version.
 
 This finally fixed our problem of zero gradients and we could observe normal learning. We recommend this technique as a default technique for every reinforcement learning algorithm. 
 
@@ -527,7 +494,7 @@ At first, we implemented gradient actionspaces, where the controller output is n
 
 \subsection{Feeding past timesteps}
 
-Another idea was that we feed the last n timesteps concatenated to the current observations. We hoped that this way, the agent could derive its own gradients internally. The result of this were high and very noisy q-losses and no sensible results still. Though gradients looked sensible, we suspect that the high Q-losses resulted in too high steps along the gradient and thus diverging behavior. 
+Another idea was that we feed the last n timesteps concatenated to the current observations. We hoped that this way, the agent could derive its own gradients internally. Also, a PID controller has a view of the past, with this extra information, the countroller would be able to generalize further. The result of this however were high and very noisy q-losses and q loss explosions, so we disabled this again.
 
 \subsection{Clipping action gradients}
 \label{sec:clip_act_grad}
@@ -576,20 +543,21 @@ Because we saw performance problems storing the priorities alongside the experie
 
 We still had some parts of the code left where there wasn't any noise involved, so we decided to add some to the training process. Data-augmentation with noise is a common technique when using neural networks \cite[p.347]{bishopNeuralNetworksPattern1995} to reduce overfitting, so we expected it to also make our model generalize better. There have been some experiments with data augmentation in reinforcement learning \cite{cobbeQuantifyingGeneralizationReinforcement2019}, but it is not often mentioned on tutorials or blog posts. We implemented by adding a small noise term to the sampled states, actions and next states \((s, a, s')\) when performing experience replay. We didn't really see any indication of bad generalization, but as implementing it wasn't a big issue and normally doesn't bring any disadvantages, we still added this feature and set the noise level to a very small value.
 
+\cite{fujimotoAddressingFunctionApproximation2018} addressed something similar on actions generated by the target policy, see section \ref{sec:double_critics} for this.
+
 \section{Exploding Q-Loss}
 
 We observed that our Q-Loss, especially after a death, explodes into e15 magnitude values, while most of the times it stayed around e2 magnitude. Instable Q-Losses are a general problem with DQN and DDPG, and some literature \cite{fujimotoAddressingFunctionApproximation2018} proposes to use two Q networks, of which only the minimum is used for training. 
 
 \subsection{Huber loss}
-We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. In fact, the authors of \ac{DQN} have caused some confusion on this in the \ac{RL}-community. In their journal paper \cite{mnihHumanlevelControlDeep2015}, they write \"We also found it helpful to clip the error term from the update [...] to be between -1 and 1\", which could be interpreted as loss clipping. However they actually switched to absolute error instead of square error after those boundaries, which is the definition for huber loss.
+We could already greatly improve our results by using huber-loss \cite{huber1964} for the critic instead of mean squared error loss as described in DDPG paper. In fact, the authors of \ac{DQN} have caused some confusion on this in the \ac{RL}-community. In their journal paper \cite{mnihHumanlevelControlDeep2015}, they write \"We also found it helpful to clip the error term from the update [...] to be between -1 and 1\", which could be interpreted as loss clipping. However they actually switched to absolute error instead of square error outside those boundaries, which is the definition for huber loss.
 
-Although loss explosions gotten less frequent and smaller in magnitude with this update, we still saw some.
+Although loss explosions gotten less frequent and smaller in magnitude with this update, we still saw some. In general we could observe an improvement in training, so we kept this active.
 
 \subsection{Double critics}
+\label{sec:double_critics}
 
-
-
-We also had a look at \cite{fujimotoAddressingFunctionApproximation2018}. They propose a set of three mechanisms that address function approximation error in \ac{DDPG}. At first, they show in section 4.1 that Q learning with a deterministic policy tends to overestimate true Q values. This has been observed in normal Q learning as well, but hasn't been generalized to \ac{DDPG} before. They show, that the interaction of the policy and the Q network leads to a residual error accumulating over the recursive nature of Q updates. To mitigate this, they at first proposed to use two Q networks and choose the minimum of the two to compute the target $y$. They combine this with the target network idea, so effectively we end up with 6 networks now. They called this technique Clipped Double Q learning. We illustrate this in figure \ref{fig:clippedq}. The Q target is computed as 
+We also had a look at \cite{fujimotoAddressingFunctionApproximation2018}. They propose a set of three mechanisms that address function approximation error in \ac{DDPG}, and they call it \ac{TD3}. At first, they show in section 4.1 that Q learning with a deterministic policy tends to overestimate true Q values. This has been observed in normal Q learning as well, but hasn't been generalized to \ac{DDPG} before. They show, that the interaction of the policy and the Q network leads to a residual error accumulating over the recursive nature of Q updates. To mitigate this, they at first proposed to use two Q networks and choose the minimum of the two to compute the target $y$. They combine this with the target network idea, so effectively we end up with 6 networks now. They called this technique Clipped Double Q learning. We illustrate this in figure \ref{fig:clippedq}. The Q target is computed as 
 
 \begin{equation}
 y = r(s, a) + \gamma \min_{i \in {1,2}} Q_i'(s', \mu'(s';\theta^{\mu'});\theta^{Q_i'})
@@ -597,7 +565,7 @@ y = r(s, a) + \gamma \min_{i \in {1,2}} Q_i'(s', \mu'(s';\theta^{\mu'});\theta^{
 
 \begin{figure}
   \centering
-  \includegraphics[width=\linewidth]{TD3-Setup.png}
+  \includegraphics[width=\linewidth]{images/TD3-Setup.png}
   \caption{Clipped double Q learning}
   \label{fig:clippedq}
 \end{figure}
@@ -614,7 +582,7 @@ Where $\tilde{a}$ is the target action with added noise on it. In their appendix
 
 When implementing this, we found that we now have two \ac{TD-Error}s which left us with a choice how to implement \ac{PER} in conjunction with this. We could either use one of the two errors. When implementing this, we found that the critic whose error we chose for \ac{PER} performed way better than the other, effectively rendering it useless to have two critics. We also tried to use the maximum and minimum of the two, which yielded more stable results, where minimum seemed better than maximum. Finally, we ended up with adding the two errors for prioritisation.
 
-Using the techniques from \cite{fujimotoAddressingFunctionApproximation2018} still didn't solve
+However, we could not get \ac{TD3} to work properly, with or without \ac{PER}, and didn't see any convergence.
 
 \subsection{Batch normalization}
 As in deep learning, batch normalization is found helpful for increasing lr and thus to skip over local maxima \cite{bjorckUnderstandingBatchNormalization}. It works by normalizing the outputs between the layers to be of zero mean and unit standart deviation, and for not losing generalization adding an extra learnt parameter per output dimension. We did get a performance boost when using this, however we ended up with NaN values after a while of running it, especially when experiencing q loss explosions. We can explain this because our prioritized experience replay most likely sampled only one item at a timee. To circumvent this, we clipped individual priorities. As these unexpected nan-values made training more complicated, we decided to not use batch normalization.
@@ -625,7 +593,7 @@ In \ac{DQN}, death conditions are accounted for by changing the Q target in the 
 
 \subsection{Clipping observations}
 
-Finally, we found that the solution to our problem lay in qblade. In certain conditions, qblade returned observations 20 orders of magnitude away from normal operation. As we based our reward calculation on the observations, the reward was also far off from normal reward. This condition happened only every 200k steps or so, and as we did not log every timestep, these spikes didn't end up in our logs. It was up to chance, that one of these spikes finally did, and we then decided to clip all normalized values to $[-3, 3]$.
+Finally, we found that the solution to our problem lay in qblade. In certain conditions, qblade returned observations 20 orders of magnitude away from normal operation. As we based our reward calculation on the observations, the reward was also far off from normal reward. This condition happened only every 200k steps or so, and as we did not log every timestep, these spikes didn't end up in our logs. We decided to filter out these spikes by clipping rewards and observations after normalization to $[-3, 3]$.
 
 \chapter{Algorithm}
 
@@ -695,16 +663,33 @@ Execute algorithm \ref{alg:pretrain} for policy pretraining \\
 
 \chapter{Evaluation}
 
-It must be stated that we did not achieve a single run which stayed within sensible operational range for longer than 30K steps. Even our handcrafted PID controller for which we took the first set of parameters that somehow works widely outperforms our learnt policies, an industry controller is even better. This result in itself is notable, because it needed a whole set of additions to plain \ac{DDPG} to get first sensible results on our windturbine environment. So either, our windturbine simulation is more complex to learn than the OpenAI gym examples, which are usually used as benchmarks for \ac{RL} performance, or we are having errors in our programme. As the final product we developped has improvements from a wide variety of papers but still does not produce stable results, we conclude that tackling wind turbine control with \ac{RL} will need more research. Though we were not able to outperform industry controllers, the speed in which the area of \ac{RL} is advancing makes us hopeful to achieve good results in the near future. With our work on integrating qblade, we provided an open-source, accessible framework to develop future reinforcement learning controllers for wind turbines.
+For our evaluation, we ran every experiment 4 times for 150 epochs, each lasting 2000 steps. We used a machine with an i7 4-core processor, 16GB RAM and a 1080 GTX with 8GB as accelerator. With these specs, we were able to run 1 experiment concurrently due to RAM limitations
 
-To demonstrate the instability, we ran 5 training runs with the same hyperparameters and measured return, epoch return, killcount and time to q explosion (where we define q explosion as q loss > 1e4)
+\section{Learning rates}
 
-\section{First working version}
+At first we regard the algorithm under different learning rates. We vary the critic learning rate between 1e-3 (left), 1e-4 (middle, recommended by DDPG authors) and 1e-5 (right) in figure \ref{fig:critic_lr}. The task to solve was to hold a rotational speed of 0.8 rad/s over the time of 2000 steps, starting with a simulation that has artificially been stabilized at the desired rotational speed with 0 degrees pitch and 0 generator torque. The agent gets a reward of 1 per step if it exactly matches rotational speed, deviation from it is linearly punished, 0 rad/s would yield a reward of 0. Thus, the theoretically possible maximum reward would be 2000, holding the turbine at perfect speed for the entire length of the simulation. However, as we start with 0 pitch and torque, action gradient limitations will naturally incur a small penalty at the beginning as these values need to be adjusted to sensible values and the resulting rotational speed deviation needs to be recovered. A perfect policy would thus reach a score of a litte bit below 2000.
 
-Our model consists of the DDPG algorithm with following additions:
-We integrated prioritized experience replay to
+Each of the controllers reaches this theoretical optimum and is able to hold it for a number of timesteps. With learning rate 1e-3, we reach it somewhere around episode 10, with learning rate 1e-4 a bit later and with 1e-5 even later. The time we are holding it before divergence also raises with learning rate.
 
-How we achieved first successes, hparams, etc
+Interesting to see is the strategy which the controller found. As described before, both increasing pitch and increasing torque reduces rotor speed, so through both it would be possible to control the rotational speed. However, all of our runs decided to implement pitch-only control. A possible explanation for this decision could be that with high pitches, lower forces act on the blades, thus rotational speed is easier to control. However, this insight is above our human knowledge of windturbines.
+
+With the aggressive learning rate, we can clearly see how quickly the algorithm is diverging. After a short period of convergence around epoch 10, the high learning rate steps the critic out of the minimum and causes instabilities. With even higher learning rates, we observed not reaching convergence at all. Interestingly, we can not see such divergence in the loss. In normal machine learning, a too high learning rate would cause a phenomenon of jumping across a minimum, taking gradient steps greater than the width of the local minimum. This would reduce in an increase in loss. Here, however, the q loss stays small on such divergence, as plotted in figure \ref{fig:critic_qloss} for the diverging run of critic lr=1e-3. This is because we are generating our prediction targets based on delayed versions of the same net, as we do not know a ground truth.
+
+In general, it is difficult to measure convergence or divergence in reinforcement learning, \cite{cobbeQuantifyingGeneralizationReinforcement2019} have made some efforts.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{images/plot_critic_1e-3.png}
+  \caption{Critic learning rate 1e-3 reward over epoch}
+  \label{fig:critic_lr}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{images/plot_critic_1e-3_qloss.png}
+  \caption{Critic learning rate 1e-3 q loss over step}
+  \label{fig:critic_qloss}
+\end{figure}
 
 \section{HParam tuning}
 We tried different hyper parameters. To evaluate our controller, we measure the time the simulation stayed within a sensible range. We define sensible as rotational speeds between 0 and 1.2 rad/s. We let each simulation run 1 million steps. As during our random exploration, the simulation was always in sensible range, we remove the random exploration phase from our evaluation.

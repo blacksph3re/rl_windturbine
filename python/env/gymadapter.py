@@ -1,8 +1,8 @@
 import gym
 
 class GymAdapter:
-  def __init__(self, hparams):
-    self.env = gym.make(hparams.env_name)
+  def __init__(self, env_name):
+    self.env = gym.make(env_name)
 
   def reset(self):
     self.observation = self.env.reset()
@@ -22,6 +22,15 @@ class GymAdapter:
 
   def get_act_low(self):
     return self.env.action_space.low
+
+  def get_act_max_grad(self):
+    return self.env.action_space.high - self.env.action_space.low
+
+  def get_obs_labels(self):
+    return {}
+
+  def get_act_labels(self):
+    return {}
 
   def step(self, action):
     self.observation, self.reward, self.death, _ = self.env.step(action)

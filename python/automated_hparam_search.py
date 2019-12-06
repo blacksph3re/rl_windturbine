@@ -44,15 +44,22 @@ import os
 ]'''
 
 
-experiments = [
-  {"id": 48},
-  {"id": 49},
-  {"id": 50},
-  {"id": 51},
-  {"id": 52},
+'''experiments = [
+  #{"id": 48}, # Twin critic, target policy smoothing on, results shitty
+  #{"id": 49},
+  #{"id": 50},
+  #{"id": 51},
+  {"id": 52}, # Single critic, critic-lr 1e-3, PER on, converged at first then diverged
   {"id": 53},
   {"id": 54},
   {"id": 55},
+]'''
+
+experiments = [
+  {"id": 56}, # Single critic, PER on, critic lr = 1e-4
+  {"id": 57},
+  {"id": 58},
+  {"id": 59},
 ]
 
 
@@ -85,7 +92,7 @@ def run_one(experiment):
     return (id, -1, -1)
 
 # Set the number of parallel runs here
-pool = Pool(2)
+pool = Pool(4)
 results = pool.map(run_one, experiments)
 
 for (id, reward, deaths) in results:

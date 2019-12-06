@@ -100,11 +100,11 @@ class UniformNoiseDec:
 # Helper class for not having noise at all
 class NoNoise:
     def __init__(self, dim, default_action=None):
-        self.default_action = default_action if default_action is not None else np.zeros(self.dim)
         self.dim = dim
+        self.default_action = default_action if default_action is not None else np.zeros(self.dim)
 
     def get_noise(self, _t=0):
-        return np.zeros(dim)
+        return self.default_action
 
 class CapacityBuffer:
     def __init__(self, max_size):
@@ -113,10 +113,11 @@ class CapacityBuffer:
 
     def append(self, data):
         self.push(data)
+
     def push(self, data):
         self.buffer.append(data)
         while(len(self.buffer) > self.max_size):
-            del self.buffer[-1]
+            self.buffer.pop(0)
 
     def get_buffer(self):
         return self.buffer
@@ -204,36 +205,8 @@ class SumTree:
         # Add the difference to all the nodes in the trajectory
         self.weights[trajectory] += weight_diff
 
-    # Samples an index from the tree
-    # Takes into account weights
-    def sample(self):
-        # Assert not empty
-        assert(self.weights[0] != 0)
+        return weight
 
-        return self.sample_rec(2) - 1 - self.tree_size
-
-    # Make one branch decision
-    # Index is a 1-terminated index in the tree, pointing to the left node of the two between which to decide
-    # Regularization is the weight of the parent node
-    # It returns the 1-terminated index in the weights
-    def sample_rec(self, index):
-        # Make a decision between the two weights
-        prob_left = self.weights[index-1]
-        prob_right = self.weights[index]
-        regularization = prob_left + prob_right
-        assert(regularization != 0)
-
-        go_left = np.random.uniform() < (prob_left/regularization)
-
-        if(not go_left):
-            index += 1
-
-        # Check whether we reached the leaf already
-        if(index > self.tree_size):
-            return index
-
-        # If not, continue recursively
-        return self.sample_rec(index * 2)
 
 # A "Basic" Buffer which stores entries and can sample them by priority
 class BasicBuffer:
@@ -250,22 +223,22 @@ class BasicBuffer:
         self.dtype = torch.float
 
         # GPU buffers
-        self.buffer_s = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device)
-        self.buffer_a = torch.zeros(max_size, action_dim, dtype=self.dtype, device=device)
-        self.buffer_snext = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device)
-        self.buffer_r = torch.zeros(max_size, 1, dtype=self.dtype, device=device)
-        self.buffer_d = torch.zeros(max_size, 1, dtype=self.dtype, device=device)
+        self.buffer_s = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device, requires_grad=False)
+        self.buffer_a = torch.zeros(max_size, action_dim, dtype=self.dtype, device=device, requires_grad=False)
+        self.buffer_snext = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device, requires_grad=False)
+        self.buffer_r = torch.zeros(max_size, 1, dtype=self.dtype, device=device, requires_grad=False)
+        self.buffer_d = torch.zeros(max_size, 1, dtype=self.dtype, device=device, requires_grad=False)
 
         self.priorities = SumTree(max_size, alpha)
         self.max_priority = 1
 
     def copy_buffer_to_device(self):
         for i in range(0, len(self)):
-            self.buffer_s[i] = torch.tensor(self.buffer[i][0])
-            self.buffer_a[i] = torch.tensor(self.buffer[i][1])
-            self.buffer_r[i] = torch.tensor(self.buffer[i][2])
-            self.buffer_snext[i] = torch.tensor(self.buffer[i][3])
-            self.buffer_d[i] = torch.tensor(self.buffer[i][4])
+            self.buffer_s[i] = torch.tensor(self.buffer[i][0], dtype=self.dtype, requires_grad=False)
+            self.buffer_a[i] = torch.tensor(self.buffer[i][1], dtype=self.dtype, requires_grad=False)
+            self.buffer_r[i] = torch.tensor(self.buffer[i][2], dtype=self.dtype, requires_grad=False)
+            self.buffer_snext[i] = torch.tensor(self.buffer[i][3], dtype=self.dtype, requires_grad=False)
+            self.buffer_d[i] = torch.tensor(self.buffer[i][4], dtype=self.dtype, requires_grad=False)
 
     def push(self, state, action, reward, next_state, done, priority=None):
         # If not given a priority, make sure it's getting sampled
@@ -283,11 +256,11 @@ class BasicBuffer:
         # Store experience
         self.buffer[self.iterator] = (state, action, np.array([reward]), next_state, np.array([done]))
 
-        self.buffer_s[self.iterator] = torch.tensor(state)
-        self.buffer_a[self.iterator] = torch.tensor(action)
-        self.buffer_snext[self.iterator] = torch.tensor(next_state)
-        self.buffer_r[self.iterator] = torch.tensor([reward])
-        self.buffer_d[self.iterator] = torch.tensor([done])
+        self.buffer_s[self.iterator] = torch.tensor(state, requires_grad=False)
+        self.buffer_a[self.iterator] = torch.tensor(action, requires_grad=False)
+        self.buffer_snext[self.iterator] = torch.tensor(next_state, requires_grad=False)
+        self.buffer_r[self.iterator] = torch.tensor([reward], requires_grad=False)
+        self.buffer_d[self.iterator] = torch.tensor([done], requires_grad=False)
 
         self.priorities.update_entry(self.iterator, priority)
         self.iterator += 1
@@ -299,12 +272,14 @@ class BasicBuffer:
     def update_priorities(self, indices, priorities):
         assert(len(indices) == len(priorities))
         for (i, p) in zip(indices, priorities):
-            self.max_priority = max(self.max_priority, p)
-            self.priorities.update_entry(i, p)
+            weight = self.priorities.update_entry(i, p)
+            self.max_priority = max(self.max_priority, weight)
 
     # Gets the prioritized to the power of alpha and normalized to sum to 1
-    def get_probabilities(self, indices):
-        weights = self.priorities.get_leaf_weights_alpha()[indices]
+    def get_probabilities(self, indices=None):
+        weights = self.priorities.get_leaf_weights_alpha()[0:len(self)]
+        if(isinstance(indices, list)):
+            weights = weight[indices]
         weights = weights/self.priorities.get_sum_alpha()
         return weights
 
@@ -321,10 +296,9 @@ class BasicBuffer:
         if(len(self.buffer) == 0):
             return [], [], [], [], [], []
 
-
         # Sample according to priorities or uniformly
         if(not uniform):
-            indices = [self.priorities.sample() for _ in range(0, batch_size)]
+            indices = np.random.choice(len(self), batch_size, p=self.get_probabilities())
         else:
             indices = np.random.choice(len(self), batch_size)
 
@@ -386,41 +360,21 @@ class BasicBuffer:
 
 class QBladeLogger:
 
-    def __init__(self, logdir, log_steps, run_name):
+    def __init__(self, logdir, log_steps, run_name, obs_labels = {}, act_labels = {}):
         self.logdir = logdir
         self.log_steps = log_steps
         run_name = run_name if run_name else str(datetime.now())
         self.writer = SummaryWriter('%s/%s' % (logdir, run_name))
+        self.obs_labels = obs_labels
+        self.act_labels = act_labels
 
     def logObservation(self, step, observation, prefix='obs'):
-        labels = {
-          0: 'rotational speed [rad/s]',
-          1: 'power [kW]',
-          2: 'HH wind velocity [m/s]',
-          3: 'yaw angle [deg]',
-          4: 'pitch blade 1 [deg]',
-          5: 'pitch blade 2 [deg]',
-          6: 'pitch blade 3 [deg]',
-          7: 'tower top bending local x [Nm]',
-          8: 'tower top bending local y [Nm]',
-          9: 'tower top bending local z [Nm]',
-          10: 'oop bending blade 1 [Nm]',
-          11: 'oop bending blade 2 [Nm]',
-          12: 'oop bending blade 3 [Nm]',
-          13: 'ip bending blade 1 [Nm]',
-          14: 'ip bending blade 2 [Nm]',
-          15: 'ip bending blade 3 [Nm]',
-          16: 'oop tip deflection blade 1 [m]',
-          17: 'oop tip deflection blade 2 [m]',
-          18: 'oop tip deflection blade 3 [m]',
-          19: 'ip tip deflection blade 1 [m]',
-          20: 'ip tip deflection blade 2 [m]',
-          21: 'ip tip deflection blade 3 [m]',
-          22: 'current time [s]'
-        }
-
         for i in range(0, len(observation)):
-            self.add_scalar('%s/%s'% (prefix, labels[i]), observation[i], step)
+            if i in self.obs_labels:
+                label = self.obs_labels[i]
+            else:
+                label = 'unknown %d' % i
+            self.add_scalar('%s/%s'% (prefix, label), observation[i], step)
 
     def add_scalar(self, name, val, time):
         # Don't do anything if not in the logging step
@@ -447,11 +401,13 @@ class QBladeLogger:
             print(e)
 
     def logAction(self, step, action, prefix='act'):
-        self.add_scalar('%s/generator torque [Nm]' % prefix, action[0], step)
-        #self.add_scalar('%s/yaw angle [deg]' % prefix, action[1], step)
-        self.add_scalar('%s/pitch blade 1 [deg]' % prefix, action[1], step)
-        #self.add_scalar('%s/pitch blade 2 [deg]' % prefix, action[3], step)
-        #self.add_scalar('%s/pitch blade 3 [deg]' % prefix, action[4], step)
+        for i in range(0, len(action)):
+            if i in self.act_labels:
+                label = self.act_labels[i]
+            else:
+                label = 'unknown %d' % i
+            self.add_scalar('%s/%s'% (prefix, label), action[i], step)
+
 
     def close(self):
         self.writer.close()

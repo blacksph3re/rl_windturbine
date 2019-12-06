@@ -4,20 +4,20 @@ import re
 # This class is partially compatible to tensorflows training.contrib.HParams class
 class HParams:
   def __init__(self, **first_data):
-    self.data = first_data
+    self.__dict__ = first_data
 
   def __str__(self):
-    return str(self.data)
+    return str(self.__dict__)
 
   def get_dict(self):
-    return self.data
+    return self.__dict__
 
   def override_from_dict(self, new_data):
     for k,v in new_data:
-      self.data[k] = v
+      self.__dict__[k] = v
 
   def items(self):
-    return self.data.items()
+    return self.__dict__.items()
 
   def values(self):
     data = {}
@@ -29,7 +29,7 @@ class HParams:
       except:
         return False
 
-    for k,v in self.data.items():
+    for k,v in self.__dict__.items():
       if(not is_jsonable):
         data[k] = str(v)
       else:
@@ -46,7 +46,7 @@ class HParams:
 
     data = json.loads(args)
     for key, value in data:
-      self.data[key] = value
+      self.__dict__[key] = value
 
   # parses in the form of a=1,b=2,
   def parse(self, args):
@@ -61,7 +61,10 @@ class HParams:
         value = eval(value) # unsafe as fuck
       except:
         pass
-      self.data[key] = value
+      self.__dict__[key] = value
 
-  def __getattr__(self, name):
-    return self.data[name]
+  #def __getattr__(self, name):
+  #  return self.__dict__[name]
+#
+#  def __setattr__(self, name, val):
+#    self.__dict__[name] = val

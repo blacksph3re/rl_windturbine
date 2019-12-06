@@ -22,7 +22,8 @@ def unloadLib(handle, path):
 
 
 class QBladeAdapter:
-  def __init__(self):
+  def __init__(self, project="../sample_projects/NREL_5MW_STR.wpa"):
+    self.project = project
     self._qbladeLib = None
 
     print("loading qblade library")
@@ -59,7 +60,7 @@ class QBladeAdapter:
     del self._advanceSingleTimestep
 
   def load_default_project(self):
-    x = ctypes.c_char_p(b"../sample_projects/NREL_5MW_STR.wpa")
+    x = ctypes.c_char_p(bytes(self.project, 'utf-8'))
     print("loading qblade project")
     self._loadProject(x)
     self.steps_since_reload = 0
@@ -75,8 +76,8 @@ class QBladeAdapter:
     # Do some steps with zero action
     action = np.zeros(self.get_act_dim())
     self.storeAction(action)
-    for i in range(0, 100):
-      self._advanceSingleTimestep()
+    #for i in range(0, 100):
+    #  self._advanceSingleTimestep()
 
     print('reset done')
 
@@ -103,6 +104,42 @@ class QBladeAdapter:
     timestep = 0.1
     return [150000*timestep, 8*timestep]
 
+  def get_obs_labels(self):
+    return {
+      0: 'rotational speed [rad/s]',
+      1: 'power [kW]',
+      2: 'HH wind velocity [m/s]',
+      3: 'yaw angle [deg]',
+      4: 'pitch blade 1 [deg]',
+      5: 'pitch blade 2 [deg]',
+      6: 'pitch blade 3 [deg]',
+      7: 'tower top bending local x [Nm]',
+      8: 'tower top bending local y [Nm]',
+      9: 'tower top bending local z [Nm]',
+      10: 'oop bending blade 1 [Nm]',
+      11: 'oop bending blade 2 [Nm]',
+      12: 'oop bending blade 3 [Nm]',
+      13: 'ip bending blade 1 [Nm]',
+      14: 'ip bending blade 2 [Nm]',
+      15: 'ip bending blade 3 [Nm]',
+      16: 'oop tip deflection blade 1 [m]',
+      17: 'oop tip deflection blade 2 [m]',
+      18: 'oop tip deflection blade 3 [m]',
+      19: 'ip tip deflection blade 1 [m]',
+      20: 'ip tip deflection blade 2 [m]',
+      21: 'ip tip deflection blade 3 [m]',
+      22: 'current time [s]'
+    }
+
+  def get_act_labels(self):
+    return {
+      0: 'generator torque [Nm]',
+      1: 'collective pitch [deg]',
+      #1: 'yaw angle [deg]',
+      #2: 'pitch blade 1 [deg]',
+      #3: 'pitch blade 2 [deg]',
+      #4: 'pitch blade 3 [deg]'
+    }
 
   def calc_reward(self, observation, action, death):
     if(death):
@@ -172,6 +209,7 @@ class QBladeAdapter:
     self._advanceSingleTimestep()
 
     observation = self.extractObservation(False)
+
     death = self.calc_death(observation)
     observation = np.nan_to_num(observation)
     reward = self.calc_reward(observation, action, death)

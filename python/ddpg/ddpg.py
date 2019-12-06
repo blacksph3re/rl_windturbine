@@ -18,7 +18,8 @@ class DDPG:
   
   def __init__(self, hparams):
     self.device = torch.device("cuda" if torch.cuda.is_available() and hparams.use_gpu else "cpu")
-    
+    self.dtype = torch.float
+
     self.hparams = hparams
     self.obs_dim = hparams.obs_dim
     self.act_dim = hparams.act_dim
@@ -42,6 +43,7 @@ class DDPG:
       self.act_high = np.ones(self.act_dim)
       self.act_low = -np.ones(self.act_dim)
       self.real_last_action = self.hparams.starting_action
+      assert(len(self.real_last_action) == self.act_dim)
       self.action_grad_denormalizer = (self.real_act_high - self.real_act_low) * self.hparams.action_gradient_stepsize
 
       assert(np.all(self.real_last_action <= self.real_act_high))
@@ -66,7 +68,7 @@ class DDPG:
       self.optimizer = optim.Adam
     else:
       self.optimizer = optim.SGD
-    self.critic_optimizer = self.optimizer(self.critic.parameters(), lr=hparams.critic_lr)
+    self.critic_optimizer = self.optimizer(self.critic.parameters(), lr=hparams.critic_lr, weight_decay=hparams.critic_weight_decay)
     self.actor_optimizer  = self.optimizer(self.actor.parameters(), lr=hparams.actor_lr)
 
     # If in twin critic mode, add another critic
@@ -95,6 +97,7 @@ class DDPG:
     # Noises
     # Random exploration
     if(self.hparams.random_exploration_type == 'correlated'):
+      assert(len(self.hparams.random_exploration_mu) == self.act_dim)
       self.random_exploration_noise = OUNoise(
         self.act_dim,
         self.hparams.random_exploration_theta,
@@ -145,7 +148,7 @@ class DDPG:
                                  self.hparams.act_high,
                                  self.device)
 
-    self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps, self.hparams.run_name)
+    self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps, self.hparams.run_name, self.hparams.obs_labels, self.hparams.act_labels)
     for key, value in self.hparams.values().items():
       self.logger.writer.add_text(key, str(value), 0)
 
@@ -177,7 +180,7 @@ class DDPG:
     # Send the observation to the device, normalize it
     # Then calculate the action and denormalize it
     assert(not np.any(np.isnan(obs)))
-    state = torch.FloatTensor(obs).unsqueeze(0).to(self.device)
+    state = torch.tensor(obs, dtype=self.dtype).unsqueeze(0).to(self.device)
 
     if (self.hparams.normalize_observations):
       state = self.normalizer.normalize_state(state, True)
@@ -187,7 +190,7 @@ class DDPG:
 
     # Add noise
     if(add_noise):
-      noise = torch.FloatTensor(self.action_noise.get_noise(self.time)).to(self.device)
+      noise = torch.tensor(self.action_noise.get_noise(self.time), dtype=self.dtype).to(self.device)
       action = action + noise
     
     if(self.hparams.normalize_actions):
@@ -210,7 +213,10 @@ class DDPG:
 
   # Returns an unnormalized expert action from the expert controller
   def get_expert_action(self, state):
-    return [2e7*state[0]-12e6,128.6*state[0]-102.9]
+    if(self.act_dim == 2):
+      return [2e7*state[0]-12e6,128.6*state[0]-102.9]
+    else:
+      return np.zeros(self.act_dim)
 
   def prepare(self, state):
     assert(not np.any(np.isnan(state)))
@@ -252,8 +258,8 @@ class DDPG:
 
     validation_actions = [self.get_expert_action(state) for state in validation_states]
 
-    validation_states = torch.FloatTensor(validation_states).to(self.device)
-    validation_actions = torch.FloatTensor(validation_actions).to(self.device)
+    validation_states = torch.tensor(validation_states, dtype=self.dtype).to(self.device)
+    validation_actions = torch.tensor(validation_actions, dtype=self.dtype).to(self.device)
 
     if(self.hparams.normalize_observations):
       validation_states = self.normalizer.normalize_state(validation_states, True)
@@ -265,8 +271,7 @@ class DDPG:
       state_batch, _, _, _, _, _ = self.replay_buffer.sample(self.hparams.pretrain_policy_batch_size)
 
       action_batch = [self.get_expert_action(state) for state in state_batch]
-
-      action_batch = torch.FloatTensor(action_batch).to(self.device)
+      action_batch = torch.tensor(action_batch, dtype=self.dtype).to(self.device)
       
       if(self.hparams.normalize_observations):
         state_batch = self.normalizer.normalize_state(state_batch, True)
@@ -299,13 +304,13 @@ class DDPG:
     # Add replay noise if desired
     if(self.hparams.replay_noise):
       state_noise = [np.random.uniform(-np.ones(self.obs_dim), np.ones(self.obs_dim), self.obs_dim) for i in range(0, batch_size)]
-      state_noise = torch.FloatTensor(state_noise).to(self.device)
+      state_noise = torch.tensor(state_noise, dtype=self.dtype).to(self.device)
       state_noise = self.normalizer.denormalize_state(state_noise, True)
       action_noise = [np.random.uniform(-np.ones(self.act_dim), np.ones(self.act_dim), self.act_dim) for i in range(0, batch_size)]
-      action_noise = torch.FloatTensor(action_noise).to(self.device)
+      action_noise = torch.tensor(action_noise, dtype=self.dtype).to(self.device)
       action_noise = self.normalizer.denormalize_action(action_noise, True)
       next_state_noise = [np.random.uniform(-np.ones(self.obs_dim), np.ones(self.obs_dim), self.obs_dim) for i in range(0, batch_size)]
-      next_state_noise = torch.FloatTensor(next_state_noise).to(self.device)
+      next_state_noise = torch.tensor(next_state_noise, dtype=self.dtype).to(self.device)
       next_state_noise = self.normalizer.denormalize_state(next_state_noise, True)
 
       state_batch = state_batch * (1 - self.hparams.replay_noise) + state_noise * self.hparams.replay_noise
@@ -328,60 +333,64 @@ class DDPG:
   def update(self, batch_size, time = None):
     time = time or self.time
 
+    
     (state_batch, action_batch, reward_batch, next_state_batch, masks, indices) = self.sample(batch_size, False)
 
+
     # When using PER, calculate IS-weights
-    weights = np.ones(batch_size)
+    weights = torch.ones(batch_size)
     if(self.hparams.prioritized_experience_replay):
       weights = self.replay_buffer.get_probabilities(indices)
       weights = (weights*batch_size) ** (-self.hparams.prioritized_experience_replay_beta)
       weights = weights / np.max(weights)
       assert(not np.any(np.isnan(weights)))
       assert(not np.any(weights > 1))
-      weights = torch.FloatTensor(weights).to(self.device)
+      weights = torch.tensor(weights, dtype=self.dtype).to(self.device)
 
     # Run the critic
-    self.critic_optimizer.zero_grad()
-    curr_Q = self.critic.forward(state_batch, action_batch)
     next_actions = self.actor_target.forward(next_state_batch).detach()
-
     # If using target policy smoothing, add a bit of noise to next actions
     if(self.hparams.target_policy_smoothing):
       sigma = torch.ones_like(next_actions) * self.hparams.target_policy_smoothing_sigma
       mu = torch.zeros_like(next_actions)
-      c = torch.ones_like(next_actions) * self.hparams.target_policy_smoothing_clip
-      next_actions += torch.clamp(torch.normal(mu, sigma), -c, c)
+
+      next_actions += torch.clamp(torch.normal(mu, sigma), -self.hparams.target_policy_smoothing_clip, self.hparams.target_policy_smoothing_clip)
       next_actions = torch.clamp(next_actions, -1, 1)
 
-    next_Q = self.critic_target.forward(next_state_batch, next_actions)
+    next_Q = self.critic_target.forward(next_state_batch, next_actions).detach()
     expected_Q = reward_batch + self.gamma * next_Q * masks
     
     # If using twin q, take minimum of the two next_Q estimations and replace that with the current one
     if(self.hparams.twin_critics):
-      self.critic2_optimizer.zero_grad()
-      curr_Q2 = self.critic2.forward(state_batch, action_batch)
+      
       next_Q2 = self.critic2_target.forward(next_state_batch, next_actions)
       expected_Q = reward_batch + self.gamma * torch.min(next_Q, next_Q2) * masks
 
-      q2_loss, td_error2 = self.critic_loss_function(curr_Q2, expected_Q.detach(), weights)
+      self.critic2_optimizer.zero_grad()
+      curr_Q2 = self.critic2.forward(state_batch, action_batch)
+      q2_loss, td_error2 = self.critic_loss_function(curr_Q2, expected_Q.detach(), weights.detach())
       q2_loss.backward()
 
       if(self.hparams.clip_gradients):
         torch.nn.utils.clip_grad_norm_(self.critic2.parameters(), self.hparams.clip_gradients)
 
       self.critic2_optimizer.step()
-      self.logger.add_scalar('Loss/q2', q2_loss, time)
+      self.logger.add_scalar('Loss/q2', q2_loss.detach(), time)
       self.logger.add_scalar('Loss/next-q2-mean', next_Q2.mean().detach().cpu(), time)
 
 
     # update critic
-    q_loss, td_error = self.critic_loss_function(curr_Q, expected_Q.detach(), weights)
+    self.critic_optimizer.zero_grad()
+    curr_Q = self.critic.forward(state_batch, action_batch)
+    q_loss, td_error = self.critic_loss_function(curr_Q, expected_Q.detach(), weights.detach())
     q_loss.backward() 
 
     if(self.hparams.clip_gradients):
       torch.nn.utils.clip_grad_norm_(self.critic.parameters(), self.hparams.clip_gradients)
 
     self.critic_optimizer.step()
+    self.logger.add_scalar('Loss/q', q_loss.detach(), time)
+    self.logger.add_scalar('Loss/next_Q_mean', next_Q.mean().detach(), time)
 
     # Also, for correction of oversampling in later policy replays, redraw samples
     if(self.hparams.prioritized_experience_replay):
@@ -397,6 +406,7 @@ class DDPG:
       policy_loss.backward()
 
       self.actor_optimizer.step()
+      self.logger.add_scalar('Loss/policy', policy_loss.detach(), time)
 
 
     # Update priorities if using prioritized experience replay
@@ -408,7 +418,7 @@ class DDPG:
         td_error = td_error + td_error2
 
       td_error = td_error.detach().abs().cpu().flatten()
-      td_error = torch.add(td_error, torch.FloatTensor(np.ones(batch_size) * 1e-6))
+      td_error = torch.add(td_error, torch.tensor(np.ones(batch_size) * 1e-6, dtype=self.dtype))
 
       self.replay_buffer.update_priorities(indices, td_error.data.numpy())
 
@@ -426,9 +436,6 @@ class DDPG:
         param.data.copy_(param.data + self.hparams.parameter_noise * np.random.uniform(-1, 1))
 
     # Log everything if needed
-    self.logger.add_scalar('Loss/q', q_loss, time)
-    self.logger.add_scalar('Loss/next_Q_mean', next_Q.mean(), time)
-    self.logger.add_scalar('Loss/policy', policy_loss, time)
     if(self.hparams.log_net_insights and self.time % self.hparams.log_net_insights == 0):
       critic_state = dict(self.critic.cpu().named_parameters())
 
@@ -510,7 +517,7 @@ class DDPG:
       self.normalizer.calc_normalizations(self.replay_buffer.get_buffer(), self.hparams.normalization_extradata)
 
       # If wanted, pretrain the policy to actions from random exploration
-      if(self.hparams.pretrain_policy_steps):
+      if(self.hparams.pretrain_policy):
         print('Pretraining the policy for %d steps' % self.hparams.pretrain_policy_steps)
         self.pretrain_policy()
 
@@ -569,7 +576,7 @@ class DDPG:
 
     self.time = self.time + 1
 
-    return action, done or epoch_end
+    return action, done or (epoch_end and self.hparams.reset_after_epoch)
 
   def close(self):
     self.logger.close()
@@ -636,12 +643,15 @@ class DDPG:
       # for the agent and the environment in each epoch.
       steps_per_epoch = 2000,
 
+      # Whether to reset the environment after an epoch
+      reset_after_epoch = True,
+
       # Number of steps to sample random actions
       # before starting to utilize the policy
-      random_exploration_steps = 10000,
+      random_exploration_steps = 0,
 
       # How many steps to train the agent after random exploration
-      random_exploration_training_steps = 10000,
+      random_exploration_training_steps = 0,
 
       # Type of random exploration noise
       # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
@@ -658,7 +668,7 @@ class DDPG:
       # -1 being minimum action and 1 maximum
       # None means np.zeros(act_dim) as mu
       # If gradient actions are active, this is in gradient action space
-      random_exploration_mu = [-1,-1],
+      random_exploration_mu = [-1, -1],
 
       # Number of steps after which to write out a checkpoint
       checkpoint_steps = 10000,
@@ -695,7 +705,7 @@ class DDPG:
       buffer_maxlen = 100000,
 
       # Learning rate of the Q approximator
-      critic_lr = 1e-3,
+      critic_lr = 1e-4,
 
       # Neural network sizes of the critic
       critic_sizes = [64, 32],
@@ -709,11 +719,14 @@ class DDPG:
       # Other values: "mse", "huber"
       critic_loss = 'huber',
 
+      # Whether to use L2 regularization
+      critic_weight_decay = 0.01,
+
       # Whether to use duelling critics
       # In this variant, two critics try to estimate q
       # and only the lower estimation will be chosen
       # Helps prevent loss explosions and overestimation
-      twin_critics = True,
+      twin_critics = False,
 
       # Learning rate of the policy
       actor_lr = 1e-4,
@@ -727,12 +740,12 @@ class DDPG:
       # Only update the actor every n critic updates
       # 1 for updating every critic update
       # From TD3
-      actor_delay = 2,
+      actor_delay = 1,
 
       # Whether to use target policy smoothing
       # In this, a bit of noise is added to target actions
       # From TD3
-      target_policy_smoothing = True,
+      target_policy_smoothing = False,
 
       # How strongly to apply target policy smoothing
       target_policy_smoothing_sigma = 0.01,
@@ -758,14 +771,14 @@ class DDPG:
       # a uniform random value between [-init_weight_limit, init_weight_limit]
       init_weight_limit = 1.,
 
-      # Observation and action dimension, will be overwritten by environment obs dim
-      obs_dim = 1,
-      act_dim = 1,
-
-      # Upper and lower limits for actions, will be overwritten by environment act limits
+      # Stuff that will be overwritten by the environment
+      obs_dim = 0,
+      act_dim = 0,
       act_high = [0.],
       act_low = [0.],
       act_max_grad = [0.],
+      act_labels = {},
+      obs_labels = {},
 
       # Where to store tensorboard logs
       logdir = "logs",
@@ -775,7 +788,7 @@ class DDPG:
 
       # Log net insight histograms every n steps
       # -1 for disabling completely
-      log_net_insights = 128,
+      log_net_insights = 1000,
 
       # Action noise
       # The type of action noise can be either
@@ -807,7 +820,7 @@ class DDPG:
 
       # Adding noise to experience replay helps to prevent overfitting
       # Requires action and observation normalization
-      replay_noise = 0,
+      replay_noise = 1e-5,
 
       # Action normalization should always be enabled when the action space is not already between -1 and 1.
       # Otherwise noise will not make sense
@@ -870,9 +883,12 @@ class DDPG:
       # Whether to clip action gradients at the maximum level returned from the environment
       clip_action_gradients = True,
 
+      # Whether to pretrain the policy
+      pretrain_policy = False,
+
       # How many steps to pretrain the policy after random exploration to predict the actions of the
       # expert controller
-      pretrain_policy_steps = 10000,
+      pretrain_policy_steps = 100,
 
       # Batch size to use in pretraining
       pretrain_policy_batch_size = 32,

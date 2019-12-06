@@ -13,6 +13,7 @@ import os
 import json
 import time
 
+
 def main():
 
   import argparse
@@ -23,7 +24,8 @@ def main():
   parser.add_argument('--load_checkpoint_hparams', action="store_true", help="also load hparams from checkpoint file")
   args = parser.parse_args()
 
-  env = QBladeAdapter()
+  env = QBladeAdapter("../sample_projects/NREL_5MW_STR.wpa")
+  #env = GymAdapter('Pendulum-v0')
 
   # Get default hparams
   hparams = DDPG.get_default_hparams()
@@ -47,6 +49,8 @@ def main():
   hparams.act_high = env.get_act_high()
   hparams.act_low = env.get_act_low()
   hparams.act_max_grad = env.get_act_max_grad()
+  hparams.act_labels = env.get_act_labels()
+  hparams.obs_labels = env.get_obs_labels()
 
   checkpoint_steps = hparams.checkpoint_steps
   checkpoint_dir = hparams.checkpoint_dir
@@ -80,13 +84,14 @@ def main():
 
     start = time.time()
     o, r, d = env.step(a)
+    reset = d
     step = time.time()
     a, reset = agent.step(o, r, d)
     end = time.time()
     execution_time_env += step - start
     execution_time_agent += end - step
 
-    if(t%100 == 0):
+    if(t%300 == 0):
       print("Step %d, Execution times env: %f, agent: %f" % (t, execution_time_env, execution_time_agent))
       execution_time_agent = 0
       execution_time_env = 0
@@ -108,6 +113,10 @@ def main():
       o, r, d = env.step(a)
 
       total_reward += r
+
+      agent.logger.logAction(t, a, 'act_test')
+      agent.logger.logObservation(t, o, 'obs_test')
+      agent.logger.add_scalar('Reward/test', r, t)
 
       if(d):
         total_deaths += 1

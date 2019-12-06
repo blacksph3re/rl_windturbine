@@ -6,6 +6,7 @@ from .utils import BasicBuffer
 class Normalizer:
   def __init__(self, obs_dim, act_dim, act_low, act_high, device):
     self.device = device
+    self.dtype = torch.float
     self.obs_dim = obs_dim
     self.act_dim = act_dim
     self.act_high = np.array(act_high)
@@ -16,19 +17,19 @@ class Normalizer:
     c = self.act_low - m * (-1)
     assert(not np.any(m == 0))
     self.action_normalizer_params = (m, c)
-    self.action_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
-                                         torch.FloatTensor(c).to(self.device))
+    self.action_normalizer_params_gpu = (torch.tensor(m, dtype=self.dtype).to(self.device),
+                                         torch.tensor(c, dtype=self.dtype).to(self.device))
 
     # We just set the rest to identity projection
     self.state_normalizer_params = (np.ones(obs_dim),
                                     np.zeros(obs_dim))
-    self.state_normalizer_params_gpu = (torch.FloatTensor(np.ones(obs_dim)).to(self.device), 
-                                        torch.FloatTensor(np.zeros(obs_dim)).to(self.device))
+    self.state_normalizer_params_gpu = (torch.tensor(np.ones(obs_dim), dtype=self.dtype).to(self.device), 
+                                        torch.tensor(np.zeros(obs_dim), dtype=self.dtype).to(self.device))
 
     self.reward_normalizer_params = (np.ones(1),
                                      np.zeros(1))
-    self.reward_normalizer_params_gpu = (torch.FloatTensor(np.ones(1)).to(self.device), 
-                                         torch.FloatTensor(np.zeros(1)).to(self.device))
+    self.reward_normalizer_params_gpu = (torch.tensor(np.ones(1), dtype=self.dtype).to(self.device), 
+                                         torch.tensor(np.zeros(1), dtype=self.dtype).to(self.device))
 
   def to_dict(self):
     return {
@@ -45,12 +46,12 @@ class Normalizer:
     self.action_normalizer_params = (np.array(data["action_m"]), np.array(data["action_c"]))
     self.reward_normalizer_params = (np.array(data["reward_m"]), np.array(data["reward_c"]))
 
-    self.state_normalizer_params_gpu =  (torch.FloatTensor(data["state_m"]).to(self.device),
-                                         torch.FloatTensor(data["state_c"]).to(self.device))
-    self.action_normalizer_params_gpu = (torch.FloatTensor(data["action_m"]).to(self.device),
-                                         torch.FloatTensor(data["action_c"]).to(self.device))
-    self.reward_normalizer_params_gpu = (torch.FloatTensor(data["reward_m"]).to(self.device),
-                                         torch.FloatTensor(data["reward_c"]).to(self.device))
+    self.state_normalizer_params_gpu =  (torch.tensor(data["state_m"], dtype=self.dtype).to(self.device),
+                                         torch.tensor(data["state_c"], dtype=self.dtype).to(self.device))
+    self.action_normalizer_params_gpu = (torch.tensor(data["action_m"], dtype=self.dtype).to(self.device),
+                                         torch.tensor(data["action_c"], dtype=self.dtype).to(self.device))
+    self.reward_normalizer_params_gpu = (torch.tensor(data["reward_m"], dtype=self.dtype).to(self.device),
+                                         torch.tensor(data["reward_c"], dtype=self.dtype).to(self.device))
 
   def normalize_action(self, action, gpu=False):
 
@@ -131,8 +132,8 @@ class Normalizer:
 
     # Store once as cpu and once as gpu variant
     self.state_normalizer_params = (m, c)
-    self.state_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
-                      torch.FloatTensor(c).to(self.device))
+    self.state_normalizer_params_gpu = (torch.tensor(m, dtype=self.dtype).to(self.device),
+                      torch.tensor(c, dtype=self.dtype).to(self.device))
 
     # Same for rewards
     rewards = [reward for _, _, reward, _, _ in replay_buffer]
@@ -151,5 +152,5 @@ class Normalizer:
     assert(not np.any(m == 0))
 
     self.reward_normalizer_params = (m, c)
-    self.reward_normalizer_params_gpu = (torch.FloatTensor(m).to(self.device),
-                       torch.FloatTensor(c).to(self.device))
+    self.reward_normalizer_params_gpu = (torch.tensor(m, dtype=self.dtype).to(self.device),
+                       torch.tensor(c, dtype=self.dtype).to(self.device))
