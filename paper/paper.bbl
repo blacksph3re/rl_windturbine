@@ -1,264 +1,210 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
-\begin{thebibliography}{MKS{\etalchar{+}}b}
+\begin{thebibliography}{SAZFG{\etalchar{+}}}
 
 \bibitem[Aga]{agarapDeepLearningUsing2019}
-\textsc{Agarap}, Abien~F.:
-\newblock Deep {{Learning}} Using {{Rectified Linear Units}} ({{ReLU}}).
-\newblock
+Abien~Fred Agarap.
+\newblock Deep {{Learning}} using {{Rectified Linear Units}} ({{ReLU}}).
 
 \bibitem[BCP{\etalchar{+}}]{brockmanOpenAIGym2016}
-\textsc{Brockman}, Greg ; \textsc{Cheung}, Vicki ; \textsc{Pettersson}, Ludwig
-  ; \textsc{Schneider}, Jonas ; \textsc{Schulman}, John ; \textsc{Tang}, Jie  ;
-  \textsc{Zaremba}, Wojciech:
+Greg Brockman, Vicki Cheung, Ludwig Pettersson, Jonas Schneider, John Schulman,
+  Jie Tang, and Wojciech Zaremba.
 \newblock {{OpenAI Gym}}.
-\newblock
 
 \bibitem[Bel]{bellmanTheoryDynamicProgramming1954}
-\textsc{Bellman}, Richard:
-\newblock The Theory of Dynamic Programming.
-\newblock
-\newblock 60, Nr. 6, S. 503--516. --
-\newblock ISSN 0002--9904
+Richard Bellman.
+\newblock The theory of dynamic programming.
+\newblock 60(6):503--516.
 
 \bibitem[BGSW]{bjorckUnderstandingBatchNormalization}
-\textsc{Bjorck}, Nils ; \textsc{Gomes}, Carla~P. ; \textsc{Selman}, Bart  ;
-  \textsc{Weinberger}, Kilian~Q.:
+Nils Bjorck, Carla~P Gomes, Bart Selman, and Kilian~Q Weinberger.
 \newblock Understanding {{Batch Normalization}}.
-\newblock
-\newblock , S.~12
+\newblock page~12.
 
 \bibitem[Bis]{bishopNeuralNetworksPattern1995}
-\textsc{Bishop}, Christopher~M.:
-\newblock \emph{Neural Networks for Pattern Recognition}.
-\newblock {Clarendon Press ; Oxford University Press}. --
-\newblock ISBN 978--0--19--853849--3 978--0--19--853864--6
+Christopher~M. Bishop.
+\newblock {\em Neural Networks for Pattern Recognition}.
+\newblock {Clarendon Press ; Oxford University Press}.
 
 \bibitem[BJSB]{burtonWindEnergyHandbook2011}
-\textsc{Burton}, Tony ; \textsc{Jenkins}, Nick ; \textsc{Sharpe}, David  ;
-  \textsc{Bossanyi}, Ervin:
-\newblock \emph{Wind {{Energy Handbook}}: {{Burton}}/{{Wind Energy Handbook}}}.
-\newblock {John Wiley \& Sons, Ltd}. --
-\newblock ISBN 978--1--119--99271--4 978--0--470--69975--1
+Tony Burton, Nick Jenkins, David Sharpe, and Ervin Bossanyi.
+\newblock {\em Wind {{Energy Handbook}}: {{Burton}}/{{Wind Energy Handbook}}}.
+\newblock {John Wiley \& Sons, Ltd}.
 
 \bibitem[BPS{\etalchar{+}}]{bhatnagarConvergentTemporalDifferenceLearning2009}
-\textsc{Bhatnagar}, Shalabh ; \textsc{Precup}, Doina ; \textsc{Silver}, David ;
-  \textsc{Sutton}, Richard~S. ; \textsc{Maei}, Hamid~R.  ;
-  \textsc{SzepesvÃ¡ri}, Csaba:
+Shalabh Bhatnagar, Doina Precup, David Silver, Richard~S Sutton, Hamid~R Maei,
+  and Csaba SzepesvÃ¡ri.
 \newblock Convergent {{Temporal}}-{{Difference Learning}} with {{Arbitrary
   Smooth Function Approximation}}.
-\newblock
-\newblock , S.~9
+\newblock page~9.
 
 \bibitem[BW]{berglindFatigueEstimationMethods2014}
-\textsc{Berglind}, J. J.~B. ; \textsc{Wisniewski}, Rafael:
+J.~J.~Barradas Berglind and Rafael Wisniewski.
 \newblock Fatigue {{Estimation Methods Comparison}} for {{Wind Turbine
   Control}}.
-\newblock
 
 \bibitem[CKH{\etalchar{+}}]{cobbeQuantifyingGeneralizationReinforcement2019}
-\textsc{Cobbe}, Karl ; \textsc{Klimov}, Oleg ; \textsc{Hesse}, Chris ;
-  \textsc{Kim}, Taehoon  ; \textsc{Schulman}, John:
+Karl Cobbe, Oleg Klimov, Chris Hesse, Taehoon Kim, and John Schulman.
 \newblock Quantifying {{Generalization}} in {{Reinforcement Learning}}.
-\newblock
 
 \bibitem[DWS]{degrisOffPolicyActorCritic2013}
-\textsc{Degris}, Thomas ; \textsc{White}, Martha  ; \textsc{Sutton},
-  Richard~S.:
+Thomas Degris, Martha White, and Richard~S. Sutton.
 \newblock Off-{{Policy Actor}}-{{Critic}}.
-\newblock
 
-\bibitem[FHM]{fujimotoAddressingFunctionApproximation2018}
-\textsc{Fujimoto}, Scott ; \textsc{van Hoof}, Herke  ; \textsc{Meger}, David:
+\bibitem[FGFGG]{fernandez-gaunaVariableSpeedWind2016}
+Borja Fernandez-Gauna, Unai Fernandez-Gamiz, and Manuel Grasa.
+\newblock Variable speed wind turbine controller adaptation by reinforcement
+  learning.
+\newblock 24(1):27--39.
+
+\bibitem[FMP]{fujimotoOffPolicyDeepReinforcement2019}
+Scott Fujimoto, David Meger, and Doina Precup.
+\newblock Off-{{Policy Deep Reinforcement Learning}} without {{Exploration}}.
+
+\bibitem[FvHM]{fujimotoAddressingFunctionApproximation2018}
+Scott Fujimoto, Herke van Hoof, and David Meger.
 \newblock Addressing {{Function Approximation Error}} in {{Actor}}-{{Critic
   Methods}}.
-\newblock
-
-\bibitem[HGH{\etalchar{+}}]{vanhasseltLearningValuesMany2016}
-\textsc{van Hasselt}, Hado ; \textsc{Guez}, Arthur ; \textsc{Hessel}, Matteo ;
-  \textsc{Mnih}, Volodymyr  ; \textsc{Silver}, David:
-\newblock Learning Values across Many Orders of Magnitude.
-\newblock
 
 \bibitem[HLD]{howlandWindFarmPower2019}
-\textsc{Howland}, Michael~F. ; \textsc{Lele}, Sanjiva~K.  ; \textsc{Dabiri},
-  John~O.:
-\newblock Wind Farm Power Optimization through Wake Steering.
-\newblock
-\newblock 116, Nr. 29, S. 14495--14500. --
-\newblock ISSN 0027--8424, 1091--6490
+Michael~F. Howland, Sanjiva~K. Lele, and John~O. Dabiri.
+\newblock Wind farm power optimization through wake steering.
+\newblock 116(29):14495--14500.
 
-\bibitem[HMH{\etalchar{+}}]{hesselRainbowCombiningImprovements2017}
-\textsc{Hessel}, Matteo ; \textsc{Modayil}, Joseph ; \textsc{van Hasselt}, Hado
-  ; \textsc{Schaul}, Tom ; \textsc{Ostrovski}, Georg ; \textsc{Dabney}, Will ;
-  \textsc{Horgan}, Dan ; \textsc{Piot}, Bilal ; \textsc{Azar}, Mohammad  ;
-  \textsc{Silver}, David:
+\bibitem[HMvH{\etalchar{+}}]{hesselRainbowCombiningImprovements2017}
+Matteo Hessel, Joseph Modayil, Hado van Hasselt, Tom Schaul, Georg Ostrovski,
+  Will Dabney, Dan Horgan, Bilal Piot, Mohammad Azar, and David Silver.
 \newblock Rainbow: {{Combining Improvements}} in {{Deep Reinforcement
   Learning}}.
-\newblock
 
 \bibitem[Hub]{huber1964}
-\textsc{Huber}, Peter~J.:
-\newblock Robust Estimation of a Location Parameter.
-\newblock
-\newblock 35, Nr. 1, S. 73--101
+Peter~J. Huber.
+\newblock Robust estimation of a location parameter.
+\newblock 35(1):73--101.
 
 \bibitem[HZ]{houImprovingDDPGPrioritized}
-\textsc{Hou}, Yuenan ; \textsc{Zhang}, Yi:
+Yuenan Hou and Yi~Zhang.
 \newblock Improving {{DDPG}} via {{Prioritized Experience Replay}}.
-\newblock
-\newblock , S.~10
+\newblock page~10.
 
 \bibitem[JBMS]{jonkmanDefinition5MWReference2009}
-\textsc{Jonkman}, J. ; \textsc{Butterfield}, S. ; \textsc{Musial}, W.  ;
-  \textsc{Scott}, G.
-\newblock \emph{Definition of a 5-{{MW Reference Wind Turbine}} for {{Offshore
-  System Development}}}
+J.~Jonkman, S.~Butterfield, W.~Musial, and G.~Scott.
+\newblock Definition of a 5-{{MW Reference Wind Turbine}} for {{Offshore System
+  Development}}.
 
 \bibitem[KB]{kingmaAdamMethodStochastic2017}
-\textsc{Kingma}, Diederik~P. ; \textsc{Ba}, Jimmy:
+Diederik~P. Kingma and Jimmy Ba.
 \newblock Adam: {{A Method}} for {{Stochastic Optimization}}.
-\newblock
 
 \bibitem[KJT]{kolterDesignAnalysisLearning2012}
-\textsc{Kolter}, J.~Z. ; \textsc{Jackowski}, Z.  ; \textsc{Tedrake}, R.:
-\newblock Design, Analysis, and Learning Control of a Fully Actuated Micro Wind
-  Turbine, {IEEE}. --
-\newblock ISBN 978--1--4577--1096--4 978--1--4577--1095--7
-  978--1--4577--1094--0 978--1--4673--2102--0, S. 2256--2263
-
-\bibitem[KPN{\etalchar{+}}]{vankuikLongtermResearchChallenges2016}
-\textsc{van Kuik}, G. A.~M. ; \textsc{Peinke}, J. ; \textsc{Nijssen}, R. ;
-  \textsc{Lekou}, D. ; \textsc{Mann}, J. ; \textsc{SA¸rensen}, J.~N. ;
-  \textsc{Ferreira}, C. ; \textsc{van Wingerden}, J.~W. ; \textsc{Schlipf}, D.
-  ; \textsc{Gebraad}, P. ; \textsc{Polinder}, H. ; \textsc{Abrahamsen}, A. ;
-  \textsc{van Bussel}, G. J.~W. ; \textsc{SA¸rensen}, J.~D. ; \textsc{Tavner},
-  P. ; \textsc{Bottasso}, C.~L. ; \textsc{Muskulus}, M. ; \textsc{Matha}, D. ;
-  \textsc{Lindeboom}, H.~J. ; \textsc{Degraer}, S. ; \textsc{Kramer}, O. ;
-  \textsc{Lehnhoff}, S. ; \textsc{Sonnenschein}, M. ; \textsc{SA¸rensen},
-  P.~E. ; \textsc{Konneke}, R.~W. ; \textsc{Morthorst}, P.~E.  ;
-  \textsc{Skytte}, K.:
-\newblock Long-Term Research Challenges in Wind Energy“ a Research Agenda by
-  the {{European Academy}} of {{Wind Energy}}.
-\newblock
-\newblock 1, Nr. 1, S. 1--39. --
-\newblock ISSN 2366--7451
+J.~Z. Kolter, Z.~Jackowski, and R.~Tedrake.
+\newblock Design, analysis, and learning control of a fully actuated micro wind
+  turbine.
+\newblock pages 2256--2263. {IEEE}.
 
 \bibitem[LHP{\etalchar{+}}]{lillicrapCONTINUOUSCONTROLDEEP2015}
-\textsc{Lillicrap}, Timothy~P. ; \textsc{Hunt}, Jonathan~J. ; \textsc{Pritzel},
-  Alexander ; \textsc{Heess}, Nicolas ; \textsc{Erez}, Tom ; \textsc{Tassa},
-  Yuval ; \textsc{Silver}, David  ; \textsc{Wierstra}, Daan:
+Timothy~P. Lillicrap, Jonathan~J. Hunt, Alexander Pritzel, Nicolas Heess, Tom
+  Erez, Yuval Tassa, David Silver, and Daan Wierstra.
 \newblock {{CONTINUOUS CONTROL WITH DEEP REINFORCEMENT LEARNING}}.
-\newblock
 
 \bibitem[MB]{mozerDiscoveringStructureReactive1990}
-\textsc{Mozer}, Michael~C. ; \textsc{Bachrach}, Jonathan:
+Michael~C. Mozer and Jonathan Bachrach.
 \newblock Discovering the {{Structure}} of a {{Reactive Environment}} by
   {{Exploration}}.
-\newblock
-\newblock 2, Nr. 4, S. 447--457. --
-\newblock ISSN 0899--7667, 1530--888X
+\newblock 2(4):447--457.
 
 \bibitem[MKS{\etalchar{+}}a]{mnihPlayingAtariDeep2013}
-\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
-  ; \textsc{Graves}, Alex ; \textsc{Antonoglou}, Ioannis ; \textsc{Wierstra},
-  Daan  ; \textsc{Riedmiller}, Martin:
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis
+  Antonoglou, Daan Wierstra, and Martin Riedmiller.
 \newblock Playing {{Atari}} with {{Deep Reinforcement Learning}}.
-\newblock
 
 \bibitem[MKS{\etalchar{+}}b]{mnihHumanlevelControlDeep2015}
-\textsc{Mnih}, Volodymyr ; \textsc{Kavukcuoglu}, Koray ; \textsc{Silver}, David
-  ; \textsc{Rusu}, Andrei~A. ; \textsc{Veness}, Joel ; \textsc{Bellemare},
-  Marc~G. ; \textsc{Graves}, Alex ; \textsc{Riedmiller}, Martin ;
-  \textsc{Fidjeland}, Andreas~K. ; \textsc{Ostrovski}, Georg ;
-  \textsc{Petersen}, Stig ; \textsc{Beattie}, Charles ; \textsc{Sadik}, Amir ;
-  \textsc{Antonoglou}, Ioannis ; \textsc{King}, Helen ; \textsc{Kumaran},
-  Dharshan ; \textsc{Wierstra}, Daan ; \textsc{Legg}, Shane  ;
-  \textsc{Hassabis}, Demis:
-\newblock Human-Level Control through Deep Reinforcement Learning.
-\newblock
-\newblock 518, Nr. 7540, S. 529--533. --
-\newblock ISSN 0028--0836, 1476--4687
+Volodymyr Mnih, Koray Kavukcuoglu, David Silver, Andrei~A. Rusu, Joel Veness,
+  Marc~G. Bellemare, Alex Graves, Martin Riedmiller, Andreas~K. Fidjeland,
+  Georg Ostrovski, Stig Petersen, Charles Beattie, Amir Sadik, Ioannis
+  Antonoglou, Helen King, Dharshan Kumaran, Daan Wierstra, Shane Legg, and
+  Demis Hassabis.
+\newblock Human-level control through deep reinforcement learning.
+\newblock 518(7540):529--533.
 
 \bibitem[MWP{\etalchar{+}}]{martenQBLADEOPENSOURCE2013}
-\textsc{Marten}, D ; \textsc{Wendler}, J ; \textsc{Pechlivanoglou}, G ;
-  \textsc{Nayeri}, C~N.  ; \textsc{Paschereit}, C~O.:
+D~Marten, J~Wendler, G~Pechlivanoglou, C~N Nayeri, and C~O Paschereit.
 \newblock {{QBLADE}}: {{AN OPEN SOURCE TOOL FOR DESIGN AND SIMULATION OF
   HORIZONTAL AND VERTICAL AXIS WIND TURBINES}}.
-\newblock
-\newblock 3, Nr. 3, S.~6
+\newblock 3(3):6.
 
 \bibitem[PHD{\etalchar{+}}]{plappertParameterSpaceNoise2017}
-\textsc{Plappert}, Matthias ; \textsc{Houthooft}, Rein ; \textsc{Dhariwal},
-  Prafulla ; \textsc{Sidor}, Szymon ; \textsc{Chen}, Richard~Y. ;
-  \textsc{Chen}, Xi ; \textsc{Asfour}, Tamim ; \textsc{Abbeel}, Pieter  ;
-  \textsc{Andrychowicz}, Marcin:
+Matthias Plappert, Rein Houthooft, Prafulla Dhariwal, Szymon Sidor, Richard~Y.
+  Chen, Xi~Chen, Tamim Asfour, Pieter Abbeel, and Marcin Andrychowicz.
 \newblock Parameter {{Space Noise}} for {{Exploration}}.
-\newblock
+
+\bibitem[SAZFG{\etalchar{+}}]{saenz-aguirreArtificialNeuralNetwork2019}
+Aitor Saenz-Aguirre, Ekaitz Zulueta, Unai Fernandez-Gamiz, Javier Lozano, and
+  Jose Lopez-Guede.
+\newblock Artificial {{Neural Network Based Reinforcement Learning}} for {{Wind
+  Turbine Yaw Control}}.
+\newblock 12(3):436.
 
 \bibitem[SB]{suttonReinforcementLearningIntroduction2018}
-\textsc{Sutton}, Richard~S. ; \textsc{Barto}, Andrew~G.:
-\newblock \emph{Reinforcement Learning: An Introduction}.
-\newblock Second edition.
-\newblock {The MIT Press}
-\newblock (Adaptive Computation and Machine Learning Series). --
-\newblock ISBN 978--0--262--03924--6
+Richard~S. Sutton and Andrew~G. Barto.
+\newblock {\em Reinforcement Learning: An Introduction}.
+\newblock Adaptive Computation and Machine Learning Series. {The MIT Press},
+  second edition edition.
 
 \bibitem[SHM{\etalchar{+}}]{silverMasteringGameGo2016}
-\textsc{Silver}, David ; \textsc{Huang}, Aja ; \textsc{Maddison}, Chris~J. ;
-  \textsc{Guez}, Arthur ; \textsc{Sifre}, Laurent ; \textsc{van~den Driessche},
-  George ; \textsc{Schrittwieser}, Julian ; \textsc{Antonoglou}, Ioannis ;
-  \textsc{Panneershelvam}, Veda ; \textsc{Lanctot}, Marc ; \textsc{Dieleman},
-  Sander ; \textsc{Grewe}, Dominik ; \textsc{Nham}, John ;
-  \textsc{Kalchbrenner}, Nal ; \textsc{Sutskever}, Ilya ; \textsc{Lillicrap},
-  Timothy ; \textsc{Leach}, Madeleine ; \textsc{Kavukcuoglu}, Koray ;
-  \textsc{Graepel}, Thore  ; \textsc{Hassabis}, Demis:
-\newblock Mastering the Game of {{Go}} with Deep Neural Networks and Tree
-  Search.
-\newblock
-\newblock 529, Nr. 7587, S. 484--489. --
-\newblock ISSN 0028--0836, 1476--4687
+David Silver, Aja Huang, Chris~J. Maddison, Arthur Guez, Laurent Sifre, George
+  van~den Driessche, Julian Schrittwieser, Ioannis Antonoglou, Veda
+  Panneershelvam, Marc Lanctot, Sander Dieleman, Dominik Grewe, John Nham, Nal
+  Kalchbrenner, Ilya Sutskever, Timothy Lillicrap, Madeleine Leach, Koray
+  Kavukcuoglu, Thore Graepel, and Demis Hassabis.
+\newblock Mastering the game of {{Go}} with deep neural networks and tree
+  search.
+\newblock 529(7587):484--489.
 
 \bibitem[SLH{\etalchar{+}}]{silverDeterministicPolicyGradient2013}
-\textsc{Silver}, David ; \textsc{Lever}, Guy ; \textsc{Heess}, Nicolas ;
-  \textsc{Degris}, Thomas ; \textsc{Wierstra}, Daan  ; \textsc{Riedmiller},
-  Martin:
+David Silver, Guy Lever, Nicolas Heess, Thomas Degris, Daan Wierstra, and
+  Martin Riedmiller.
 \newblock Deterministic {{Policy Gradient Algorithms}}.
-\newblock
-\newblock , S.~9
+\newblock page~9.
 
 \bibitem[SMSM]{suttonPolicyGradientMethods}
-\textsc{Sutton}, Richard~S. ; \textsc{McAllester}, David~A. ; \textsc{Singh},
-  Satinder~P.  ; \textsc{Mansour}, Yishay:
+Richard~S Sutton, David~A McAllester, Satinder~P Singh, and Yishay Mansour.
 \newblock Policy {{Gradient Methods}} for {{Reinforcement Learning}} with
   {{Function Approximation}}.
-\newblock
-\newblock , S.~7
+\newblock page~7.
 
 \bibitem[SQAS]{schaulPrioritizedExperienceReplay2016}
-\textsc{Schaul}, Tom ; \textsc{Quan}, John ; \textsc{Antonoglou}, Ioannis  ;
-  \textsc{Silver}, David:
+Tom Schaul, John Quan, Ioannis Antonoglou, and David Silver.
 \newblock Prioritized {{Experience Replay}}.
-\newblock
 
 \bibitem[UO]{uhlenbeckTheoryBrownianMotion1930}
-\textsc{Uhlenbeck}, G.~E. ; \textsc{Ornstein}, L.~S.:
+G.~E. Uhlenbeck and L.~S. Ornstein.
 \newblock On the {{Theory}} of the {{Brownian Motion}}.
-\newblock
-\newblock 36, Nr. 5, S. 823--841. --
-\newblock ISSN 0031--899X
+\newblock 36(5):823--841.
+
+\bibitem[vHGH{\etalchar{+}}]{vanhasseltLearningValuesMany2016}
+Hado van Hasselt, Arthur Guez, Matteo Hessel, Volodymyr Mnih, and David Silver.
+\newblock Learning values across many orders of magnitude.
+
+\bibitem[vKPN{\etalchar{+}}]{vankuikLongtermResearchChallenges2016}
+G.~A.~M. van Kuik, J.~Peinke, R.~Nijssen, D.~Lekou, J.~Mann, J.~N. SA¸rensen,
+  C.~Ferreira, J.~W. van Wingerden, D.~Schlipf, P.~Gebraad, H.~Polinder,
+  A.~Abrahamsen, G.~J.~W. van Bussel, J.~D. SA¸rensen, P.~Tavner, C.~L.
+  Bottasso, M.~Muskulus, D.~Matha, H.~J. Lindeboom, S.~Degraer, O.~Kramer,
+  S.~Lehnhoff, M.~Sonnenschein, P.~E. SA¸rensen, R.~W. Konneke, P.~E.
+  Morthorst, and K.~Skytte.
+\newblock Long-term research challenges in wind energy“ a research agenda by
+  the {{European Academy}} of {{Wind Energy}}.
+\newblock 1(1):1--39.
 
 \bibitem[Wil]{williamsSimpleStatisticalGradientfollowing}
-\textsc{Williams}, Ronald~J.:
-\newblock Simple Statistical Gradient-Following Algorithms for Connectionist
-  Reinforcement Learning.
-\newblock
-\newblock , S.~28
+Ronald~J Williams.
+\newblock Simple statistical gradient-following algorithms for connectionist
+  reinforcement learning.
+\newblock page~28.
 
 \bibitem[ZLZH]{zhaExperienceReplayOptimization2019}
-\textsc{Zha}, Daochen ; \textsc{Lai}, Kwei-Herng ; \textsc{Zhou}, Kaixiong  ;
-  \textsc{Hu}, Xia:
+Daochen Zha, Kwei-Herng Lai, Kaixiong Zhou, and Xia Hu.
 \newblock Experience {{Replay Optimization}}.
-\newblock
-\newblock , S.~7
+\newblock page~7.
 
 \end{thebibliography}

@@ -1,7 +1,7 @@
 %%
 %% CGV Style-File fuer CGV Publikationen
 %% Autor: Guido Juckeland (juckeland@zhr.tu-dresden.de)
-%% angepasst von: Sören König 
+%% angepasst von: SÃ¶ren KÃ¶nig 
 %%
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{cgvpub}
@@ -518,7 +518,7 @@
 	    \begin{center}
 	    %Institution an der die Arbeit geschrieben wurde
 	    \huge
-	    \textsc{Technische Universität Dresden}
+	    \textsc{Technische UniversitÃ¤t Dresden}
 
 	    \bigskip
 	    \Large
@@ -666,7 +666,7 @@
 \fi
 
 \cleardoublestandardpage
-%Selbständigkeitserklärung
+%SelbstÃ¤ndigkeitserklÃ¤rung
      \chapter*{Selbstst\"{a}ndigkeitserkl\"{a}rung}
 
     Hiermit erkl\"{a}re ich, dass ich die von mir am heutigen Tag dem Pr\"{u}fungsausschuss der Fakult\"{a}t \@faculty~eingereichte Arbeit zum Thema:
@@ -752,7 +752,7 @@
   \fi
 \fi}{%
 % Literatur-, Abbildungs- und Tabellenverzeichnis, wenn nicht schon bei
-% \appendix automatisch davor eingefügt
+% \appendix automatisch davor eingefÃ¼gt
 \ifx\@empty\@haveapp
   \cleardoublestandardpage
   \ifx\@empty\@bibfiles

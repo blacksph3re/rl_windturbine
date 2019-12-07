@@ -92,17 +92,22 @@ class QBladeAdapter:
     return 2
 
   def get_act_high(self):
-    #return [10, 10, 10, 10, 10]
-    return [474029.1, 90]
+    gearbox_ratio = 97
+    generator_torque = 47402.91
+    return [generator_torque*gearbox_ratio, 90]
 
   # TODO get actual values for this
   def get_act_low(self):
     #return [0, 0, 0, 0, 0]
-    return [0, 0]
+    return [0,0]
 
   def get_act_max_grad(self):
     timestep = 0.1
-    return [150000*timestep, 8*timestep]
+    gearbox_ratio = 97
+    torque_step = 15000
+    pitch_step = 8
+
+    return [torque_step*gearbox_ratio*timestep, pitch_step*timestep]
 
   def get_obs_labels(self):
     return {
@@ -147,15 +152,15 @@ class QBladeAdapter:
     else:
       death_penalty = 0
 
-    rated_power = 3200
+    rated_power = 3500
     rated_speed = 0.8
     #return -np.abs(observation[1]-rated_power) - 1e3*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
-    #return 1-np.abs((observation[1]-rated_power)/rated_power)-death_penalty
+    return np.clip(1-np.abs((observation[1]-rated_power)/rated_power)-death_penalty, -4, 4)
     #return np.clip(observation[1], 0, None) - 1e4*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18]))
     #return np.clip(5 
     #  - np.abs((observation[1]-rated_power)/rated_power)
     #  - 5e-2*(np.abs(observation[16]) + np.abs(observation[17]) + np.abs(observation[18])), -10, 10)
-    return np.clip(1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty, -4, 4)
+    #return np.clip(1-np.abs((observation[0]-rated_speed)/rated_speed)-death_penalty, -4, 4)
 
   def calc_death(self, observation):
     # If there are nan values, reload completely
@@ -168,11 +173,15 @@ class QBladeAdapter:
 
     # 63 is the rotor size, so if anything bends further than that, it's broken off.
     broken_state = 20
+    max_rotorspeed = 3
+    min_rotorspeed = -0.05
+    max_power = 8000
     return np.abs(observation[16]) > broken_state or \
            np.abs(observation[17]) > broken_state or \
            np.abs(observation[18]) > broken_state or \
-           observation[0] > 3 or \
-           observation[0] < -0.5
+           observation[0] > max_rotorspeed or \
+           observation[0] < min_rotorspeed or \
+           observation[1] > max_power
 
   def padAction(self, action):
     action = [action[0], 0, action[1], action[1], action[1]]

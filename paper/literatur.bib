@@ -543,3 +543,65 @@
   file = {/home/sph3re/Zotero/storage/9U7KI379/van Hasselt et al. - 2015 - Deep Reinforcement Learning with Double Q-learning.pdf;/home/sph3re/Zotero/storage/JXZEFBYM/1509.html}
 }
 
+@article{fujimotoOffPolicyDeepReinforcement2019,
+  archivePrefix = {arXiv},
+  eprinttype = {arxiv},
+  eprint = {1812.02900},
+  primaryClass = {cs, stat},
+  title = {Off-{{Policy Deep Reinforcement Learning}} without {{Exploration}}},
+  url = {http://arxiv.org/abs/1812.02900},
+  abstract = {Many practical applications of reinforcement learning constrain agents to learn from a fixed batch of data which has already been gathered, without offering further possibility for data collection. In this paper, we demonstrate that due to errors introduced by extrapolation, standard off-policy deep reinforcement learning algorithms, such as DQN and DDPG, are incapable of learning with data uncorrelated to the distribution under the current policy, making them ineffective for this fixed batch setting. We introduce a novel class of off-policy algorithms, batch-constrained reinforcement learning, which restricts the action space in order to force the agent towards behaving close to on-policy with respect to a subset of the given data. We present the first continuous control deep reinforcement learning algorithm which can learn effectively from arbitrary, fixed batch data, and empirically demonstrate the quality of its behavior in several tasks.},
+  urldate = {2019-12-07},
+  date = {2019-08-09},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning,Computer Science - Artificial Intelligence},
+  author = {Fujimoto, Scott and Meger, David and Precup, Doina},
+  file = {/home/sph3re/Zotero/storage/DVNCLW98/Fujimoto et al. - 2019 - Off-Policy Deep Reinforcement Learning without Exp.pdf;/home/sph3re/Zotero/storage/VV2QGEKH/1812.html}
+}
+
+@article{abouheafModelfreeAdaptiveLearning2018a,
+  langid = {english},
+  title = {Model-Free Adaptive Learning Control Scheme for Wind Turbines with Doubly Fed Induction Generators},
+  volume = {12},
+  issn = {1752-1416, 1752-1424},
+  url = {https://digital-library.theiet.org/content/journals/10.1049/iet-rpg.2018.5353},
+  doi = {10.1049/iet-rpg.2018.5353},
+  abstract = {The classical control mechanisms of the wind turbines are generally based on precise modelling approaches to ensure robust and effective interplay between the wind turbines and the main power grids in both autonomous and gridconnected modes. This study presents an innovative intelligent control system for the doubly fed induction generator wind turbines. The proposed system uses model-free control polices. The online controller is based on a policy iteration reinforcement learning paradigm along with an adaptive actor-critic technique. It is shown to be robust against the turbine's high non-linearities and stochastic variations in the inputâ€“output conditions. These are associated with single and double rotor doubly fed large-scale induction generators driven by wind turbines in the range of 5â€“7 MW. The performance of the controller is validated against challenging scenarios of coexisting undesired situations like severe wind changes with load excursions and abrupt shifts in the loads.},
+  number = {14},
+  journaltitle = {IET Renewable Power Generation},
+  urldate = {2019-12-07},
+  date = {2018-10-29},
+  pages = {1675-1686},
+  author = {Abouheaf, Mohammed and Gueaieb, Wail and Sharaf, Adel},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/08490354.pdf}
+}
+
+@article{saenz-aguirreArtificialNeuralNetwork2019,
+  langid = {english},
+  title = {Artificial {{Neural Network Based Reinforcement Learning}} for {{Wind Turbine Yaw Control}}},
+  volume = {12},
+  issn = {1996-1073},
+  url = {http://www.mdpi.com/1996-1073/12/3/436},
+  doi = {10.3390/en12030436},
+  abstract = {This paper introduces a novel data driven yaw control algorithm synthesis method based on Reinforcement Learning (RL) for a variable pitch variable speed wind turbine. Yaw control has not been extendedly studied in the literature; in fact, most of the currently considered developments in the scope of the wind energy are oriented to the pitch and speed control. The most important drawbacks of the yaw control are the very large time constants and the strict yaw angle change rate constraints due to the high mechanical loads when the wind turbine angle is changed in order to adequate it to the wind speed orientation. An optimal yaw control algorithm needs to be designed in order to adapt the rotor orientation depending on the wind turbine dynamics and the local wind speed regime. Consequently, the biggest challenge of the yaw control algorithm is to decide the moment and the quantity of the wind turbine orientation variation to achieve the highest quantity of power at each instant, taking into account the constraints derived from the mechanical limitations of the yawing system and the mechanical loads. In this paper, a novel based algorithm based on the RL Q-Learning algorithm is introduced. The first step is to obtain a model of the power generated by the wind turbine (a real onshore wind turbine in this paper) through a power curve, that in conjunction with a conventional proportional regulator will be used to obtain a dataset that explains the actual behaviour of the real wind turbine when a variety of different yaw control commands are imposed. That knowledge is then used to learn the best control action for each different state of the wind turbine with respect to the wind direction represented by the yaw angle, storing that knowledge in a matrix Q(s,a). The last step is to model that matrix through a MultiLayer Perceptron with BackPropagation (MLP-BP) Artificial Neural Network (ANN) to avoid large matrix management and quantification problems. Once that the optimal yaw controller has been synthetized, its performance has been assessed using a number of wind speed realizations obtained using the software application TurbSim, in order to analyze how the introduced novel algorithm deals with different wind speed scenarios.},
+  number = {3},
+  journaltitle = {Energies},
+  urldate = {2019-12-07},
+  date = {2019-01-30},
+  pages = {436},
+  author = {Saenz-Aguirre, Aitor and Zulueta, Ekaitz and Fernandez-Gamiz, Unai and Lozano, Javier and Lopez-Guede, Jose},
+  file = {/home/sph3re/Programming/windturbine/paper/literature/energies-12-00436.pdf}
+}
+
+@article{fernandez-gaunaVariableSpeedWind2016,
+  title = {Variable Speed Wind Turbine Controller Adaptation by Reinforcement Learning},
+  volume = {24},
+  issn = {10692509, 18758835},
+  url = {https://www.medra.org/servlet/aliasResolver?alias=iospress&doi=10.3233/ICA-160531},
+  doi = {10.3233/ICA-160531},
+  number = {1},
+  journaltitle = {Integrated Computer-Aided Engineering},
+  urldate = {2019-12-07},
+  date = {2016-12-30},
+  pages = {27-39},
+  author = {Fernandez-Gauna, Borja and Fernandez-Gamiz, Unai and Grasa, Manuel}
+}

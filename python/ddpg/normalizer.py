@@ -4,9 +4,9 @@ import numpy as np
 from .utils import BasicBuffer
 
 class Normalizer:
-  def __init__(self, obs_dim, act_dim, act_low, act_high, device):
+  def __init__(self, obs_dim, act_dim, act_low, act_high, device, dtype=torch.float):
     self.device = device
-    self.dtype = torch.float
+    self.dtype = dtype
     self.obs_dim = obs_dim
     self.act_dim = act_dim
     self.act_high = np.array(act_high)

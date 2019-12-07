@@ -1259,7 +1259,7 @@ MACRO {dec} {"Dezember"}
 
 
 
-%%$$$  stillgelegte Beispiele fr den Gebrauch von Krzeln (hier Zs-Titel).
+%%$$$  stillgelegte Beispiele fÂr den Gebrauch von KÂrzeln (hier Zs-Titel).
 
 %%MACRO {acmcs} {"ACM Computing Surveys"}
 

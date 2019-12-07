@@ -1,4 +1,4 @@
-\documentclass[hyperref,german,beleg]{cgvpub}
+\documentclass[hyperref,beleg]{cgvpub}
 
 \usepackage{fancyref}
 \usepackage{acro}
@@ -7,6 +7,7 @@
 \usepackage{commath}
 \usepackage[ruled]{algorithm2e}
 \usepackage{multicol}
+\usepackage{subcaption}
 \input{abbreviations}
 
 %weitere Optionen zum Ergänzen (in eckigen Klammern):
@@ -68,28 +69,26 @@
 }
 
 
-\copyrighterklaerung{Hier soll jeder Autor die von ihm eingeholten
-Zustimmungen der Copyright-Besitzer angeben bzw. die in Web Press
-Rooms angegebenen generellen Konditionen seiner Text- und
-Bild"ubernahmen zitieren.}
-\acknowledgments{At first thanks to my advisors Mattew Lennie and Dmitrij Shlezinger for their support. Also, I guess, thanks David Silver - 7 of my most important papers were from you. Thanks to my laptop for almost dying, but then surviving. And big thanks to the mighty god of windturbines for letting me crush $\num{12345}$ windturbines for science - yes I counted.}
-
+\acknowledgments{At first thanks to my advisors Mattew Lennie and Dmitrij Shlezinger for their support. Also, I guess, thanks David Silver - 7 of my most important papers were from you. Thanks to my laptop for almost dying, but then surviving. And big thanks to the mighty god of windturbines for letting me crush several thousand windturbines for science.}
 
 \begin{document}
 \chapter{Abstract}
-Small 
 
+Recent advancements in reinforcment learning have managed to tackle more and more complex problems, like StarCraft or Go. The range of topics, RL is applicable to, increases. However, so far, these advancements were only partially applied to the area of windturbine pitch and torque control. Current state of the art linear controllers are performing well in maintaining turbine control, and the optimization margin for these is small, as they achieve the theoretical maximum energy output up to rated windspeed and manage to keep the turbine intact above rated windspeeds. However, these simple controllers can only deal with a limited amount of data inputs and are preventing turbine damages. We are evaluating the use of an actor-critic reinforcement learning algorithm to solve continous control of a windturbine, hoping to lay a foundational work for later improvements. We find that utilizing a wildly proven continous control algorithm does not solve our windturbine problem. Finally, we demonstrate that this control is possible, however we do not achieve results outperforming industry controllers.
 
-\chapter{Intro}
+\chapter{Introduction}
 
-Recent advancements in reinforcment learning have managed to tackle more and more complex problems, like StarCraft or Go. The range of topics, RL is applicable to, increases. However, so far, there hasn't been an effort to control a windturbine with a reinforcement learning algorithm. Current state of the art linear controllers are performing well in maintaining turbine control, and the optimization margin for these is small, as they achieve the theoretical maximum energy output up to rated windspeed and manage to keep the turbine intact above rated windspeeds.
+With the issue of global warming, we are facing maybe the biggest challenge to our generation. Though wheather models have predicted the effect since the 1980s, only in the recent years this topic has been brought into societal focus. CO2 is seen as the main cause for a tendency in the global weather to heat up. Since our industrial age, humankind has been releasing CO2 into the athmosphere in large scales. If however we continue doing so the way we are doing now, we will likely increase global temperature by a degree which will make living on this planet difficult. With the Paris agreement, the United Nations decided to limit global warming to 1.5 degrees, for which massive reductions in CO2 emissions are necessary. As energy production holds one of the biggest parts in the global CO2 emissions, we need to replace CO2 emitting power plants. For this, renewable energies have played a major role, and as a big part of this also windpower.
 
-Trying it nontheless can still provide for some foundational knowledge for future developments. Park control becomes a bigger topic in wind-energy, where controlling all windturbines of a park together can increase overall energy yield or protect windturbines further down the windstream from wakes by turbines up front. 
+Winds are a direct result of sunshine. The sun heats different parts of the earth to different temperatures, as the surface of the earth isn't uniform. The air over hotter regions such as close to the equator tends to rise, while on mountains and the poles it tends to fall. Combine this with a vast and complex interplay of humidities, Coriolis effects, mountains, cloud formation and enough effects to fill an entire branch of science and you will get wind. Windturbines operate by drawing energy from this weather phenomenon. Large rotors placed in windy regions which are connected to a generator yield electrical power. As weather is a complex phenomenon, wind tends to come from different directions with different speeds. This makes drawing energy from it more complex, or less efficient. If we were to draw energy from both storms and light breezes with the same turbine, we would not be efficient. Thus, modern windturbines are built to be adjustable. With these adjustments, a turbine can operate sensibly over a broader range of wind conditions. However, somehow, these adjustments need to be automatically adapted to the wind condition. This is the task of the turbine controller. We are attempting to learn such a controller.
+
+Machine learning has developped immensly over the last years. Benefitting from Moore's law, huge amounts of computational power can be used to train more and more complex models. Machine learning is generally split into three big branches. Supervised learning, unsupervised learning and reinforcement learning. In supervised learning, some form of fitting is done on a dataset. 
+
 
 
 \chapter{Background}
 
-This section aims at facilitating the background knowledge necessary for understanding this paper. We will first introduce windturbines and common terms around this area of research.
+This section aims at facilitating the background knowledge necessary for understanding this work. We will first introduce windturbines and common terms around this area of research. Then we will motivate our work precisely. We will give insights on the simulation tool we used and then derive the reinforcement learning algorithm we decided to use. Lastly we will present another paper which tried to combine reinforcement learning and windturbines.
 
 \section{Windturbine control}
 % Quote wind-energy handbook, talk about how currently wind turbines are controlled.
@@ -115,14 +114,16 @@ However back to windturbines. Usually, we implement two PID controllers to contr
 
 Still, in this work, we are trying to replace these hand-designed controllers with a reinforcement-learning algorithm. We are not expecting to exceed the performance of a industry controller. So why do we even do this?
 
-\subsection{Why we do what we do}
+\subsection{Motivation}
+
 As you might have seen before, all controllers follow a certain style. They take a single input variable, such as rotor speed, and adjust a single output such as torque. This type of controller is called \ac{SISO}. \ac{SISO} controllers are easy to design and work reliably. They can also be interconnected, such as with the pitch controller which gets a vibration input and a rotor speed input to combine them to one output. The main challenge with wind turbine control at the moment is however not to optimize for power, but to optimize for life-time \cite[Chapter 4]{vankuikLongtermResearchChallenges2016}. The controllers are dealing well with adjusting energy to a good level, but they are missing out on keeping the windturbine intact over a long life time.
 
-Also, the outputs get more complex. Back in the early days of wind turbines, you could control 3 variables - pitch, torque and yaw. Nowadays, we can control each of the blades individually and with a quick enough response time to wiggle the blades around within one single rotor rotation. Research on adding active control elements to the blades such as flaps is happening, which would add many more control parameters. You might have seen flaps on an aircraft wing, extending the length of the wing or adding gaps at takeoff and landing to account for the low wind speeds hitting the aircraft wing in these flight scenarios. This could also benefit wind turbines at low wind speeds. Tackling all this with \ac{SISO} is possible, but a lot of manual work.
+Also, the outputs get more complex. Back in the early days of wind turbines, you could control 3 variables - pitch, torque and yaw. Nowadays, we can control each of the blades individually and with a quick enough response time to wiggle the blades around within one single rotor rotation. Research on adding active control elements to the blades such as flaps is happening, which would add many more control parameters. You might have seen flaps on an aircraft wing, extending the length of the wing or adding gaps at takeoff and landing to account for the low wind speeds hitting the aircraft wing in these flight scenarios. This could also benefit wind turbines at low wind speeds, however building a good controller for them is challenging. Tackling all this with \ac{SISO} is possible, but a lot of manual work.
 
 Next, the inputs also get more complex. It is getting cheaper to install high-precision sensors, and many of them. Wind measurement techniques such as LIDAR based aenometers are able to efficiently and precisely predict incoming wind situations. Load measurements can be done in real-time across a turbine blade and in theory, it would be possible to incorporate these into control systems. However, accomodating all these input parameters in \ac{SISO} systems is difficult as we would have to hand-model each of the inputs and how exactly it ends up in the output.
 
 We hope to lay a foundational step in solving these issues by using an end-to-end machine learning algorithm which is capable of learning a wind turbine control scenario with many inputs and outputs. Also, we must admit that we are generally interested in playing around with reinforcement learning, it's fucking cool.
+
 
 \section{QBlade}
 % Quickly introduce qblade as a simulation tool
@@ -280,7 +281,7 @@ If we are visualizing our Q as a function of state and action, we get a fully di
 \theta_{i+1} = \theta_i + \alpha \mathbb{E}_{s \sim \rho^{\mu_{\theta_i}}}[\Delta Q^{\mu_{\theta_i}}(s, \mu_{\theta_i}(s))]
 \end{equation}
 
-\cite[Theorem 1]{silverDeterministicPolicyGradient2013} proves that this gradient always exists. We now managed to remove any expectation that is related to our action space from our gradient updates. This is beautiful because at first, we do not have to sample over many actions to learn this expectation. But more importantly, this term also works off policy, and without importance sampling. We can use a different exploration policy $\beta$ and replace our expectation term $\mathbb{E}_{s \sim \rho^{\mu}}$ with $\mathbb{E}_{\rho^{\beta}}$ here completely unpenalized. Why is this so? \cite{degrisOffPolicyActorCritic2013} proved off-policy gradients possible, but had to use importance sampling to correct for the bias in $\beta$. In fact, generally, it is not possible to do this replacement. However, \cite[Section 4.3]{silverDeterministicPolicyGradient2013} formulated a compatibility theorem. They proved, that a linear function approximator $Q^{\omega}$ which minimizes the MSE between $Q^{\omega}$ and $Q^{\mu}$ will retain the gradient, even when trained on samples generated by $\beta$, and called this Q \textit{compatible}. However, in practice we are not minimizing that loss and neither are we using linear function approximators. \cite{bhatnagarConvergentTemporalDifferenceLearning2009} proved that using a non-linear function approximator to predict the value function $V(s)$ will converge towards a local optimum. As we can formulate our Q by using V, we transfer this to our scenario. However, \ac{DPG} is not definitely proven to converge for a non-linear function approximator, as this transfer was, to our knowledge, never fully formulated. Observations show that it still does converge.
+\cite[Theorem 1]{silverDeterministicPolicyGradient2013} proves that this gradient always exists. We now managed to remove any expectation that is related to our action space from our gradient updates. This is beautiful because at first, we do not have to sample over many actions to learn this expectation. But more importantly, this term also works off policy, and without importance sampling. We can use a different exploration policy $\beta$ and replace our expectation term $\mathbb{E}_{s \sim \rho^{\mu}}$ with $\mathbb{E}_{\rho^{\beta}}$ here completely unpenalized. Why is this so? \cite{degrisOffPolicyActorCritic2013} proved off-policy gradients possible, but had to use importance sampling to correct for the bias in $\beta$. In fact, generally, it is not possible to do this replacement. However, \cite[Section 4.3]{silverDeterministicPolicyGradient2013} formulated a compatibility theorem. They proved, that a linear function approximator $Q^{\omega}$ which minimizes the MSE between $Q^{\omega}$ and $Q^{\mu}$ will retain the gradient, even when trained on samples generated by $\beta$, and called this Q \textit{compatible}. However, in practice we are not minimizing that loss and neither are we using linear function approximators. \cite{bhatnagarConvergentTemporalDifferenceLearning2009} proved that using a non-linear function approximator to predict the value function $V(s)$ will converge towards a local optimum. As we can formulate our Q by using V, we transfer this to our scenario. However, \ac{DPG} is not definitely proven to converge for a non-linear function approximator, as this transfer was, to our knowledge, never fully formulated. However, in practice, it is still trained off-policy. In our own experiments, we found that using a wildly different policy for exploration than for training did in fact result in worse behavior, and \cite{fujimotoOffPolicyDeepReinforcement2019} observed the same behavior. Although there is some evidence against this being possible, we will from now on just assume that DDPG is trainable off-policy because it delivered good results in the past and because the paper stating it is possible has been cited more than 100 times more often than the one saying it's not. Science!
 
 So let's restate our objective function for the actor.
 
@@ -380,6 +381,10 @@ Note, how they denoted J in their paper as rewards, while we are using r for rew
 
 Having described this paper, we want to also summarize what we do differently and why. First, they had a simpler environment. While a full scale windturbine has a strong tendency to destroy itself when outside of their operational margin, their turbine did not fly apart when not applying braking. Also, they were setting electrical resistance, not rotor torque. This system applies a braking force constant to rotational speed times resistance parameter, and thus already acts as a P controller. We were setting torque, so we had to adjust it regularly to rotor speed. In general, their turbine behaved more concavely opposed to our turbine, which with a constant parameter set, would settle to either rotating quickly backwards, forwards or not at all. Because of this, they were able to give the turbine some time at the beginning to stabilize before applying reinforcement learning while we needed to start with the standing turbine. Lastly and most importantly, they aimed to find optimal control settings for a constant wind speed. To create a full controller setup from this, they would have to repeat this process for every windspeed and use the resulting look-up table to derive a PID-controller. We however want to create an end-to-end system and want to experiment with the possibly higher expressive nature of predicting actions based on a full state input. We want to create a version as general as possible. Also, as \ac{DDPG} is a direct successor on \ac{REINFORCE} and has proven to outperform it in many areas, we do not reimplement their paper.
 
+Further works on reinforcement learning on windturbine are also \cite{saenz-aguirreArtificialNeuralNetwork2019}. This work uses traditional supervised learning to fit a neural network of 10 neurons to the straight line that describes the relation between yaw angle and power output and because what they got looks similar to a Q function they call it reinforcement learning. \cite{fernandez-gaunaVariableSpeedWind2016} published in a proprietary journal. 
+
+%we didn't get \cite{abouheafModelfreeAdaptiveLearning2018a}
+
 \chapter{Experimentation}
 
 For everyone who is interested in a recap of our design process, in this section we will provide such. We will again present our algorithm in a later section. To understand our design decisions, it might be interesting to read this passage, but you can also skip this passage and just read the rest. 
@@ -420,16 +425,25 @@ As qblade doesn't provide a built-in reward function, we needed to craft our own
 
 \item \textbf{Penalize action gradients} Penalize high action gradients. With \(a_t\) being the current action, \(a_{t-1}\) the last action, \(c\) a penalty constant and \(r(s)\) another reward function, calculate: \(r'(s, a) = r(s) - c * (a_t - a_{t-1})\)
 
+\item \textbf{Penalize death conditions} Penalize when a death condition is reached. With $r(s)$ being another reward function, $d(s) \in {0,1}$ being our indicator for deaths and $c$ a constant penalty, calculate $r'(s) = r(s) - c * d(s)$
+
 \end{itemize}
 
 \textbf{Rated speed} is the easiest of the rewards, as holding a rated speed can be achieved by either pitch or torque or a combination of the two. So both a high pitch and a high torque will stop it from running faster than it should. We used this reward for our first working version.
+
 \textbf{Rated power} is a bit more difficult. For reaching rated power, a certain aerodynamic torque is required, so pitching the blades out completely won't deliver rated power. However especially if setting an artificial rated power lower than what the turbine was built for, there is a certain play in how strongly to use blade pitch and how much needs to be done through torque.
+
 \textbf{Maximal power} is an intuitive reward, but might yield unrealistic results. This rewards high power regardless of the stress that is induced to the turbine, so a good policy might spin the turbine at high speeds beyond any turbine specification and then apply maximum torque. So this reward makes more sense when combined with a stress penalty.
+
 \textbf{Penalize current stress} is the easiest stress penalty, where a penalty proportional to the current bending of the structure can be used. As there are several bending modes on most of the components of the windturbine, a combination or selection of modes and components should be taken before. We decided to limit us to out-of-plane bending of the blade tips. This is a simple variant which leaves out bending in the middle of the blades, bending in the rotational plane, vibration or bending of the tower and torsional stress on the shaft.
+
 \textbf{Penalize accumulated stress} is a more complete, but time dependent variant. \ac{RFC} is a commonly used method for calculating structural fatigue in windturbines \cite{berglindFatigueEstimationMethods2014}. \ac{RFC} takes in a bending signal over time and returns a table with amplitudes and their frequency, as in how often the structure swung how far. It filters out some higher-frequency swinging in between two lower frequency swings and thus also works for structures that swing in more than one frequency. To use it as a penalty, we needed to create a function that maps from that table to a scalar penalty. This penalty accumulates past stress, so it increases over time. We suspect this penalty to be hard to learn, as it reacts slowly to changes and a once given penalty will never be lifted again.
+
 \textbf{Penalize action gradients} is an option which is useful in contexts where high action gradients are impossible on the real system. Instead of clipping them, penalizing them could include action gradients into the learning process. We only expect sensible results with a stateful agent which knows at least the last action it took or one which has recurrent connections, as otherwise the last action taken is unknown to the agent.
 
-Most of our experimentation we did with rewarding rated speed, as we expected this reward function to be the easiest to learn.
+\textbf{Penalize deaths} is simple to implement but yields a not differentiable loss function at deaths. Especially because we are learning a continuous value estimation, it will most likely smooth out along a death and likely underestimate the death penalty and underestimate values close to the death. Alternatively we could imagine penalizing getting close to a death condition continously.
+
+Most of our experimentation we did with rewarding rated speed and penalize deaths, as we expected this reward function to be the easiest to learn. In a real application, crafting a good reward function will be a bigger challenge, but this is out of the scope of this work.
 
 \section{Aiding exploration}
 
@@ -465,6 +479,8 @@ Use replay buffer $\mathcal{R}$ from normal training\\
 \label{alg:expertexplo}
 \end{algorithm}
 
+We did however not really observe better results with expert exploration enabled. We tried combining it with the algorithm from section \ref{sec:pretrain}, because we were suspecting that the large difference between the actor distribution and the expert distribution lead to problems in learning the respective Q distribution. We argued before that we suspect DDPG not to be able to learn completely off-policy but just a bit off-policy. Together with the pretraining algorithm, we had some slight improvements, but these didn't justify the extra computation time needed for this. Also, though an expert controller which yields somewhat sensible result is easy to build for each turbine, this is a step of human interaction and expert knowledge, which machine learning generally tries to minimize in algorithm design.
+
 \subsection{Parameter noise}
 
 As we still didn't see good results, we tried adding parameter-space noise \cite{plappertParameterSpaceNoise2017} to the actor function, as the paper promised better exploration. We could not observe any improvements and thus deactivated parameter space noise for the rest of the experimentation.
@@ -493,6 +509,7 @@ We observed that our controller delivers high action gradients and reacts strong
 At first, we implemented gradient actionspaces, where the controller output is not an absolute pitch or torque value but a difference to the last output, starting with everything set to 0. For aiding training, we added the actual actions taken to the observation space of the next step. This way, we could clip the action gradients by reducing the gradient action space, so that in each timestep, only a fraction of the actual action space could be traversed. If the controller would output a positive change at maximum pitch/torque or a negative change at minimum pitch, this would be ignored. This did effectively limit action gradients, but also did not lead to any sensible results, so we deactivated this again.
 
 \subsection{Feeding past timesteps}
+\label{sec:feedpast}
 
 Another idea was that we feed the last n timesteps concatenated to the current observations. We hoped that this way, the agent could derive its own gradients internally. Also, a PID controller has a view of the past, with this extra information, the countroller would be able to generalize further. The result of this however were high and very noisy q-losses and q loss explosions, so we disabled this again.
 
@@ -503,8 +520,9 @@ We eventually solved the problem with the high action gradients by still letting
 We at first hid this clipping from the replay buffer, but then decided to store the actual values taken, as the models then don't have to also learn the clipping effect. We observed better learning when not hiding the clipping from the replay buffer.
 
 \subsection{Pretraining the policy}
+\label{sec:pretrain}
 
-We added a small period of direct pretraining of the policy on the actions taken by the expert policy during random exploration. We hoped for a more sensible default policy at the beginning and indeed observed reaching sensible behavior a little earlier. We summarize this in algorithm \ref{alg:pretrain}, parametrized with training time $T=10000$ and batch size $N=32$
+We added a small period of direct pretraining of the policy on the actions taken by the expert policy during random exploration. We hoped for a more sensible default policy at the beginning. We summarize this in algorithm \ref{alg:pretrain}, parametrized with training time $T=10000$ and batch size $N=32$
 
 \begin{algorithm}
 \SetAlgoLined
@@ -518,6 +536,8 @@ Use expert policy $\mathcal{C}$ from expert exploration\\
 \caption{Policy pretraining}
 \label{alg:pretrain}
 \end{algorithm}
+
+The training is relatively straightforward, however because we decided to abolish expert exploration, we also abolished this.
 
 \section{Other improvements}
 
@@ -615,13 +635,11 @@ We hid all observations except for power and rotational speed from the algorithm
 
 \section{Core algorithm}
 
-As DDPG is capable of learning from a replay of experiences, we implemented a replay buffer. To enable \ac{PER}, we needed to sample according to priorities proportional to a metric, in our case \ac{TD-Error}. We implemented the replay buffer as a sum tree datastructure, a binary weighted tree in which each node holds the sum of the weights of the nodes below. The root node thus always held the sum of all metrics. Also, we did not store probabilities right away but kept the unnormalized experiences $p_i = (\abs{\sigma} + \epsilon)^{\alpha}$ with an epsilon of $\num{1e-6}$ and $\alpha = 0.5$. 
+As DDPG is capable of learning from a replay of experiences, we implemented a replay buffer with capacity 1e6. To enable \ac{PER}, we needed to sample according to priorities proportional to a metric, in our case absolute \ac{TD-Error}. We implemented the replay buffer as a sum tree datastructure, a binary weighted tree in which each node holds the sum of the weights of the nodes below.  Also, we did not store probabilities right away but kept the unnormalized experiences $p_i = (\abs{\sigma} + \epsilon)^{\alpha}$ with an epsilon of $\num{1e-6}$ and $\alpha = 0.5$. 
 
-We implemented our actor model according to the \ac{DDPG} paper, but with less neurons per layer. Instead of 400 and 300 neurons, we use 32 and 16 neurons. Our critic is also according to the \ac{DDPG} paper but with less neurons. Instead of 400 and 300 we use 64 and 32 neurons. All states, rewards and actions seen by the network are normalized to be between $[-1, 1]$.
+We implemented our actor model according to the \ac{DDPG} paper, but with less neurons per layer. Instead of 400 and 300 neurons, we use 32 and 16 neurons. Our critic is also according to the \ac{DDPG} paper but with less neurons. Instead of 400 and 300 we use 64 and 32 neurons. We use batch normalization between the layers. All states and rewards seen by the network are normalized to be between $[-1, 1]$ 90\% of the time and are clipped to $[-3, 3]$. Actions are normalized to $[-1, 1]$. Learning rate for both actor and critic are 1e-4 and we use adam optimization. We train with batch size 128, discounting factor $\gamma$ = 0.01 and target update rate $\tau$ = 0.05. Weights are initialized by uniform random in $[-0.5, 0.5]$.
 
-We start our simulation with an expert exploration. We designed a P-controller which can keep the turbine at a constant rotational speed and added \ac{OU-Noise} to it to explore sensible operation range. For 3 epochs, we let our expert policy with noise control the turbine before we hand over to our \ac{DDPG}-Agent. During the handover, the policy is pretrained for 10k steps, lr 1e-4, adam optimizer, mse loss to directly predict actions from the expert controller. This way we started off early with better actions. Then, critic and actor training is done on the experiences from expert exploration. After this training, all priorities in the replay buffer are set to their maximum (so they all will be seen) and normal training starts. Each epoch lasts for 2000 steps and at the beginning of it, the simulation is reset to default state. We trained for 150 epochs.
-
-Critic updates are done similar to \ac{DQN} updates with \ac{PER}. We use importance sampling to correct for \ac{PER} overestimation bias and regard death conditions. All in all, algorithm \ref{alg:ourddpg} summarizes all improvements:
+Critic updates are done similar to \ac{DQN} updates with \ac{PER}. We use importance sampling to correct for \ac{PER} overestimation bias in the critic and redraw samples uniformly for policy training. We regard death conditions in the Q update as in \ac{DQN}. Also, we use huber loss instead of MSE. All in all, algorithm \ref{alg:ourddpg} summarizes all improvements:
 
 
 \begin{algorithm}
@@ -629,10 +647,7 @@ Critic updates are done similar to \ac{DQN} updates with \ac{PER}. We use import
 Randomly initialize critic network $Q(s, a;\theta^Q)$ and actor $\mu(s;\theta^{\mu})$ with weights $\theta^Q$ and $\theta^{\mu}$\\
 Initialize target networks $Q'$ and $\mu'$ with weights $\theta^{Q'} \leftarrow \theta^Q, \theta^{\mu'} \leftarrow \theta^{\mu}$\\
 Initialize replay buffer $\mathcal{R}$\\
-
-Execute algorithm \ref{alg:expertexplo} for expert exploration \\
-Calculate normalization factors based on exploraton buffer and data from a previous run \\
-Execute algorithm \ref{alg:pretrain} for policy pretraining \\
+Calculate normalization factors based on data from a previous run \\
 
 \For{episode = 1, M}{
   Initialize a random process $\mathcal{N}$ for action exploration\\
@@ -663,80 +678,101 @@ Execute algorithm \ref{alg:pretrain} for policy pretraining \\
 
 \chapter{Evaluation}
 
-For our evaluation, we ran every experiment 4 times for 150 epochs, each lasting 2000 steps. We used a machine with an i7 4-core processor, 16GB RAM and a 1080 GTX with 8GB as accelerator. With these specs, we were able to run 1 experiment concurrently due to RAM limitations
+For our evaluation, we used a machine with an Intel\textsuperscript{\textregistered} i7 4-core processor, 16GB RAM and a Nvidia 1080 GTX with 8GB as accelerator. On this system, a fully realistic run with 300k steps would take roughly 200 hours, of which almost everything would be used by qblade. Partly this is because we didn't manage to enable hardware acceleration because of compilation problems, but computing a fluid simulation is always time-consuming. We could bring the computation time down to 12 hours per run by deactivating wake calculations and using a different structural computation method in qblade. Wake calculations are responsible for calculating the effects of the rotor on the surrounding air. Without this effect, the rotor can draw infinite energy from the air as it can generate lift without slowing down the air. Effectively, this increased instability of the system, as now the rotor does not get slowed down at high rotational speeds, but otherwise we would not have been able to evaluate our work.
 
-\section{Learning rates}
+We ran every experiment 4 times except stated otherwise. We visualize our measures as confidence plots, for which we calculated the mean and a 90\% confidence interval over the results. The mean is displayed as a solid line, while the confidence is plotted as a colored background. 
 
-At first we regard the algorithm under different learning rates. We vary the critic learning rate between 1e-3 (left), 1e-4 (middle, recommended by DDPG authors) and 1e-5 (right) in figure \ref{fig:critic_lr}. The task to solve was to hold a rotational speed of 0.8 rad/s over the time of 2000 steps, starting with a simulation that has artificially been stabilized at the desired rotational speed with 0 degrees pitch and 0 generator torque. The agent gets a reward of 1 per step if it exactly matches rotational speed, deviation from it is linearly punished, 0 rad/s would yield a reward of 0. Thus, the theoretically possible maximum reward would be 2000, holding the turbine at perfect speed for the entire length of the simulation. However, as we start with 0 pitch and torque, action gradient limitations will naturally incur a small penalty at the beginning as these values need to be adjusted to sensible values and the resulting rotational speed deviation needs to be recovered. A perfect policy would thus reach a score of a litte bit below 2000.
+\section{Hold speed}
 
-Each of the controllers reaches this theoretical optimum and is able to hold it for a number of timesteps. With learning rate 1e-3, we reach it somewhere around episode 10, with learning rate 1e-4 a bit later and with 1e-5 even later. The time we are holding it before divergence also raises with learning rate.
+We start off with the simplest task. The task to solve was to hold a rotational speed of 0.8 rad/s over the time of 2000 steps, starting with a simulation that has artificially been stabilized at the desired rotational speed with 0 degrees pitch and 0 generator torque. Wind-speed is kept constant at 11m/s. The agent gets a reward of 1 per step if it exactly matches rotational speed, deviation from it is linearly punished, 0 rad/s would yield a reward of 0. Thus, the theoretically possible maximum reward would be 2000, holding the turbine at perfect speed for the entire length of the simulation. However, as we start with 0 pitch and torque, action gradient limitations will naturally incur a small penalty at the beginning as these values need to be adjusted to sensible values and the resulting rotational speed deviation needs to be recovered. A perfect policy would thus reach a score of a litte bit below 2000. This task is simple because it can be achieved either through pitching out, increasing generator torque or a combination of both. This task is not realistic, as it can be solved without generating energy whatsoever.
 
-Interesting to see is the strategy which the controller found. As described before, both increasing pitch and increasing torque reduces rotor speed, so through both it would be possible to control the rotational speed. However, all of our runs decided to implement pitch-only control. A possible explanation for this decision could be that with high pitches, lower forces act on the blades, thus rotational speed is easier to control. However, this insight is above our human knowledge of windturbines.
+We look at two different learning rates for the critic network, 1e-3 (a) and 1e-4 (b). The latter is what was recommended in the DDPG paper.
 
-With the aggressive learning rate, we can clearly see how quickly the algorithm is diverging. After a short period of convergence around epoch 10, the high learning rate steps the critic out of the minimum and causes instabilities. With even higher learning rates, we observed not reaching convergence at all. Interestingly, we can not see such divergence in the loss. In normal machine learning, a too high learning rate would cause a phenomenon of jumping across a minimum, taking gradient steps greater than the width of the local minimum. This would reduce in an increase in loss. Here, however, the q loss stays small on such divergence, as plotted in figure \ref{fig:critic_qloss} for the diverging run of critic lr=1e-3. This is because we are generating our prediction targets based on delayed versions of the same net, as we do not know a ground truth.
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/plot_critic_1e-3.png}
+  \caption{critic lr=1e-3}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{images/plot_critic_1e-4.png}
+  \caption{critic lr=1e-4}
+\end{subfigure}
+\caption{Learning rate comparison for the critic network}
+\label{fig:critic_lr}
+\end{figure}
 
-In general, it is difficult to measure convergence or divergence in reinforcement learning, \cite{cobbeQuantifyingGeneralizationReinforcement2019} have made some efforts.
+Each of the controllers reaches close to theoretical optimum and is able to hold it for a number of epochs. With learning rate 1e-3, we reach it somewhere around episode 10, with learning rate 1e-4 a bit later around epoch 25. The time we are holding it before divergence also raises with learning rate. The most aggressive learning rate reached 1828.8 average epoch reward between epoch 7 and 11 and a single maximum of 1917.5 points. On the lower learning rate, it held an average of 1896 points from episode 30 to 56 and reached a maximum of 1968.4 points. The maximum we could reach with our hand-designed PID controller was 1981 points, where the 19 points were lost through the swing at the beginning and then rotational speed was held perfectly.
 
 \begin{figure}
   \centering
-  \includegraphics[width=0.5\linewidth]{images/plot_critic_1e-3.png}
-  \caption{Critic learning rate 1e-3 reward over epoch}
-  \label{fig:critic_lr}
+  \includegraphics[width=0.5\linewidth]{images/epoch40.png}
+  \caption{Pitch, torque and rotational speed from a sample epoch}
+  \label{fig:strategy}
 \end{figure}
+
+Interesting to see is the strategy which the agent found. As described before, both increasing pitch and increasing torque reduces rotor speed, so through both it would be possible to control the rotational speed. However, all of our runs decided to implement pitch-only control and kept torque constant at zero, as possible to see in figure \ref{fig:strategy}. A possible explanation for this decision could be that with high pitches, lower forces act on the blades, thus rotational speed is easier to control. However, this insight is above our human knowledge of windturbines. Furthermore should be noted that rotational speed is still varying between 0.75 and 0.85 and the pitch is ranging from 15 to 25 degrees (note the scaling of the pitch and torque). In a realistic scenario, oscillations of this magnitude would likely destroy the turbine very soon, as pitching the blades around this quickly creates strong material stress. 
 
 \begin{figure}
   \centering
   \includegraphics[width=0.5\linewidth]{images/plot_critic_1e-3_qloss.png}
-  \caption{Critic learning rate 1e-3 q loss over step}
+  \caption{Critic q loss during divergence}
   \label{fig:critic_qloss}
 \end{figure}
 
-\section{HParam tuning}
-We tried different hyper parameters. To evaluate our controller, we measure the time the simulation stayed within a sensible range. We define sensible as rotational speeds between 0 and 1.2 rad/s. We let each simulation run 1 million steps. As during our random exploration, the simulation was always in sensible range, we remove the random exploration phase from our evaluation.
-
-We tried
-\begin{itemize} 
-  \item increasing/decreasing both learning rates
-  \item increasing/decreasing tau and gamma
-  \item increasing/decreasing batch size
-  \item increasing/decreasing replay noise
-\end{itemize}
+With the aggressive learning rate, we can clearly see how quickly the algorithm is diverging. After a short period of convergence around epoch 10, the high learning rate steps the critic out of the minimum and causes instabilities. With even higher learning rates, we observed not reaching convergence at all. Interestingly, we can not see such divergence in the loss. In normal machine learning, a too high learning rate would cause a phenomenon of jumping across a minimum, taking gradient steps greater than the width of the local minimum. This would reduce in an increase in loss. Here, however, the q loss stays small on such divergence, as plotted in figure \ref{fig:critic_qloss} for the diverging run of critic lr=1e-3. This is because we are generating our prediction targets based on delayed versions of the same net, as we do not know a ground truth. As this delayed target net will diverge with the original net if divergence happens slow enough, we do not see it. 
 
 
 
-\section{Comparison to industry controllers}
+\section{Hold rated power}
+A more difficult task to solve, but also a more realistic one it to hold a rated power. Analog to our hold speed task, the agent gets a simulation which was artificially stabilized at 0.8rpm with pitch and torque 0, and should generate exactly 5MW of power during an epoch of 2000 steps. This power is the reference output of the NREL 5MW turbine, and in our wind scenario it should theoretically be able to reach this power. Wind speed was kept constant at 11m/s. Again, the agent gets a reward of 1 for hitting 5MW perfectly, and 0 for having no power at all, so a perfect policy would get something a little below 2000. Unfortunately, we did not get any policy to achieve something close to optimal, the best score we achieved was 1500 points with an average of 5 kills per episode. Unfortunately, this result wasn't very stable, so we can not plot an average over many runs. An example for a relatively successful epoch is figure \ref{fig:crashing_turbines}. Here, the controller maxed out torque and tried to hold the turbine stable with pitch. Power output for these insane regions was up to 9MW, which would have instantly roasted any electronics in a real wind turbine. Also, blades would have taken serious damage on these rotational speeds.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{images/crashing_turbines.png}
+  \caption{An epoch from the hold power task}
+  \label{fig:crashing_turbines}
+\end{figure}
+
+At the end, most controllers converged to leaving pitch at zero and left the turbine to die regularily with maximum generator torque.
+
+\section{Hold power}
+The next task
+
+\section{Pendulum}
+To exclude the possibility that our implementation is buggy, we decided to run our DDPG algorithm on the Pendulum task. With our hyperparameters, we could not observe convergence and only switching back to the algorithm of \ac{DDPG}, the agent managed to balance out the pendulum after 11 epochs. Especially the network size hyperparameter was important for this.
 
 
-% What should I put here?
+\section{Discussion}
 
-% Holds power, doesn't diverge, way to many actions, super noisy, we are at least somewhere close to sensible
-% Different reward function
-% Different wind speed
+Commonly, algorithms are evaluated over many different problems. The OpenAI Gym suite is the common suite for evaluating reinforcement learning algorithms, and typical problems in this are balance problems (all cartpole* and pendulum* tasks) and actuation tasks (gripper*, reacher*, cheetah*). Balance tasks could be argued to resemble our windturbine in a way, as we want to balance an output aswell. However a windturbine is vastly more complex than a pendulum. It exhibits resonant frequencies in addition to the optimization problem which the controller needs to keep under control. Our experiments showed that it didn't. We were able to solve easy tasks, in which resonances of high magnitude still lead to acceptable results, however as soon as it got more difficult, high swinging lead to our control task not being accomplished. Also, noisy sensor measurements were a more difficult task to learn. We could not implement the same size of network and thus not achieve the same learning potential as the authors in \ac{DDPG}.
+
 
 \chapter{Future work}
-% Reworking reward functions
-% Trying different algorithms for better stability?
-% Pretraining the policy with a reference controller
-% Expert policy in instable conditions
-% Whatever comes to our mind
-% Punishment for high action gradients
-% Switch reward functions during training?
-% Interest from TU Berlin from control elements guy
 
-\section{More computational power}
+Just because we didn't manage doesn't means it's impossible. We could imagine that with some additional work, learning stable policies would be possible. We have some ideas how we could achieve this result.
 
-As we weren't able to solve the problem by our reasoning, we could just implement a huge hyperparameter search. Limiting factor in this is currently the simulation, which currently uses 70\% of the computation time, while we only use 30\% to train our networks. As on windows, gpu support in qblade is available, it might be interesting to run qblade on another machine than the training.
+\section{Scale up}
+
+It was limiting to perform all our experiment on the tiny machine. Limiting factor in this is currently the simulation, even with the lowered accuracy, which currently uses 70\% of the computation time, while we only use 30\% to train our networks. As currently, linux hardware acceleration is broken in qblade, a nice idea could be to fix this and to run future experiments on a cluster. This would also allow efficient hyperparameter sweeps, as we saw that hyperparameter choice greatly affects the outcome of the simulation.
+
+This would also allow to evaluate different wind scenarios and simulations with enabled wakes.
+
+\section{Validate \ac{PER}}
+
+We did not validate our combination of \ac{PER} and \ac{DDPG}. For our task, it gave better results, but it would be interesting to know whether our algorithm might also yield better results on general reinforcement learning tasks. This might also yield some insights into what makes our case special in comparison to general reinforcement learning.
 
 \section{Train PID inputs}
 
-As PID controllers have proven well in controlling a turbine and neural nets directly performed poorly, we could imagine to predict PID controller parameters and error targets instead of directly building the controller. 
+As PID controllers have proven well in controlling a turbine and neural nets directly performed poorly, we could imagine to predict PID controller parameters and error targets instead of directly building the controller. Alternatively, feeding the algorithm with derivative and integrative inputs similar to what we described in section \ref{sec:feedpast} could enable the policy to build more resonant-robust results.
 
 \section{Reward functions}
 
-We did all our training under the simple hold-speed reward function. A realistic reward function however would incorporate power generated and damage incurred. As soon as a stable agent under the hold speed reward function was created, using different rewards could bring the performance of the controller closer to that of industry controllers. A complex reward function like what we proposed in section \ref{rewardfunctions} however also makes learning more difficult, and thus would need more work in refining the algorithm.
+We did all our training under the simple hold-speed or hold-power reward function. A realistic reward function however would incorporate power generated and long-term damages occured. Especially the last part is tricky, as it would somehow have to be included into the scalar reward function. An interesting approach could be to try to train under multi-dimensional reward functions. To our knowledge, there haven't been efforts to accomodate this into Q-learning. Also, we could imagine interpolating between different reward functions during training.
 
-\section{Switch reward functions during training}
-To combine the learning ease of a simple reward function with the performance of a complex reward, we could imagine fading over between a simple and complex reward function. In early stages of training, the network is conditioned to only output anything sane, while in later training it could optimize power or damage prevention more.
+To combine the learning ease of a simple reward function with the performance of a complex reward, we could imagine fading over between a simple and complex reward function. In early stages of training, the network is conditioned to only output anything sane, while in later training it could optimize complex goals such as damage prevention more. This could be achieved by increasing the magnitude of the reward function further down in training, like after focussing on the big chunky goals zoom in on more fine-grained problems.
 
 
 \section{Expert policy training}
@@ -744,13 +780,9 @@ To combine the learning ease of a simple reward function with the performance of
 We implemented expert policy pretraining. Alternatively, we could imagine leaving the expert policy training active the whole time, not just once after random exploration, and to reduce the learning rate of the expert policy training gradually. This way, in initial training, predicting the expert policies actions would have a higher impact than what the Q-function would suggest, whereas in later training with the smaller learning rate, deviations from the expert policy would be punished less and the policy is allowed to deviate further from the expert policy. This would involve two backward passes per training iteration and would require prediction targets from the expert policy on new seen observations
 
 \section{Expert policy in instable conditions}
-When the turbine is reaching a dangerous state (high/low rotational speed, high vibrations), we could fall back to our expert controller to save the situation. This would result in a safe controller, that upon insane policies would fall back to sane behavior. It would degrade exploration beyond what we doom safe, so a controller with this fallback method would never explore a death condition. This would not necessarily hinder learning, as a complete death condition might not be necessary to explore to see the decreasing loss gradient leading to it. However, seeing a death condition could result in more extreme Q-predictions and thus more incentive to stay clear of a death.
+When the turbine is reaching a dangerous state (high/low rotational speed, high vibrations), we could fall back to our expert controller to save the situation. This would result in a safe controller, that upon insane policies would fall back to sane behavior. It would degrade exploration to what we deem safe, so a controller with this fallback method would never explore a death condition. This would not necessarily hinder learning, as a complete death condition might not be necessary to explore to see the decreasing loss gradient leading to it. However, seeing a death condition could result in more extreme Q-predictions and thus more incentive to stay clear of a death.
 
 \section{Active control elements}
 There is ongoing research into adding active control elements to windturbine blades such as flaps. A difficulty incurred in that research is the design of a controller, as the high-dimensional action space makes it difficult for a human to engineer a controller. Using our automatically learning agent could enable a first working version to that research, providing a first direction or even lead to performance increases over not using active control elements in a turbine.
-
-\chapter{Conclusion}
-
-% It's pretty hard to create a working controller for a windturbine, apparently RL needs some more foundational research or we are just not able to
 
 \end{document}

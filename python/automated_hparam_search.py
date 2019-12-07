@@ -55,13 +55,40 @@ import os
   {"id": 55},
 ]'''
 
-experiments = [
-  {"id": 56}, # Single critic, PER on, critic lr = 1e-4
+'''experiments = [
+  {"id": 56}, # Single critic, PER on, critic lr = 1e-4, hold speed
   {"id": 57},
   {"id": 58},
   {"id": 59},
-]
+]'''
 
+
+'''experiments = [
+  {"id": 60}, # Single critic, PER on, critic lr = 1e-4, hold power
+  {"id": 61, "critic_lr": 5e-5},
+  {"id": 62, "critic_lr": 1e-5},
+  {"id": 63, "actor_lr": 1e-5},  # Got closest
+  {"id": 64, "prioritized_experience_replay": False}, 
+  {"id": 65, "batch_size": 64},
+  {"id": 66, "batch_size": 32},
+  {"id": 67, "prioritized_experience_replay_alpha": 0.8, "prioritized_experience_replay_beta": 0.8},
+  {"id": 68, "prioritized_experience_replay_alpha": 0.3},
+  {"id": 69, "prioritized_experience_replay_alpha": 1, "prioritized_experience_replay_beta": 0.8},
+]'''
+
+# Hold lower power, actor lr 5e-5
+experiments = [
+  # {"id": 70}, # Disaster
+  # {"id": 71, "critic_lr": 5e-5}, # Disaster
+  # {"id": 72, "critic_lr": 1e-5}, # Disaster
+  # {"id": 73, "actor_lr": 1e-5}, $ Disaster
+  {"id": 74, "prioritized_experience_replay": False}, 
+  {"id": 75, "batch_size": 64},
+  {"id": 76, "batch_size": 32},
+  {"id": 77, "prioritized_experience_replay_alpha": 0.8, "prioritized_experience_replay_beta": 0.8},
+  {"id": 78, "prioritized_experience_replay_alpha": 0.3},
+  {"id": 79, "prioritized_experience_replay_alpha": 1, "prioritized_experience_replay_beta": 0.8},
+]
 
 def run_one(experiment):
   id = experiment['id']

@@ -92,7 +92,7 @@ class DDPG:
     self.critic_loss_function = lambda target, pred, weights: generic_loss_function(target, pred, weights)
 
     # Buffor for experience replay
-    self.replay_buffer = BasicBuffer(hparams.buffer_maxlen, self.device, self.obs_dim, self.act_dim, hparams.prioritized_experience_replay_alpha)
+    self.replay_buffer = BasicBuffer(hparams.buffer_maxlen, self.device, self.obs_dim, self.act_dim, hparams.prioritized_experience_replay_alpha, self.dtype)
 
     # Noises
     # Random exploration
@@ -146,7 +146,8 @@ class DDPG:
                                  self.act_dim,
                                  self.hparams.act_low,
                                  self.hparams.act_high,
-                                 self.device)
+                                 self.device,
+                                 self.dtype)
 
     self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps, self.hparams.run_name, self.hparams.obs_labels, self.hparams.act_labels)
     for key, value in self.hparams.values().items():
@@ -214,7 +215,7 @@ class DDPG:
   # Returns an unnormalized expert action from the expert controller
   def get_expert_action(self, state):
     if(self.act_dim == 2):
-      return [2e7*state[0]-12e6,128.6*state[0]-102.9]
+      return [2e7*state[0]-12e6,128.6*state[0]-128.6]
     else:
       return np.zeros(self.act_dim)
 
@@ -338,7 +339,6 @@ class DDPG:
 
 
     # When using PER, calculate IS-weights
-    weights = torch.ones(batch_size)
     if(self.hparams.prioritized_experience_replay):
       weights = self.replay_buffer.get_probabilities(indices)
       weights = (weights*batch_size) ** (-self.hparams.prioritized_experience_replay_beta)
@@ -346,6 +346,8 @@ class DDPG:
       assert(not np.any(np.isnan(weights)))
       assert(not np.any(weights > 1))
       weights = torch.tensor(weights, dtype=self.dtype).to(self.device)
+    else:
+      weights = torch.ones(batch_size, dtype=self.dtype, device=self.device)
 
     # Run the critic
     next_actions = self.actor_target.forward(next_state_batch).detach()
@@ -597,7 +599,7 @@ class DDPG:
       "prefix": prefix,
       "time": str(datetime.now()),
       "killcount": self.killcount,
-      "hparams": self.hparams.values(),
+      "hparams": str(self.hparams.get_dict()),
       "normalizer": self.normalizer.to_dict(),
       "real_last_action": self.real_last_action.tolist() if self.hparams.action_gradients else None,
     }
@@ -655,7 +657,7 @@ class DDPG:
 
       # Type of random exploration noise
       # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
-      random_exploration_type = "correlated",
+      random_exploration_type = "none",
 
       # How strongly it is drawn towards mu
       random_exploration_theta = 0.03,
@@ -705,10 +707,10 @@ class DDPG:
       buffer_maxlen = 100000,
 
       # Learning rate of the Q approximator
-      critic_lr = 1e-4,
+      critic_lr = 1e-5,
 
       # Neural network sizes of the critic
-      critic_sizes = [64, 32],
+      critic_sizes = [128, 64],
 
       # Whether to use a 4-layer or a 2-layer structure
       # for the critic
@@ -729,7 +731,7 @@ class DDPG:
       twin_critics = False,
 
       # Learning rate of the policy
-      actor_lr = 1e-4,
+      actor_lr = 1e-5,
 
       # Network sizes of the policy
       actor_sizes = [32, 16],
@@ -769,7 +771,7 @@ class DDPG:
 
       # Network parameters of both the actor and critic will be initialized to
       # a uniform random value between [-init_weight_limit, init_weight_limit]
-      init_weight_limit = 1.,
+      init_weight_limit = 0.5,
 
       # Stuff that will be overwritten by the environment
       obs_dim = 0,
@@ -831,20 +833,20 @@ class DDPG:
       # after the random exploration phase
       # After that, observations will mostly be between -1 and 1 internally
       # though min and max from the random exploration phase is assumed
-      normalize_observations = True,
+      normalize_observations = False,
 
       # Whether to normalize rewards
       # Normalization factor will be computed after observing some rewards, i.e.
       # after the random exploration phase
       # After that, rewards will mostly be between -1 and 1 internally
       # Though min and max from the random exploration phase is assumed
-      normalize_rewards = True,
+      normalize_rewards = False,
 
       # Additional nrmalization replay data to load when
       # calculating normalizations
       # Set to none if you don't want to load extra data
       #normalization_extradata = 'normalization_data/past_feeding_1.dat',
-      normalization_extradata = 'normalization_data/two_observations.dat',
+      normalization_extradata = 'normalization_data/two_observations_hold_power.dat',
       #normalization_extradata = None,
 
       # Whether to offer gradient action spaces instead of the ones from the environment
@@ -868,7 +870,7 @@ class DDPG:
 
       # In prioritized experience replay the probability of a sample to be replayed is proportional to its TD error
       # This allows critical samples to be replayed more often and thus the critic updating faster
-      prioritized_experience_replay = True,
+      prioritized_experience_replay = False,
 
       # How strongly to apply prioritized experience replay
       # 1 means sampling happens only according to the priority,

@@ -1,87 +1,118 @@
 This is BibTeX, Version 0.99d (TeX Live 2019/Arch Linux)
 Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: paper.aux
-The style file: alphadin.bst
-Reallocated singl_function (elt_size=8) to 100 items from 50.
+The style file: alpha.bst
 Database file #1: literatur.bib
 Warning--entry type for "jonkmanDefinition5MWReference2009" isn't style-file defined
 --line 150 of file literatur.bib
-Reallocated wiz_functions (elt_size=8) to 6000 items from 3000.
-Warning--Es gibt einen Jahrgang, aber kein Jahr in agarapDeepLearningUsing2019
-Warning--Es gibt einen Jahrgang, aber kein Jahr in brockmanOpenAIGym2016
-Warning--Es gibt einen Jahrgang, aber kein Jahr in bellmanTheoryDynamicProgramming1954
-Warning--Es gibt einen Jahrgang, aber kein Jahr in bjorckUnderstandingBatchNormalization
-Warning--empty edition in bishopNeuralNetworksPattern1995
-Warning--Es gibt nur eine Verlagsangabe in bishopNeuralNetworksPattern1995
-Warning--empty edition in burtonWindEnergyHandbook2011
-Warning--Es gibt nur eine Verlagsangabe in burtonWindEnergyHandbook2011
-Warning--Es gibt einen Jahrgang, aber kein Jahr in bhatnagarConvergentTemporalDifferenceLearning2009
-Warning--Es gibt einen Jahrgang, aber kein Jahr in berglindFatigueEstimationMethods2014
-Warning--Es gibt einen Jahrgang, aber kein Jahr in cobbeQuantifyingGeneralizationReinforcement2019
-Warning--Es gibt einen Jahrgang, aber kein Jahr in degrisOffPolicyActorCritic2013
-Warning--Es gibt einen Jahrgang, aber kein Jahr in fujimotoAddressingFunctionApproximation2018
-Warning--Es gibt einen Jahrgang, aber kein Jahr in vanhasseltLearningValuesMany2016
-Warning--Es gibt einen Jahrgang, aber kein Jahr in howlandWindFarmPower2019
-Warning--Es gibt einen Jahrgang, aber kein Jahr in hesselRainbowCombiningImprovements2017
-Warning--Es gibt einen Jahrgang, aber kein Jahr in huber1964
-Warning--Es gibt einen Jahrgang, aber kein Jahr in houImprovingDDPGPrioritized
-Warning--Es gibt einen Jahrgang, aber kein Jahr in kingmaAdamMethodStochastic2017
+Warning--empty journal in agarapDeepLearningUsing2019
+Warning--empty year in agarapDeepLearningUsing2019
+Warning--empty journal in brockmanOpenAIGym2016
+Warning--empty year in brockmanOpenAIGym2016
+Warning--empty journal in bellmanTheoryDynamicProgramming1954
+Warning--empty year in bellmanTheoryDynamicProgramming1954
+Warning--empty journal in bjorckUnderstandingBatchNormalization
+Warning--empty year in bjorckUnderstandingBatchNormalization
+Warning--empty year in bishopNeuralNetworksPattern1995
+Warning--empty year in burtonWindEnergyHandbook2011
+Warning--empty journal in bhatnagarConvergentTemporalDifferenceLearning2009
+Warning--empty year in bhatnagarConvergentTemporalDifferenceLearning2009
+Warning--empty journal in berglindFatigueEstimationMethods2014
+Warning--empty year in berglindFatigueEstimationMethods2014
+Warning--empty journal in cobbeQuantifyingGeneralizationReinforcement2019
+Warning--empty year in cobbeQuantifyingGeneralizationReinforcement2019
+Warning--empty journal in degrisOffPolicyActorCritic2013
+Warning--empty year in degrisOffPolicyActorCritic2013
+Warning--empty journal in fernandez-gaunaVariableSpeedWind2016
+Warning--empty year in fernandez-gaunaVariableSpeedWind2016
+Warning--empty journal in fujimotoOffPolicyDeepReinforcement2019
+Warning--empty year in fujimotoOffPolicyDeepReinforcement2019
+Warning--empty journal in fujimotoAddressingFunctionApproximation2018
+Warning--empty year in fujimotoAddressingFunctionApproximation2018
+Warning--empty journal in howlandWindFarmPower2019
+Warning--empty year in howlandWindFarmPower2019
+Warning--empty journal in hesselRainbowCombiningImprovements2017
+Warning--empty year in hesselRainbowCombiningImprovements2017
+Warning--empty journal in huber1964
+Warning--empty year in huber1964
+Warning--empty journal in houImprovingDDPGPrioritized
+Warning--empty year in houImprovingDDPGPrioritized
+Warning--empty journal in kingmaAdamMethodStochastic2017
+Warning--empty year in kingmaAdamMethodStochastic2017
 Warning--empty booktitle in kolterDesignAnalysisLearning2012
-Warning--Es gibt nur eine Verlagsangabe in kolterDesignAnalysisLearning2012
-Warning--Es gibt einen Jahrgang, aber kein Jahr in vankuikLongtermResearchChallenges2016
-Warning--Es gibt einen Jahrgang, aber kein Jahr in lillicrapCONTINUOUSCONTROLDEEP2015
-Warning--Es gibt einen Jahrgang, aber kein Jahr in mozerDiscoveringStructureReactive1990
-Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihPlayingAtariDeep2013
-Warning--Es gibt einen Jahrgang, aber kein Jahr in mnihHumanlevelControlDeep2015
-Warning--Es gibt einen Jahrgang, aber kein Jahr in martenQBLADEOPENSOURCE2013
-Warning--Es gibt einen Jahrgang, aber kein Jahr in plappertParameterSpaceNoise2017
-Warning--Es gibt nur eine Verlagsangabe in suttonReinforcementLearningIntroduction2018
-Warning--Es gibt einen Jahrgang, aber kein Jahr in silverMasteringGameGo2016
-Warning--Es gibt einen Jahrgang, aber kein Jahr in silverDeterministicPolicyGradient2013
-Warning--Es gibt einen Jahrgang, aber kein Jahr in suttonPolicyGradientMethods
-Warning--Es gibt einen Jahrgang, aber kein Jahr in schaulPrioritizedExperienceReplay2016
-Warning--Es gibt einen Jahrgang, aber kein Jahr in uhlenbeckTheoryBrownianMotion1930
-Warning--Es gibt einen Jahrgang, aber kein Jahr in williamsSimpleStatisticalGradientfollowing
-Warning--Es gibt einen Jahrgang, aber kein Jahr in zhaExperienceReplayOptimization2019
-You've used 34 entries,
-            3183 wiz_defined-function locations,
-            820 strings with 12700 characters,
-and the built_in function-call counts, 32341 in all, are:
-= -- 3385
-> -- 1240
-< -- 1425
-+ -- 1668
-- -- 503
-* -- 2454
-:= -- 5985
-add.period$ -- 34
-call.type$ -- 34
-change.case$ -- 289
-chr.to.int$ -- 33
-cite$ -- 70
-duplicate$ -- 629
-empty$ -- 1384
-format.name$ -- 674
-if$ -- 5577
+Warning--empty year in kolterDesignAnalysisLearning2012
+Warning--empty journal in lillicrapCONTINUOUSCONTROLDEEP2015
+Warning--empty year in lillicrapCONTINUOUSCONTROLDEEP2015
+Warning--empty journal in mozerDiscoveringStructureReactive1990
+Warning--empty year in mozerDiscoveringStructureReactive1990
+Warning--empty journal in mnihPlayingAtariDeep2013
+Warning--empty year in mnihPlayingAtariDeep2013
+Warning--empty journal in mnihHumanlevelControlDeep2015
+Warning--empty year in mnihHumanlevelControlDeep2015
+Warning--empty journal in martenQBLADEOPENSOURCE2013
+Warning--empty year in martenQBLADEOPENSOURCE2013
+Warning--empty journal in plappertParameterSpaceNoise2017
+Warning--empty year in plappertParameterSpaceNoise2017
+Warning--empty journal in saenz-aguirreArtificialNeuralNetwork2019
+Warning--empty year in saenz-aguirreArtificialNeuralNetwork2019
+Warning--empty year in suttonReinforcementLearningIntroduction2018
+Warning--empty journal in silverMasteringGameGo2016
+Warning--empty year in silverMasteringGameGo2016
+Warning--empty journal in silverDeterministicPolicyGradient2013
+Warning--empty year in silverDeterministicPolicyGradient2013
+Warning--empty journal in suttonPolicyGradientMethods
+Warning--empty year in suttonPolicyGradientMethods
+Warning--empty journal in schaulPrioritizedExperienceReplay2016
+Warning--empty year in schaulPrioritizedExperienceReplay2016
+Warning--empty journal in uhlenbeckTheoryBrownianMotion1930
+Warning--empty year in uhlenbeckTheoryBrownianMotion1930
+Warning--empty journal in vanhasseltLearningValuesMany2016
+Warning--empty year in vanhasseltLearningValuesMany2016
+Warning--empty journal in vankuikLongtermResearchChallenges2016
+Warning--empty year in vankuikLongtermResearchChallenges2016
+Warning--empty journal in williamsSimpleStatisticalGradientfollowing
+Warning--empty year in williamsSimpleStatisticalGradientfollowing
+Warning--empty journal in zhaExperienceReplayOptimization2019
+Warning--empty year in zhaExperienceReplayOptimization2019
+You've used 37 entries,
+            2543 wiz_defined-function locations,
+            741 strings with 13125 characters,
+and the built_in function-call counts, 17258 in all, are:
+= -- 1493
+> -- 1325
+< -- 13
++ -- 494
+- -- 492
+* -- 1514
+:= -- 3005
+add.period$ -- 98
+call.type$ -- 37
+change.case$ -- 344
+chr.to.int$ -- 36
+cite$ -- 106
+duplicate$ -- 548
+empty$ -- 915
+format.name$ -- 520
+if$ -- 3253
 int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 36
-newline$ -- 201
-num.names$ -- 102
-pop$ -- 422
+missing$ -- 39
+newline$ -- 174
+num.names$ -- 111
+pop$ -- 525
 preamble$ -- 1
-purify$ -- 357
+purify$ -- 383
 quote$ -- 0
-skip$ -- 1590
+skip$ -- 355
 stack$ -- 0
-substring$ -- 2721
-swap$ -- 219
-text.length$ -- 220
+substring$ -- 511
+swap$ -- 43
+text.length$ -- 13
 text.prefix$ -- 5
 top$ -- 0
-type$ -- 260
-warning$ -- 36
-while$ -- 312
-width$ -- 40
-write$ -- 433
-(There were 37 warnings)
+type$ -- 284
+warning$ -- 69
+while$ -- 126
+width$ -- 41
+write$ -- 383
+(There were 70 warnings)

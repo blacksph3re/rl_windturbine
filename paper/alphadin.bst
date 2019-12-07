@@ -1351,7 +1351,7 @@ FUNCTION {format.lab.names}
 }
 %% Anmerkung, Lo 14/12/95:
 %% wenn man in der letzten label-Bearbeitung #4 statt #3 setzt, dann werden
-%% auch Umlaute oder แ an 3. Stelle im Namen korrekt in das label genommen.
+%% auch Umlaute oder รก an 3. Stelle im Namen korrekt in das label genommen.
 %% Tip: Aendere diese Zahl nur, wenn in einer Lit.-Liste der Umlautsonderfall
 %% stoerend auffaellt.
 

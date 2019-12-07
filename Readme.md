@@ -203,7 +203,8 @@ BN works pretty well, on my laptop I could use a LR of 1e-3 and it still worked.
 Also it would be helpful to restrict actions in the ddpg module to store the real actions in the replay buffer. I have tried it but it seems to have a bug still.
 
 TODOs paper:
-- Abstract (3h)
+x Abstract (3h)
+x Background RL on windturbines (4h)
 x RL/env: add formulae (1h)
 x RL/Q learning (4h)
 x RL/PG (8h)
@@ -221,15 +222,13 @@ x Exp/Nonsense/Data aug: Add details (30m)
 x Exp/QLoss/Huber: Much more math (2h)
 x Exp/QLoss/Twin: Much more explanation (4h)
 o Exp/QLoss/BN: Much more expl (3h)
-- Eval/Algorithm: Describe algorithm (2h)
-- Eval/Convergence: Plot simplest reward function (3h)
-- Eval/Different windspeeds: Try under different windspeeds (3h write, 8h calc)
-- Eval/Different rewards: Try hold power (1h)
-- Eval/Learning rates: Grid-search for learning rate (5h write, 8h calc)
-- Eval/PER-alpha beta: Grid search for best PER parameters (5h write, 8h calc)
-- Eval/Conclusion: First halfway stable results (5h)
-- Future: Write (3h)
-- Concl: Write (4h)
+x Eval/Algorithm: Describe algorithm (2h)
+x Eval/Hold speed: Plot simplest reward function (3h)
+x Eval/Hold rated power: Try under different windspeeds (3h write, 8h calc)
+- Eval/Hold power: Try hold power (6h)
+o Eval/Discussion: First halfway stable results (5h)
+o Future: Write (3h)
+
 
 
 
@@ -275,3 +274,8 @@ train step
   train -> broker train sends his new policy (in linked mode) and training metrics to the broker 
   broker -> train sends new replay buffer updates
 This is also done only every b steps
+
+
+### **12/07**
+
+Mediocre results on a simple hold speed task, terrible on hold power. On hold power, it learned to die quite often, maybe I could rephrase my death conditions again. Trying continous death conditions? Also it couldn't stop the system from swinging, maybe experimenting again with feeding past timesteps? Or even feeding a rolling average (for I) and difference to the last step (D), so it can in theory build its own PID?

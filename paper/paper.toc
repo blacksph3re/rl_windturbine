@@ -1,58 +1,59 @@
 \contentsline {section}{\numberline {0.1}Background:}{2}{section.0.1}% 
 \contentsline {section}{\numberline {0.2}Tasks}{2}{section.0.2}% 
-\contentsline {chapter}{\numberline {1}Abstract}{4}{chapter.1}% 
-\contentsline {chapter}{\numberline {2}Intro}{5}{chapter.2}% 
-\contentsline {chapter}{\numberline {3}Background}{6}{chapter.3}% 
-\contentsline {section}{\numberline {3.1}Windturbine control}{6}{section.3.1}% 
-\contentsline {subsection}{\numberline {3.1.1}Why we do what we do}{8}{subsection.3.1.1}% 
-\contentsline {section}{\numberline {3.2}QBlade}{9}{section.3.2}% 
-\contentsline {section}{\numberline {3.3}Reinforcement learning}{10}{section.3.3}% 
-\contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{10}{subsection.3.3.1}% 
+\contentsline {chapter}{\numberline {1}Abstract}{3}{chapter.1}% 
+\contentsline {chapter}{\numberline {2}Introduction}{4}{chapter.2}% 
+\contentsline {chapter}{\numberline {3}Background}{5}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Windturbine control}{5}{section.3.1}% 
+\contentsline {subsection}{\numberline {3.1.1}Motivation}{7}{subsection.3.1.1}% 
+\contentsline {section}{\numberline {3.2}QBlade}{8}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Reinforcement learning}{9}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}Environment assumptions}{9}{subsection.3.3.1}% 
 \contentsline {subsection}{\numberline {3.3.2}Definitions}{11}{subsection.3.3.2}% 
-\contentsline {subsection}{\numberline {3.3.3}Q-Learning}{13}{subsection.3.3.3}% 
-\contentsline {subsection}{\numberline {3.3.4}Policy Gradients}{14}{subsection.3.3.4}% 
-\contentsline {subsection}{\numberline {3.3.5}Deterministic Policy Gradients}{17}{subsection.3.3.5}% 
-\contentsline {subsection}{\numberline {3.3.6}DDPG}{18}{subsection.3.3.6}% 
-\contentsline {section}{\numberline {3.4}RL on windturbines}{21}{section.3.4}% 
+\contentsline {subsection}{\numberline {3.3.3}Q-Learning}{12}{subsection.3.3.3}% 
+\contentsline {subsection}{\numberline {3.3.4}Policy Gradients}{13}{subsection.3.3.4}% 
+\contentsline {subsection}{\numberline {3.3.5}Deterministic Policy Gradients}{16}{subsection.3.3.5}% 
+\contentsline {subsection}{\numberline {3.3.6}DDPG}{17}{subsection.3.3.6}% 
+\contentsline {section}{\numberline {3.4}RL on windturbines}{19}{section.3.4}% 
 \contentsline {chapter}{\numberline {4}Experimentation}{23}{chapter.4}% 
 \contentsline {section}{\numberline {4.1}Gym Experiments}{23}{section.4.1}% 
 \contentsline {section}{\numberline {4.2}Starting with qblade}{23}{section.4.2}% 
 \contentsline {section}{\numberline {4.3}Designing reward functions}{24}{section.4.3}% 
-\contentsline {section}{\numberline {4.4}Aiding exploration}{25}{section.4.4}% 
+\contentsline {section}{\numberline {4.4}Aiding exploration}{26}{section.4.4}% 
 \contentsline {subsection}{\numberline {4.4.1}Action Noise}{26}{subsection.4.4.1}% 
-\contentsline {subsection}{\numberline {4.4.2}Random exploration}{26}{subsection.4.4.2}% 
-\contentsline {subsection}{\numberline {4.4.3}Parameter noise}{27}{subsection.4.4.3}% 
-\contentsline {section}{\numberline {4.5}Zero Gradients}{27}{section.4.5}% 
-\contentsline {subsection}{\numberline {4.5.1}Simplifying the architecture}{27}{subsection.4.5.1}% 
+\contentsline {subsection}{\numberline {4.4.2}Random exploration}{27}{subsection.4.4.2}% 
+\contentsline {subsection}{\numberline {4.4.3}Parameter noise}{28}{subsection.4.4.3}% 
+\contentsline {section}{\numberline {4.5}Zero Gradients}{28}{section.4.5}% 
+\contentsline {subsection}{\numberline {4.5.1}Simplifying the architecture}{28}{subsection.4.5.1}% 
 \contentsline {subsection}{\numberline {4.5.2}Normalization}{28}{subsection.4.5.2}% 
-\contentsline {section}{\numberline {4.6}High action gradients}{28}{section.4.6}% 
+\contentsline {section}{\numberline {4.6}High action gradients}{29}{section.4.6}% 
 \contentsline {subsection}{\numberline {4.6.1}Gradient actionspace}{29}{subsection.4.6.1}% 
-\contentsline {subsection}{\numberline {4.6.2}Feeding past timesteps}{29}{subsection.4.6.2}% 
-\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{29}{subsection.4.6.3}% 
+\contentsline {subsection}{\numberline {4.6.2}Feeding past timesteps}{30}{subsection.4.6.2}% 
+\contentsline {subsection}{\numberline {4.6.3}Clipping action gradients}{30}{subsection.4.6.3}% 
 \contentsline {subsection}{\numberline {4.6.4}Pretraining the policy}{30}{subsection.4.6.4}% 
 \contentsline {section}{\numberline {4.7}Other improvements}{30}{section.4.7}% 
-\contentsline {subsection}{\numberline {4.7.1}Prioritized experience replay}{30}{subsection.4.7.1}% 
-\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{32}{subsection.4.7.2}% 
+\contentsline {subsection}{\numberline {4.7.1}Prioritized experience replay}{31}{subsection.4.7.1}% 
+\contentsline {subsection}{\numberline {4.7.2}Data augmentation}{33}{subsection.4.7.2}% 
 \contentsline {section}{\numberline {4.8}Exploding Q-Loss}{33}{section.4.8}% 
 \contentsline {subsection}{\numberline {4.8.1}Huber loss}{33}{subsection.4.8.1}% 
-\contentsline {subsection}{\numberline {4.8.2}Double critics}{33}{subsection.4.8.2}% 
-\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{34}{subsection.4.8.3}% 
+\contentsline {subsection}{\numberline {4.8.2}Double critics}{34}{subsection.4.8.2}% 
+\contentsline {subsection}{\numberline {4.8.3}Batch normalization}{35}{subsection.4.8.3}% 
 \contentsline {subsection}{\numberline {4.8.4}Regarding death conditions}{35}{subsection.4.8.4}% 
-\contentsline {subsection}{\numberline {4.8.5}Clipping observations}{35}{subsection.4.8.5}% 
-\contentsline {chapter}{\numberline {5}Algorithm}{36}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}QBlade}{36}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}Core algorithm}{37}{section.5.2}% 
-\contentsline {chapter}{\numberline {6}Evaluation}{39}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Learning rates}{39}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}HParam tuning}{40}{section.6.2}% 
-\contentsline {section}{\numberline {6.3}Comparison to industry controllers}{41}{section.6.3}% 
-\contentsline {chapter}{\numberline {7}Future work}{42}{chapter.7}% 
-\contentsline {section}{\numberline {7.1}More computational power}{42}{section.7.1}% 
-\contentsline {section}{\numberline {7.2}Train PID inputs}{42}{section.7.2}% 
-\contentsline {section}{\numberline {7.3}Reward functions}{42}{section.7.3}% 
-\contentsline {section}{\numberline {7.4}Switch reward functions during training}{42}{section.7.4}% 
-\contentsline {section}{\numberline {7.5}Expert policy training}{43}{section.7.5}% 
-\contentsline {section}{\numberline {7.6}Expert policy in instable conditions}{43}{section.7.6}% 
-\contentsline {section}{\numberline {7.7}Active control elements}{43}{section.7.7}% 
-\contentsline {chapter}{\numberline {8}Conclusion}{44}{chapter.8}% 
-\contentsline {chapter}{\nonumberline Literaturverzeichnis}{45}{chapter*.7}% 
+\contentsline {subsection}{\numberline {4.8.5}Clipping observations}{36}{subsection.4.8.5}% 
+\contentsline {chapter}{\numberline {5}Algorithm}{37}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}QBlade}{37}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Core algorithm}{38}{section.5.2}% 
+\contentsline {chapter}{\numberline {6}Evaluation}{40}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Hold speed}{40}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Hold rated power}{42}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Hold power}{43}{section.6.3}% 
+\contentsline {section}{\numberline {6.4}Pendulum}{43}{section.6.4}% 
+\contentsline {section}{\numberline {6.5}Discussion}{43}{section.6.5}% 
+\contentsline {chapter}{\numberline {7}Future work}{45}{chapter.7}% 
+\contentsline {section}{\numberline {7.1}Scale up}{45}{section.7.1}% 
+\contentsline {section}{\numberline {7.2}Validate \ac {PER}}{45}{section.7.2}% 
+\contentsline {section}{\numberline {7.3}Train PID inputs}{45}{section.7.3}% 
+\contentsline {section}{\numberline {7.4}Reward functions}{46}{section.7.4}% 
+\contentsline {section}{\numberline {7.5}Expert policy training}{46}{section.7.5}% 
+\contentsline {section}{\numberline {7.6}Expert policy in instable conditions}{46}{section.7.6}% 
+\contentsline {section}{\numberline {7.7}Active control elements}{47}{section.7.7}% 
+\contentsline {chapter}{\nonumberline Bibliography}{48}{chapter*.19}% 

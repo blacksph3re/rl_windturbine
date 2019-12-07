@@ -211,7 +211,7 @@ class SumTree:
 # A "Basic" Buffer which stores entries and can sample them by priority
 class BasicBuffer:
 
-    def __init__(self, max_size, device, state_dim, action_dim, alpha=1):
+    def __init__(self, max_size, device, state_dim, action_dim, alpha=1, dtype=torch.float):
         self.device = device
         self.max_size = max_size
         self.iterator = 0 # Next position to write to
@@ -220,7 +220,7 @@ class BasicBuffer:
         # CPU buffer
         self.buffer = np.array([(None, None, None, None, None) for _ in range(max_size)])
 
-        self.dtype = torch.float
+        self.dtype = dtype
 
         # GPU buffers
         self.buffer_s = torch.zeros(max_size, state_dim, dtype=self.dtype, device=device, requires_grad=False)
