@@ -60,7 +60,7 @@ class Normalizer:
       action = torch.clamp((action - c) / m, -3, 3)
     else:
       m, c = self.action_normalizer_params
-      action = np.clip((action - c) / m, -3, 3)
+      action = np.clip((action - c) / m, -3, 3) 
     
     return action
 
@@ -87,16 +87,16 @@ class Normalizer:
 
     if(gpu):
       m, c = self.reward_normalizer_params_gpu
-      reward = torch.clamp((reward - c) / m, -3, 3)
+      reward = torch.clamp((reward - c) / m, -3, 3) + 3
     else:
       m, c = self.reward_normalizer_params
-      reward = np.clip((reward - c) / m, -3, 3)
+      reward = np.clip((reward - c) / m, -3, 3) + 3
     
     return reward
 
   def denormalize_reward(self, reward, gpu=False):
     m, c = self.reward_normalizer_params_gpu if gpu else self.reward_normalizer_params
-    return reward * m + c
+    return (reward - 3) * m + c
 
   def calc_normalizations(self, replay_buffer, normalization_extradata=None):
     # Load additional data if wanted

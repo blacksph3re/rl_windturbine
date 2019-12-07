@@ -226,8 +226,7 @@ x Eval/Algorithm: Describe algorithm (2h)
 x Eval/Hold speed: Plot simplest reward function (3h)
 x Eval/Hold rated power: Try under different windspeeds (3h write, 8h calc)
 - Eval/Hold power: Try hold power (6h)
-o Eval/Discussion: First halfway stable results (5h)
-o Future: Write (3h)
+x Future: Write (3h)
 
 
 

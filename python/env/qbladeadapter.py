@@ -175,7 +175,7 @@ class QBladeAdapter:
     broken_state = 20
     max_rotorspeed = 3
     min_rotorspeed = -0.05
-    max_power = 8000
+    max_power = 10000
     return np.abs(observation[16]) > broken_state or \
            np.abs(observation[17]) > broken_state or \
            np.abs(observation[18]) > broken_state or \

@@ -393,6 +393,7 @@ class DDPG:
     self.critic_optimizer.step()
     self.logger.add_scalar('Loss/q', q_loss.detach(), time)
     self.logger.add_scalar('Loss/next_Q_mean', next_Q.mean().detach(), time)
+    self.logger.add_scalar('critic/deaths_seen', (1 - masks).sum(), time)
 
     # Also, for correction of oversampling in later policy replays, redraw samples
     if(self.hparams.prioritized_experience_replay):
@@ -707,7 +708,7 @@ class DDPG:
       buffer_maxlen = 100000,
 
       # Learning rate of the Q approximator
-      critic_lr = 1e-5,
+      critic_lr = 1e-4,
 
       # Neural network sizes of the critic
       critic_sizes = [128, 64],
@@ -731,7 +732,7 @@ class DDPG:
       twin_critics = False,
 
       # Learning rate of the policy
-      actor_lr = 1e-5,
+      actor_lr = 5e-5,
 
       # Network sizes of the policy
       actor_sizes = [32, 16],
@@ -760,7 +761,7 @@ class DDPG:
       optimizer = 'adam',
 
       # How many training steps to do per environment iteration
-      training_steps_per_env_iteration = 1,
+      training_steps_per_env_iteration = 2,
 
       # Whether to clip gradients
       # If yes, to which values to clip them to
