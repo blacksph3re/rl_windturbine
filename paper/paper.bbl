@@ -15,11 +15,6 @@ Richard Bellman.
 \newblock The theory of dynamic programming.
 \newblock 60(6):503--516.
 
-\bibitem[BGSW]{bjorckUnderstandingBatchNormalization}
-Nils Bjorck, Carla~P Gomes, Bart Selman, and Kilian~Q Weinberger.
-\newblock Understanding {{Batch Normalization}}.
-\newblock page~12.
-
 \bibitem[Bis]{bishopNeuralNetworksPattern1995}
 Christopher~M. Bishop.
 \newblock {\em Neural Networks for Pattern Recognition}.
@@ -76,7 +71,7 @@ Matteo Hessel, Joseph Modayil, Hado van Hasselt, Tom Schaul, Georg Ostrovski,
 \newblock Rainbow: {{Combining Improvements}} in {{Deep Reinforcement
   Learning}}.
 
-\bibitem[Hub]{huber1964}
+\bibitem[Hub]{Huber1964}
 Peter~J. Huber.
 \newblock Robust estimation of a location parameter.
 \newblock 35(1):73--101.
@@ -165,6 +160,11 @@ David Silver, Guy Lever, Nicolas Heess, Thomas Degris, Daan Wierstra, and
   Martin Riedmiller.
 \newblock Deterministic {{Policy Gradient Algorithms}}.
 \newblock page~9.
+
+\bibitem[SLM{\etalchar{+}}]{schulmanTrustRegionPolicy2017}
+John Schulman, Sergey Levine, Philipp Moritz, Michael~I. Jordan, and Pieter
+  Abbeel.
+\newblock Trust {{Region Policy Optimization}}.
 
 \bibitem[SMSM]{suttonPolicyGradientMethods}
 Richard~S Sutton, David~A McAllester, Satinder~P Singh, and Yishay Mansour.

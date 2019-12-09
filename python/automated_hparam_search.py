@@ -77,7 +77,7 @@ import os
 ]'''
 
 # Hold lower power, actor lr 5e-5
-experiments = [
+'''experiments = [
   # {"id": 70}, # Disaster
   # {"id": 71, "critic_lr": 5e-5}, # Disaster
   # {"id": 72, "critic_lr": 1e-5}, # Disaster
@@ -88,6 +88,13 @@ experiments = [
   {"id": 77, "prioritized_experience_replay_alpha": 0.8, "prioritized_experience_replay_beta": 0.8},
   {"id": 78, "prioritized_experience_replay_alpha": 0.3},
   {"id": 79, "prioritized_experience_replay_alpha": 1, "prioritized_experience_replay_beta": 0.8},
+]'''
+
+experiments = [
+  {"id": 81},
+  {"id": 82},
+  {"id": 83},
+  {"id": 84},
 ]
 
 def run_one(experiment):

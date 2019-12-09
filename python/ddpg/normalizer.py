@@ -4,13 +4,14 @@ import numpy as np
 from .utils import BasicBuffer
 
 class Normalizer:
-  def __init__(self, obs_dim, act_dim, act_low, act_high, device, dtype=torch.float):
+  def __init__(self, obs_dim, act_dim, act_low, act_high, device, dtype=torch.float, reward_offset=0):
     self.device = device
     self.dtype = dtype
     self.obs_dim = obs_dim
     self.act_dim = act_dim
     self.act_high = np.array(act_high)
     self.act_low = np.array(act_low)
+    self.reward_offset = reward_offset
 
     # Calculate action normalization
     m = (self.act_low - self.act_high) / (-1 - 1)
@@ -87,29 +88,42 @@ class Normalizer:
 
     if(gpu):
       m, c = self.reward_normalizer_params_gpu
-      reward = torch.clamp((reward - c) / m, -3, 3) + 3
+      reward = torch.clamp((reward - c) / m, -3, 3) + self.reward_offset
     else:
       m, c = self.reward_normalizer_params
-      reward = np.clip((reward - c) / m, -3, 3) + 3
+      reward = np.clip((reward - c) / m, -3, 3) + self.reward_offset
     
     return reward
 
   def denormalize_reward(self, reward, gpu=False):
     m, c = self.reward_normalizer_params_gpu if gpu else self.reward_normalizer_params
-    return (reward - 3) * m + c
+    return (reward - self.reward_offset) * m + c
 
-  def calc_normalizations(self, replay_buffer, normalization_extradata=None):
+  def calc_normalizations(self, replay_buffer, normalization_extradata=None, feed_past=0):
     # Load additional data if wanted
     if(normalization_extradata):
-      tmpbuffer = BasicBuffer(100000, torch.device('cpu'), self.obs_dim, self.act_dim)
+      
+      if(feed_past):
+        obs_dim = int(self.obs_dim/(feed_past+1))
+      else:
+        obs_dim = self.obs_dim
+
+      tmpbuffer = BasicBuffer(100000, torch.device('cpu'), obs_dim, self.act_dim)
       tmpbuffer.load(normalization_extradata)
       extrastates = [state for state, _, _, _, _ in tmpbuffer.get_buffer()]
       extrarewards = [reward for _, _, reward, _, _ in tmpbuffer.get_buffer()]
+
+      if(feed_past):
+        extrastates = [np.array([s for i in range(0, feed_past+1)]).flatten() for s in extrastates]
 
       # Length of our observations and the observations in the data must match
       if(len(extrastates[0]) != self.obs_dim):
         print('Normalization extradata incompatible')
         extrastates = []
+
+
+
+
 
 
     # Calculate state max and min

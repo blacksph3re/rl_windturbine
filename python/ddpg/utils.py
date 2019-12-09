@@ -64,7 +64,7 @@ class GaussianNoise:
         self.variance = variance
 
     def get_noise(self, _t=0):
-        return np.random.randn(dim) * variance + mean
+        return np.random.randn(self.dim) * self.variance + self.mean
 
 
 class UniformNoise:
@@ -360,16 +360,20 @@ class BasicBuffer:
 
 class QBladeLogger:
 
-    def __init__(self, logdir, log_steps, run_name, obs_labels = {}, act_labels = {}):
+    def __init__(self, logdir, log_steps, run_name, obs_labels = {}, act_labels = {}, feed_past=0):
         self.logdir = logdir
         self.log_steps = log_steps
         run_name = run_name if run_name else str(datetime.now())
         self.writer = SummaryWriter('%s/%s' % (logdir, run_name))
         self.obs_labels = obs_labels
         self.act_labels = act_labels
+        self.feed_past = feed_past
 
     def logObservation(self, step, observation, prefix='obs'):
-        for i in range(0, len(observation)):
+        length = len(observation)
+        if(self.feed_past):
+            length = int(length/(self.feed_past+1))
+        for i in range(0, length):
             if i in self.obs_labels:
                 label = self.obs_labels[i]
             else:

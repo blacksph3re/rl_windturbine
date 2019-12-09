@@ -77,6 +77,9 @@ class Actor(nn.Module):
         self.action_dim = action_dim
         self.simple = simple
 
+        self.f_inner = torch.nn.ReLU()
+        self.f_last = torch.nn.Tanh()
+
         if(batch_normalization):
             self.bn1 = nn.BatchNorm1d(hidden_size_1)
             self.bn2 = nn.BatchNorm1d(hidden_size_2)

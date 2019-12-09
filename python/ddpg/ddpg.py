@@ -20,6 +20,9 @@ class DDPG:
     self.device = torch.device("cuda" if torch.cuda.is_available() and hparams.use_gpu else "cpu")
     self.dtype = torch.float
 
+    if(hparams.target_policy_smoothing):
+      assert(hparams.normalize_actions)
+
     self.hparams = hparams
     self.obs_dim = hparams.obs_dim
     self.act_dim = hparams.act_dim
@@ -92,7 +95,12 @@ class DDPG:
     self.critic_loss_function = lambda target, pred, weights: generic_loss_function(target, pred, weights)
 
     # Buffor for experience replay
-    self.replay_buffer = BasicBuffer(hparams.buffer_maxlen, self.device, self.obs_dim, self.act_dim, hparams.prioritized_experience_replay_alpha, self.dtype)
+    self.replay_buffer = BasicBuffer(hparams.buffer_maxlen,
+                                     self.device,
+                                     self.obs_dim,
+                                     self.act_dim,
+                                     hparams.prioritized_experience_replay_alpha,
+                                     self.dtype)
 
     # Noises
     # Random exploration
@@ -106,8 +114,8 @@ class DDPG:
     elif(self.hparams.random_exploration_type == 'uncorrelated'):
       self.random_exploration_noise = GaussianNoise(
         self.act_dim,
-        self.hparams.random_exploration_mean,
-        self.hparams.random_exploration_variance)
+        self.hparams.random_exploration_mu,
+        self.hparams.random_exploration_sigma)
     else:
       self.random_exploration_noise = NoNoise(
         self.act_dim)
@@ -147,9 +155,16 @@ class DDPG:
                                  self.hparams.act_low,
                                  self.hparams.act_high,
                                  self.device,
-                                 self.dtype)
+                                 self.dtype,
+                                 self.hparams.reward_offset)
 
-    self.logger = QBladeLogger(self.hparams.logdir, self.hparams.log_steps, self.hparams.run_name, self.hparams.obs_labels, self.hparams.act_labels)
+    self.logger = QBladeLogger(self.hparams.logdir,
+                               self.hparams.log_steps,
+                               self.hparams.run_name,
+                               self.hparams.obs_labels,
+                               self.hparams.act_labels,
+                               self.hparams.feed_past)
+
     for key, value in self.hparams.values().items():
       self.logger.writer.add_text(key, str(value), 0)
 
@@ -242,9 +257,11 @@ class DDPG:
       if(len(self.past_obs) < self.hparams.feed_past):
         self.reset_past_obs(state)
 
-      state = np.concatenate([state, *self.past_obs.get_buffer()])
 
+      newstate = np.concatenate([state, *self.past_obs.get_buffer()])
       self.past_obs.append(state)
+
+      state = newstate
 
     assert(len(state) == self.obs_dim)
     return state
@@ -403,13 +420,33 @@ class DDPG:
     # update actor
     policy_loss = 0
     if(time%self.hparams.actor_delay == 0):
-      self.actor_optimizer.zero_grad()
-      policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
 
+
+      self.actor_optimizer.zero_grad()
+      
+      a_pred = self.actor.forward(state_batch)
+
+
+      # Calculate the policy loss, but tell torch autograd to calculate
+      # gradients with respect to the inputs, not the critic parameters
+      # Also we want to decouple gradient calculations in the actor from
+      # Calculating action gradients in the critic for being able to log them
+      a_pred_clone = a_pred.clone().detach().requires_grad_(True)
+      self.critic.requires_grad_(False)
+      policy_loss = -torch.mean(self.critic.forward(state_batch, a_pred_clone))
+      self.critic.requires_grad_(True)
       policy_loss.backward()
 
+      # Now we have action gradients in a_pred_clone, use them for our
+      # backward pass on a_pred
+      a_pred.backward(a_pred_clone.grad)
+
+      # In short this would roughly be equivalent to
+      #policy_loss = -torch.mean(self.critic.forward(state_batch, self.actor.forward(state_batch)))
+      #policy_loss.backward()
+
       self.actor_optimizer.step()
-      self.logger.add_scalar('Loss/policy', policy_loss.detach(), time)
+      self.logger.add_scalar('Loss/policy', policy_loss, time)
 
 
     # Update priorities if using prioritized experience replay
@@ -467,6 +504,8 @@ class DDPG:
 
       actor_state = dict(self.actor.cpu().named_parameters())
 
+      self.logger.add_histogram_nofilter('actor-grads/action', np.log10(np.abs(a_pred_clone.grad.cpu().numpy())+1e-20), time)
+
       self.logger.add_scalar_nofilter('actor/l1-dead', np.sum(actor_state['linear1.weight'].data.numpy() == 0), time)
       self.logger.add_scalar_nofilter('actor/l1-grad-exp', np.sum(actor_state['linear1.weight'].grad.numpy() > 1e10), time)
       self.logger.add_scalar_nofilter('actor/l1-vanishing-grad', np.sum(actor_state['linear1.weight'].grad.numpy() == 0), time)
@@ -517,7 +556,7 @@ class DDPG:
 
     if (self.time == self.hparams.random_exploration_steps):
       print("Random exploration finished, preparing normal run")
-      self.normalizer.calc_normalizations(self.replay_buffer.get_buffer(), self.hparams.normalization_extradata)
+      self.normalizer.calc_normalizations(self.replay_buffer.get_buffer(), self.hparams.normalization_extradata, self.hparams.feed_past)
 
       # If wanted, pretrain the policy to actions from random exploration
       if(self.hparams.pretrain_policy):
@@ -551,8 +590,8 @@ class DDPG:
         self.update(self.batch_size, self.time + i/self.hparams.training_steps_per_env_iteration)
 
     if(self.time < self.hparams.random_exploration_steps):
-      action = self.get_expert_action(state)
-      action += self.normalizer.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
+      #action = self.get_expert_action(state)
+      action = self.normalizer.denormalize_action(self.random_exploration_noise.get_noise(self.time), False)
       action = self.clip_action(action)
     else:
       action = self.get_action(state, True)
@@ -572,9 +611,12 @@ class DDPG:
     self.logger.add_scalar('Reward/real', reward, self.time)
 
     if(self.time > self.hparams.random_exploration_steps):
-      self.logger.logAction(self.time, self.normalizer.normalize_action(action), 'act_norm')
-      self.logger.logObservation(self.time, self.normalizer.normalize_state(state), 'obs_norm')
-      self.logger.add_scalar('Reward/norm', self.normalizer.normalize_reward([reward], False), self.time)
+      if(self.hparams.normalize_actions):
+        self.logger.logAction(self.time, self.normalizer.normalize_action(action), 'act_norm')
+      if(self.hparams.normalize_observations):
+        self.logger.logObservation(self.time, self.normalizer.normalize_state(state), 'obs_norm')
+      if(self.hparams.normalize_rewards):
+        self.logger.add_scalar('Reward/norm', self.normalizer.normalize_reward([reward], False), self.time)
 
 
     self.time = self.time + 1
@@ -658,20 +700,20 @@ class DDPG:
 
       # Type of random exploration noise
       # 'correlated' (OU Noise), 'uncorrelated' (gaussian) or 'none'
-      random_exploration_type = "none",
+      random_exploration_type = "uncorrelated",
 
       # How strongly it is drawn towards mu
       random_exploration_theta = 0.03,
 
       # How strongly it wanders around
-      random_exploration_sigma = 0.02,
+      random_exploration_sigma = 1,
 
       # The default action to start with in random exploration
       # Also where most of the exploration will happen around
       # -1 being minimum action and 1 maximum
       # None means np.zeros(act_dim) as mu
       # If gradient actions are active, this is in gradient action space
-      random_exploration_mu = [-1, -1],
+      random_exploration_mu = [0, 0],
 
       # Number of steps after which to write out a checkpoint
       checkpoint_steps = 10000,
@@ -680,7 +722,7 @@ class DDPG:
       checkpoint_dir = "checkpoints",
 
       # Number of total epochs to run the training
-      epochs = 150,
+      epochs = 500,
 
       # Number of steps to run after the training, testing the policy
       test_steps = 50000,
@@ -691,7 +733,7 @@ class DDPG:
       # Batch size for experience replay
       # The bigger the less it will overfit to specific samples
       # Also the bigger, the less likely vanishing gradients appear
-      batch_size = 128,
+      batch_size = 64,
 
       # The discounting factor with which experiences in the future are regarded
       # less than experiences now. The higher, the further into the future the value function
@@ -735,7 +777,7 @@ class DDPG:
       actor_lr = 5e-5,
 
       # Network sizes of the policy
-      actor_sizes = [32, 16],
+      actor_sizes = [64, 32],
 
       # Whether to use a 2-layer or a 3-layer structure for the actor
       actor_simple = False,
@@ -761,7 +803,7 @@ class DDPG:
       optimizer = 'adam',
 
       # How many training steps to do per environment iteration
-      training_steps_per_env_iteration = 2,
+      training_steps_per_env_iteration = 1,
 
       # Whether to clip gradients
       # If yes, to which values to clip them to
@@ -791,7 +833,7 @@ class DDPG:
 
       # Log net insight histograms every n steps
       # -1 for disabling completely
-      log_net_insights = 1000,
+      log_net_insights = 100,
 
       # Action noise
       # The type of action noise can be either
@@ -800,12 +842,12 @@ class DDPG:
       # 'uncorrelated' Uniform noise
       # 'uncorrelated-decreasing' Uniform noise that decreases over time
       # 'none' No noise
-      action_noise_type = 'correlated-decreasing',
+      action_noise_type = 'correlated',
 
       # For correlated noise the sigma (intensity of random movement)
       # For uncorrelated noise the noise_level factor
       # 1 results in noise across the whole action space
-      action_noise_sigma = 0.1,
+      action_noise_sigma = 0.05,
 
       # For decreasing noises this is the minimum sigma level
       action_noise_sigma_decayed = 0.00002,
@@ -834,14 +876,19 @@ class DDPG:
       # after the random exploration phase
       # After that, observations will mostly be between -1 and 1 internally
       # though min and max from the random exploration phase is assumed
-      normalize_observations = False,
+      normalize_observations = True,
 
       # Whether to normalize rewards
       # Normalization factor will be computed after observing some rewards, i.e.
       # after the random exploration phase
       # After that, rewards will mostly be between -1 and 1 internally
       # Though min and max from the random exploration phase is assumed
-      normalize_rewards = False,
+      normalize_rewards = True,
+
+      # Whether to add an offset to incoming rewards
+      # Adding a positive offset might help the agent to stay clear of death conditions
+      # As rewards are clipped in [-3, 3], a constant offset of 3 will be the safest option
+      reward_offset = 3,
 
       # Additional nrmalization replay data to load when
       # calculating normalizations
@@ -867,21 +914,21 @@ class DDPG:
       # Feed in this number of past observations as additional data to the net
       # This will increase the observation size by the given factor
       # None if you want to disable it
-      feed_past = 0,
+      feed_past = 3,
 
       # In prioritized experience replay the probability of a sample to be replayed is proportional to its TD error
       # This allows critical samples to be replayed more often and thus the critic updating faster
-      prioritized_experience_replay = False,
+      prioritized_experience_replay = True,
 
       # How strongly to apply prioritized experience replay
       # 1 means sampling happens only according to the priority,
       # 0 means uniform sampling
-      prioritized_experience_replay_alpha = 0.5,
+      prioritized_experience_replay_alpha = 0.8,
 
       # How strongly to use importance sampling to account for
       # overestimation bias
       # 1 means full compensation, 0 means no compensation
-      prioritized_experience_replay_beta = 0.5,
+      prioritized_experience_replay_beta = 0.8,
 
       # Whether to clip action gradients at the maximum level returned from the environment
       clip_action_gradients = True,

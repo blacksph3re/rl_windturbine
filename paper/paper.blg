@@ -11,8 +11,6 @@ Warning--empty journal in brockmanOpenAIGym2016
 Warning--empty year in brockmanOpenAIGym2016
 Warning--empty journal in bellmanTheoryDynamicProgramming1954
 Warning--empty year in bellmanTheoryDynamicProgramming1954
-Warning--empty journal in bjorckUnderstandingBatchNormalization
-Warning--empty year in bjorckUnderstandingBatchNormalization
 Warning--empty year in bishopNeuralNetworksPattern1995
 Warning--empty year in burtonWindEnergyHandbook2011
 Warning--empty journal in bhatnagarConvergentTemporalDifferenceLearning2009
@@ -33,8 +31,8 @@ Warning--empty journal in howlandWindFarmPower2019
 Warning--empty year in howlandWindFarmPower2019
 Warning--empty journal in hesselRainbowCombiningImprovements2017
 Warning--empty year in hesselRainbowCombiningImprovements2017
-Warning--empty journal in huber1964
-Warning--empty year in huber1964
+Warning--empty journal in Huber1964
+Warning--empty year in Huber1964
 Warning--empty journal in houImprovingDDPGPrioritized
 Warning--empty year in houImprovingDDPGPrioritized
 Warning--empty journal in kingmaAdamMethodStochastic2017
@@ -60,6 +58,8 @@ Warning--empty journal in silverMasteringGameGo2016
 Warning--empty year in silverMasteringGameGo2016
 Warning--empty journal in silverDeterministicPolicyGradient2013
 Warning--empty year in silverDeterministicPolicyGradient2013
+Warning--empty journal in schulmanTrustRegionPolicy2017
+Warning--empty year in schulmanTrustRegionPolicy2017
 Warning--empty journal in suttonPolicyGradientMethods
 Warning--empty year in suttonPolicyGradientMethods
 Warning--empty journal in schaulPrioritizedExperienceReplay2016
@@ -76,43 +76,43 @@ Warning--empty journal in zhaExperienceReplayOptimization2019
 Warning--empty year in zhaExperienceReplayOptimization2019
 You've used 37 entries,
             2543 wiz_defined-function locations,
-            741 strings with 13125 characters,
-and the built_in function-call counts, 17258 in all, are:
-= -- 1493
-> -- 1325
-< -- 13
-+ -- 494
-- -- 492
-* -- 1514
-:= -- 3005
-add.period$ -- 98
+            742 strings with 13139 characters,
+and the built_in function-call counts, 17208 in all, are:
+= -- 1485
+> -- 1329
+< -- 12
++ -- 495
+- -- 493
+* -- 1516
+:= -- 3004
+add.period$ -- 97
 call.type$ -- 37
-change.case$ -- 344
+change.case$ -- 345
 chr.to.int$ -- 36
 cite$ -- 106
-duplicate$ -- 548
-empty$ -- 915
+duplicate$ -- 542
+empty$ -- 910
 format.name$ -- 520
-if$ -- 3253
+if$ -- 3235
 int.to.chr$ -- 2
 int.to.str$ -- 0
 missing$ -- 39
-newline$ -- 174
+newline$ -- 173
 num.names$ -- 111
 pop$ -- 525
 preamble$ -- 1
-purify$ -- 383
+purify$ -- 384
 quote$ -- 0
-skip$ -- 355
+skip$ -- 349
 stack$ -- 0
-substring$ -- 511
-swap$ -- 43
-text.length$ -- 13
+substring$ -- 507
+swap$ -- 38
+text.length$ -- 12
 text.prefix$ -- 5
 top$ -- 0
 type$ -- 284
 warning$ -- 69
-while$ -- 126
+while$ -- 125
 width$ -- 41
-write$ -- 383
+write$ -- 381
 (There were 70 warnings)
